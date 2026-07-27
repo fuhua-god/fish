@@ -208,12 +208,15 @@
     display: none; flex-direction: column; align-items: center; gap: 10px;
   }
   .fish-jumpin.show { display: flex; }
+  .fish-jumpin.show > svg {
+    animation: popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275) both;
+  }
   .fish-jumpin.show .speech-lose {
-    animation: popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+    animation: popIn 0.4s 0.15s cubic-bezier(0.175,0.885,0.32,1.275) both;
   }
   @keyframes popIn {
-    0% { transform: scale(0); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
+    0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
   }
   .fish-jumpin .speech-lose {
     font-size: 28px; font-weight: bold; color: #ec407a;
@@ -648,8 +651,13 @@
 
   function onLose(){
     gameStatus.textContent = '你输了 😢';
+    // 先移除再添加，强制重播动画
+    fishJumpin.classList.remove('show');
+    resultBtns.classList.remove('show-btns');
+    void fishJumpin.offsetWidth;
     fishJumpin.classList.add('show');
     resultBtns.style.display = 'flex';
+    void resultBtns.offsetWidth;
     resultBtns.classList.add('show-btns');
   }
 </script>
