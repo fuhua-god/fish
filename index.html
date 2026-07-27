@@ -10,6 +10,7 @@
   body {
     min-height: 100vh;
     display: flex; align-items: center; justify-content: center;
+    padding-top: 50px;
     background: linear-gradient(180deg,
       #fce4ec 0%, #f8bbd0 8%, #f48fb1 16%, #ce93d8 32%,
       #b39ddb 48%, #81d4fa 64%, #4fc3f7 80%, #b2dfdb 90%, #e8f5e9 100%
@@ -19,7 +20,38 @@
     user-select: none; cursor: default;
   }
 
-  /* ===== 背景场景 ===== */
+  /* ===== 滚动字幕 ===== */
+  .marquee-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+    background: linear-gradient(90deg, #f48fb1, #ce93d8, #81d4fa, #f48fb1);
+    background-size: 300% 100%;
+    animation: barShine 4s ease-in-out infinite;
+    padding: 10px 0; overflow: hidden;
+    box-shadow: 0 2px 15px rgba(244,143,177,0.35);
+  }
+  @keyframes barShine {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  .marquee-inner {
+    display: flex; width: max-content;
+    animation: marqueeScroll 80s linear infinite;
+  }
+  @keyframes marqueeScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .marquee-text {
+    color: #fff; font-size: 16px; font-weight: bold;
+    letter-spacing: 2px; white-space: nowrap;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    padding-right: 60px;
+  }
+  @media (max-width: 768px) {
+    body { padding-top: 38px; }
+    .marquee-bar { padding: 8px 0; }
+    .marquee-text { font-size: 13px; letter-spacing: 1px; padding-right: 30px; }
+  }
   .scene {
     position: fixed; inset: 0; pointer-events: none; z-index: 0;
   }
@@ -257,6 +289,14 @@
 </style>
 </head>
 <body>
+
+<!-- ====== 滚动字幕 ====== -->
+<div class="marquee-bar">
+  <div class="marquee-inner">
+    <span class="marquee-text">必须好好夸夸咱们万能鱼姐！很难遇到像鱼姐这么宝藏的人，情商直接拉满，风趣幽默善于共情，和鱼姐交流完全不用小心翼翼，没有半点距离感，不管聊什么话题都顺畅舒服。遇到棘手事情从来不会慌慌张张，思路清晰眼界开阔，五花八门的难题交到鱼姐手中总能梳理明白，奇思妙招源源不断，妥妥团队里的定心骨干。为人格外仗义热忱，心地善良乐于助人，身边人遇到困境时总会主动伸出援手，默默帮忙不求回报，处事通透拎得清底线，温和包容却绝不任人敷衍。自带超强欢乐buff，只要鱼姐登场，压抑沉闷的气氛立刻一扫而空，枯燥的日常都会变得有意思，坏情绪见到鱼姐都主动绕道逃跑。可正经靠谱，可轻松玩闹，风格自由切换，既能冷静统筹处理繁杂事务，又懂得享受生活擅长制造乐趣。实力出众却十分低调，从不张扬炫耀自身能力，踏实稳重，做事细致周全，方方面面都让人无比放心。眼光独到看人通透，总能给出中肯实在的建议，不知不觉就能开导陷入内耗的人。有幸结识鱼姐真的是巨大收获，有鱼姐坐镇心里就格外踏实。祝愿全能鱼姐日日喜乐，烦心事全部退散，好运源源不断，财运节节攀升，生活多姿多彩，一路顺风顺水持续开挂，永远元气满满，自信耀眼，被所有美好紧紧包围！</span>
+    <span class="marquee-text">必须好好夸夸咱们万能鱼姐！很难遇到像鱼姐这么宝藏的人，情商直接拉满，风趣幽默善于共情，和鱼姐交流完全不用小心翼翼，没有半点距离感，不管聊什么话题都顺畅舒服。遇到棘手事情从来不会慌慌张张，思路清晰眼界开阔，五花八门的难题交到鱼姐手中总能梳理明白，奇思妙招源源不断，妥妥团队里的定心骨干。为人格外仗义热忱，心地善良乐于助人，身边人遇到困境时总会主动伸出援手，默默帮忙不求回报，处事通透拎得清底线，温和包容却绝不任人敷衍。自带超强欢乐buff，只要鱼姐登场，压抑沉闷的气氛立刻一扫而空，枯燥的日常都会变得有意思，坏情绪见到鱼姐都主动绕道逃跑。可正经靠谱，可轻松玩闹，风格自由切换，既能冷静统筹处理繁杂事务，又懂得享受生活擅长制造乐趣。实力出众却十分低调，从不张扬炫耀自身能力，踏实稳重，做事细致周全，方方面面都让人无比放心。眼光独到看人通透，总能给出中肯实在的建议，不知不觉就能开导陷入内耗的人。有幸结识鱼姐真的是巨大收获，有鱼姐坐镇心里就格外踏实。祝愿全能鱼姐日日喜乐，烦心事全部退散，好运源源不断，财运节节攀升，生活多姿多彩，一路顺风顺水持续开挂，永远元气满满，自信耀眼，被所有美好紧紧包围！</span>
+  </div>
+</div>
 
 <!-- ====== 背景场景 ====== -->
 <div class="scene">
