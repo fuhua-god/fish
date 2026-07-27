@@ -177,8 +177,10 @@ body{
   <span class="ribbon-tag">🐟 小鱼</span>
   <p class="counter" id="counter"></p>
   <p class="clock" id="clock"></p>
+  <p class="counter" id="affectionBar" style="background:rgba(244,143,177,0.45)">💖 好感度 0</p>
   <div class="main-btns">
     <button class="btn-album" onclick="openAlbum()">📖 图鉴</button>
+    <button class="btn-album" id="feedBtn" onclick="feedFish()">🍥 喂食</button>
   </div>
   <div class="game-entry">
     <button class="entry-btn" onclick="enterGame('tictactoe')">🎮 井字棋</button>
@@ -242,6 +244,16 @@ body{
     <div class="days-num" id="easterNum" style="font-size:36px"></div>
     <div class="days-text">🌿 休息一下眼睛，活动活动肩膀～</div>
     <button class="days-close" onclick="closeEaster()">☕ 好的，休息一下</button>
+  </div>
+</div>
+
+<!-- ====== 喂食弹窗 ====== -->
+<div class="days-overlay" id="feedOverlay">
+  <div class="days-card" id="feedCard">
+    <div class="days-emoji" id="feedEmoji"></div>
+    <div class="days-text" id="feedMsg"></div>
+    <div class="days-num" style="font-size:28px" id="feedDetail"></div>
+    <button class="days-close" onclick="closeFeed()">🐟 好的～</button>
   </div>
 </div>
 
@@ -773,8 +785,96 @@ document.getElementById('sideImgLeft').addEventListener('click', () => {
 });
 function closeDays() { document.getElementById('daysOverlay').classList.remove('active'); }
 function closeEaster() { document.getElementById('easterOverlay').classList.remove('active'); }
+function closeFeed() {
+  document.getElementById('feedOverlay').classList.remove('active');
+  // 如果有待领取的奖励抽卡，弹出
+  if (window._bonusDraw) {
+    window._bonusDraw = false;
+    pendingFish = drawFish();
+    showGacha(pendingFish);
+  }
+}
+
+// ========== 喂食系统 ==========
+function getFeedData() {
+  const d = JSON.parse(localStorage.getItem('fishFeedData') || '{}');
+  if (d.date !== getToday()) {
+    d.date = getToday();
+    d.remaining = 10;
+    d.bonusUsed = false;
+    saveFeedData(d);
+  }
+  return d;
+}
+function saveFeedData(d) { localStorage.setItem('fishFeedData', JSON.stringify(d)); }
+
+function getAffection() { return parseInt(localStorage.getItem('fishAffection') || '0'); }
+function saveAffection(v) { localStorage.setItem('fishAffection', v); updateAffectionBar(); }
+
+function updateAffectionBar() {
+  const a = getAffection();
+  document.getElementById('affectionBar').textContent = `💖 好感度 ${a}`;
+  const btn = document.getElementById('feedBtn');
+  const d = getFeedData();
+  btn.textContent = d.remaining > 0 ? `🍥 喂食(${d.remaining})` : '🍥 喂食(0)';
+}
+
+function feedFish() {
+  const d = getFeedData();
+  if (d.remaining <= 0) {
+    document.getElementById('feedEmoji').textContent = '😿';
+    document.getElementById('feedMsg').textContent = '今天的鱼饲料已经喂完啦～';
+    document.getElementById('feedDetail').textContent = '明天再来吧！';
+    document.getElementById('feedOverlay').classList.add('active');
+    return;
+  }
+  d.remaining--;
+  saveFeedData(d);
+
+  // 随机品质
+  const r = Math.random();
+  let quality, points, emoji, label;
+  if (r < 0.5) { quality=0; points=10; emoji='🍞'; label='普通饲料'; }
+  else if (r < 0.8) { quality=1; points=20; emoji='🍰'; label='优质饲料'; }
+  else { quality=2; points=50; emoji='🍣'; label='上等饲料'; }
+
+  const oldAff = getAffection();
+  const newAff = oldAff + points;
+  saveAffection(newAff);
+
+  // 呛到彩蛋 0.33
+  const choked = Math.random() < 0.33;
+
+  // 好感度里程碑
+  const oldMilestone = Math.floor(oldAff / 200);
+  const newMilestone = Math.floor(newAff / 200);
+  let bonusMsg = '';
+
+  if (newMilestone > oldMilestone && !d.bonusUsed) {
+    d.bonusUsed = true;
+    saveFeedData(d);
+    window._bonusDraw = true;
+    bonusMsg = '<br>🎉 好感度突破 ' + (newMilestone * 200) + '！<br>今天鱼吃爽了，让你再抽一次卡！';
+  }
+
+  const cEmoji = choked ? '😤' : '😋';
+  const cMsg = choked ? '鱼吃太快呛到了！咳咳咳…' : '鱼吃得津津有味～';
+  document.getElementById('feedEmoji').textContent = cEmoji;
+  document.getElementById('feedMsg').innerHTML = cMsg + bonusMsg;
+  document.getElementById('feedDetail').textContent = `${emoji} ${label} +${points}好感度 | 剩余饲料:${d.remaining}`;
+  document.getElementById('feedOverlay').classList.add('active');
+  updateAffectionBar();
+
+  if (choked) {
+    setTimeout(() => fishSay('咳咳咳…呛到了！😤'), 400);
+  }
+}
+
+// 初始化
+updateAffectionBar();
 
 // ========== 启动 ==========
+getFeedData(); // 初始化饲料
 checkDailyGacha();
 </script>
 </body>
