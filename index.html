@@ -934,19 +934,19 @@ function showHolidayPopup(holiday) {
   document.getElementById('easterOverlay').classList.add('active');
 }
 
-// ========== 启动 ==========
-getFeedData();
-checkDailyGacha();
-
-// 节日检查（每日弹窗 + 奖励抽卡）
-const todayHoliday = checkHoliday();
-const holidayShown = localStorage.getItem('holidayShownDate');
-if (todayHoliday && holidayShown !== getToday()) {
-  showHolidayPopup(todayHoliday);
-  localStorage.setItem('holidayShownDate', getToday());
-  window._bonusDraw = true;
-  window._bonusMsg = `🎉 ${todayHoliday.name}额外抽卡机会`;
-}
+// ========== 启动（异常保护，不影响核心功能） ==========
+try { getFeedData(); } catch(e) { console.log('feed init error:', e); }
+try { checkDailyGacha(); } catch(e) { console.log('gacha init error:', e); }
+try {
+  const todayHoliday = checkHoliday();
+  const holidayShown = localStorage.getItem('holidayShownDate');
+  if (todayHoliday && holidayShown !== getToday()) {
+    showHolidayPopup(todayHoliday);
+    localStorage.setItem('holidayShownDate', getToday());
+    window._bonusDraw = true;
+    window._bonusMsg = `🎉 ${todayHoliday.name}额外抽卡机会`;
+  }
+} catch(e) { console.log('holiday init error:', e); }
 </script>
 </body>
 </html>
