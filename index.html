@@ -157,6 +157,26 @@
   .side-img.left  { left: 20px; }
   .side-img.right { right: 20px; }
 
+  /* 手机端：缩小并放到上下 */
+  @media (max-width: 768px) {
+    .side-img {
+      position: fixed;
+      top: auto;
+      transform: none;
+      width: 120px;
+      opacity: 0.7;
+      z-index: 0;
+    }
+    .side-img.left {
+      left: 5px;
+      bottom: 60px;
+    }
+    .side-img.right {
+      right: 5px;
+      bottom: 60px;
+    }
+  }
+
   /* ===== 主内容 ===== */
   .container {
     position: relative;
