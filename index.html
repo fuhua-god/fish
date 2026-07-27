@@ -206,7 +206,7 @@ body{
 <!-- ====== 抽卡弹窗 ====== -->
 <div class="gacha-overlay" id="gachaOverlay">
   <div class="gacha-card" id="gachaCard">
-    <div class="gacha-title">🎣 今日抽鱼</div>
+    <div class="gacha-title" id="gachaTitle">🎣 今日抽鱼</div>
     <div class="gacha-fish-img" id="gachaFishImg"></div>
     <div class="gacha-rarity" id="gachaRarity"></div>
     <div class="gacha-fish-name" id="gachaFishName"></div>
@@ -640,16 +640,16 @@ function drawFish(){
   return pool[Math.floor(Math.random()*pool.length)];
 }
 
-function showGacha(fish){
+function showGacha(fish, customTitle){
   const overlay=document.getElementById('gachaOverlay');
   const card=document.getElementById('gachaCard');
   card.className='gacha-card r'+fish.rarity;
+  document.getElementById('gachaTitle').textContent = customTitle || '🎣 今日抽鱼';
   document.getElementById('gachaFishImg').innerHTML=renderFishSVG(fish,180,130);
   document.getElementById('gachaRarity').textContent=RARITY[fish.rarity]+'款';
   document.getElementById('gachaRarity').className='gacha-rarity rarity-'+fish.rarity;
   document.getElementById('gachaFishName').textContent=fish.name;
   overlay.classList.add('active');
-  // 特效
   const img=document.getElementById('gachaFishImg');
   img.style.animation='none';void img.offsetWidth;img.style.animation='gachaReveal .6s cubic-bezier(.175,.885,.32,1.275)';
 }
@@ -789,22 +789,27 @@ document.getElementById('sideImgLeft').addEventListener('click', () => {
 });
 function closeDays() { document.getElementById('daysOverlay').classList.remove('active'); }
 function closeEaster() {
+  const bonusDraw = window._bonusDraw;
+  const bonusMsg = window._bonusMsg || '';
   document.getElementById('easterOverlay').classList.remove('active');
-  if (window._bonusDraw) {
+  if (bonusDraw) {
     window._bonusDraw = false;
+    window._bonusMsg = '';
     setTimeout(() => {
       pendingFish = drawFish();
-      showGacha(pendingFish);
+      showGacha(pendingFish, bonusMsg);
     }, 400);
   }
 }
 function closeFeed() {
+  const bonusDraw = window._bonusDraw;
+  const bonusMsg = window._bonusMsg || '';
   document.getElementById('feedOverlay').classList.remove('active');
-  // 如果有待领取的奖励抽卡，弹出
-  if (window._bonusDraw) {
+  if (bonusDraw) {
     window._bonusDraw = false;
+    window._bonusMsg = '';
     pendingFish = drawFish();
-    showGacha(pendingFish);
+    setTimeout(() => showGacha(pendingFish, bonusMsg), 400);
   }
 }
 
@@ -867,6 +872,7 @@ function feedFish() {
     d.bonusUsed = true;
     saveFeedData(d);
     window._bonusDraw = true;
+    window._bonusMsg = '💖 好感度 ' + (newMilestone * 200) + ' 奖励抽卡';
     bonusMsg = '<br>🎉 好感度突破 ' + (newMilestone * 200) + '！<br>今天鱼吃爽了，让你再抽一次卡！';
   }
 
@@ -938,8 +944,8 @@ const holidayShown = localStorage.getItem('holidayShownDate');
 if (todayHoliday && holidayShown !== getToday()) {
   showHolidayPopup(todayHoliday);
   localStorage.setItem('holidayShownDate', getToday());
-  // 节日额外抽卡
   window._bonusDraw = true;
+  window._bonusMsg = `🎉 ${todayHoliday.name}额外抽卡机会`;
 }
 </script>
 </body>
