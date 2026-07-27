@@ -675,9 +675,9 @@ function renderAlbum(tierFilter=null){
   const unlocked=getUnlockedFish();
   const unlockedMap={};unlocked.forEach(f=>{unlockedMap[f.id]=f.count||1});
   let total=R_COUNTS.reduce((a,b)=>a+b,0);
-  unlocked.forEach(f=>{owned++});
+  const totalOwned=unlocked.reduce((s,f)=>s+(f.count||1),0);
 
-  document.getElementById('albumStats').textContent=`已解锁 ${unlocked.length} / ${total} 种（含重复共 ${unlocked.reduce((s,f)=>s+(f.count||1),0)} 条）`;
+  document.getElementById('albumStats').textContent=`已解锁 ${unlocked.length} / ${total} 种（含重复共 ${totalOwned} 条）`;
 
   // tabs
   const tabs=document.getElementById('albumTabs');
