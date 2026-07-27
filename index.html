@@ -258,6 +258,16 @@
     text-shadow: 0 1px 2px rgba(0,0,0,0.2);
   }
 
+  .clock {
+    color: #fff;
+    font-size: 14px;
+    background: rgba(0,0,0,0.3);
+    padding: 5px 16px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  }
+
   .ribbon-tag {
     display: inline-block;
     background: #f48fb1;
@@ -662,20 +672,44 @@
   <p class="hint">✧ 点一下这条呆鱼 ✧</p>
   <span class="ribbon-tag">🐟 小鱼</span>
   <p class="counter" id="counter"></p>
+  <p class="clock" id="clock"></p>
 </div>
 
 <script>
   const fishWrapper = document.getElementById('fishWrapper');
   const speechText = document.getElementById('speechText');
   const counterEl = document.getElementById('counter');
-  let clickCount = 0;
+  const clockEl = document.getElementById('clock');
+
+  // 从 localStorage 读取点击次数（持久化）
+  let clickCount = parseInt(localStorage.getItem('fishClickCount') || '0');
   let textTimer = null;
+
+  // 初始化显示
+  if (clickCount > 0) {
+    counterEl.textContent = `这条呆鱼一共说了 ${clickCount} 次 "我是傻鱼"～`;
+  }
+
+  // 实时时钟
+  function updateClock() {
+    const now = new Date();
+    clockEl.textContent = now.toLocaleString('zh-CN', {
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      hour12: false
+    });
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
 
   fishWrapper.addEventListener('click', () => {
     clickCount++;
 
+    // 保存到 localStorage
+    localStorage.setItem('fishClickCount', clickCount);
+
     speechText.textContent = '我是傻鱼 🐟';
-    counterEl.textContent = `这条呆鱼已经说了 ${clickCount} 次 "我是傻鱼"～`;
+    counterEl.textContent = `这条呆鱼一共说了 ${clickCount} 次 "我是傻鱼"～`;
 
     // 每次点击都触发抖动（先移除再添加以重播动画）
     speechText.classList.remove('shake');
