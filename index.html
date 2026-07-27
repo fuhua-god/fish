@@ -239,11 +239,11 @@ body{
 <!-- ====== 彩蛋弹窗 ====== -->
 <div class="days-overlay" id="easterOverlay">
   <div class="days-card">
-    <div class="days-emoji">😌</div>
+    <div class="days-emoji" id="easterEmoji">😌</div>
     <div class="days-text" id="easterMsg"></div>
     <div class="days-num" id="easterNum" style="font-size:36px"></div>
-    <div class="days-text">🌿 休息一下眼睛，活动活动肩膀～</div>
-    <button class="days-close" onclick="closeEaster()">☕ 好的，休息一下</button>
+    <div class="days-text" id="easterHint">🌿 休息一下眼睛，活动活动肩膀～</div>
+    <button class="days-close" id="easterCloseBtn" onclick="closeEaster()">☕ 好的，休息一下</button>
   </div>
 </div>
 
@@ -553,8 +553,12 @@ fishWrapper.addEventListener('click',(e)=>{
   // 彩蛋：50的倍数
   if (clickCount % 50 === 0) {
     setTimeout(() => {
+      window._bonusDraw = false;
+      document.getElementById('easterEmoji').textContent = '😌';
       document.getElementById('easterNum').textContent = `你已经点了 ${clickCount} 次鱼！`;
       document.getElementById('easterMsg').innerHTML = '🐟 鱼鱼提醒你：<br>已经戳了好多下啦～';
+      document.getElementById('easterHint').textContent = '🌿 休息一下眼睛，活动活动肩膀～';
+      document.getElementById('easterCloseBtn').textContent = '☕ 好的，休息一下';
       document.getElementById('easterOverlay').classList.add('active');
     }, 600);
   }
@@ -784,7 +788,16 @@ document.getElementById('sideImgLeft').addEventListener('click', () => {
   document.getElementById('daysOverlay').classList.add('active');
 });
 function closeDays() { document.getElementById('daysOverlay').classList.remove('active'); }
-function closeEaster() { document.getElementById('easterOverlay').classList.remove('active'); }
+function closeEaster() {
+  document.getElementById('easterOverlay').classList.remove('active');
+  if (window._bonusDraw) {
+    window._bonusDraw = false;
+    setTimeout(() => {
+      pendingFish = drawFish();
+      showGacha(pendingFish);
+    }, 400);
+  }
+}
 function closeFeed() {
   document.getElementById('feedOverlay').classList.remove('active');
   // 如果有待领取的奖励抽卡，弹出
@@ -873,9 +886,61 @@ function feedFish() {
 // 初始化
 updateAffectionBar();
 
+// ========== 节日检测 ==========
+const HOLIDAYS = {
+  // 农历节日（每年日期不同，需手动更新）
+  '2026-02-16': { name: '除夕', emoji: '🧧', msg: '辞旧迎新，鱼姐新年快乐！' },
+  '2026-03-03': { name: '元宵节', emoji: '🏮', msg: '团团圆圆，甜甜蜜蜜～' },
+  '2026-04-05': { name: '清明节', emoji: '🌿', msg: '踏青赏春，万物清明～' },
+  '2026-09-25': { name: '中秋节', emoji: '🥮', msg: '月圆人圆，鱼姐中秋快乐！' },
+  '2027-02-05': { name: '除夕', emoji: '🧧', msg: '辞旧迎新，鱼姐新年快乐！' },
+  '2027-02-20': { name: '元宵节', emoji: '🏮', msg: '团团圆圆，甜甜蜜蜜～' },
+  '2027-04-05': { name: '清明节', emoji: '🌿', msg: '踏青赏春，万物清明～' },
+  '2027-09-14': { name: '中秋节', emoji: '🥮', msg: '月圆人圆，鱼姐中秋快乐！' },
+  '2028-01-25': { name: '除夕', emoji: '🧧', msg: '辞旧迎新，鱼姐新年快乐！' },
+  '2028-02-08': { name: '元宵节', emoji: '🏮', msg: '团团圆圆，甜甜蜜蜜～' },
+  '2028-04-04': { name: '清明节', emoji: '🌿', msg: '踏青赏春，万物清明～' },
+  '2028-10-03': { name: '中秋节', emoji: '🥮', msg: '月圆人圆，鱼姐中秋快乐！' },
+};
+// 阳历固定节日
+const SOLAR_HOLIDAYS = [
+  { mmdd: '05-01', name: '劳动节', emoji: '💪', msg: '劳动最光荣，鱼姐辛苦啦！' },
+  { mmdd: '06-01', name: '儿童节', emoji: '🎈', msg: '不管几岁，开心万岁！' },
+  { mmdd: '10-01', name: '国庆节', emoji: '🇨🇳', msg: '祖国繁荣昌盛，假期快乐！' },
+];
+
+function checkHoliday() {
+  const today = getToday();
+  // 检查阴历节日
+  const lunar = HOLIDAYS[today];
+  if (lunar) return lunar;
+  // 检查阳历节日 (MM-DD)
+  const mmdd = today.slice(5); // 'MM-DD'
+  return SOLAR_HOLIDAYS.find(h => h.mmdd === mmdd) || null;
+}
+
+function showHolidayPopup(holiday) {
+  document.getElementById('easterEmoji').textContent = holiday.emoji;
+  document.getElementById('easterNum').textContent = holiday.name;
+  document.getElementById('easterMsg').innerHTML = holiday.msg;
+  document.getElementById('easterHint').textContent = '🎁 今天额外赠送一次抽卡机会！';
+  document.getElementById('easterCloseBtn').textContent = '🎣 收下礼物！';
+  document.getElementById('easterOverlay').classList.add('active');
+}
+
 // ========== 启动 ==========
-getFeedData(); // 初始化饲料
+getFeedData();
 checkDailyGacha();
+
+// 节日检查（每日弹窗 + 奖励抽卡）
+const todayHoliday = checkHoliday();
+const holidayShown = localStorage.getItem('holidayShownDate');
+if (todayHoliday && holidayShown !== getToday()) {
+  showHolidayPopup(todayHoliday);
+  localStorage.setItem('holidayShownDate', getToday());
+  // 节日额外抽卡
+  window._bonusDraw = true;
+}
 </script>
 </body>
 </html>
