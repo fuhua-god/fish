@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐟 我是傻鱼 ~ ♪</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg,
+      #fce4ec 0%,
+      #f8bbd0 8%,
+      #f48fb1 16%,
+      #ce93d8 32%,
+      #b39ddb 48%,
+      #81d4fa 64%,
+      #4fc3f7 80%,
+      #b2dfdb 90%,
+      #e8f5e9 100%
+    );
+    overflow-x: hidden;
+    font-family: "Comic Sans MS", "KaiTi", "STKaiti", "Microsoft YaHei", cursive, sans-serif;
+    user-select: none;
+    cursor: default;
+  }
+
+  .scene {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* --- 云朵 --- */
+  .cloud {
+    position: absolute;
+    animation: cloudDrift linear infinite;
+  }
+  @keyframes cloudDrift {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-130vw); }
+  }
+
+  /* --- 海底沙子 --- */
+  .seabed {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 110px;
+    background: linear-gradient(180deg, #ffe0b2, #ffcc80 40%, #ffb74d 100%);
+    border-radius: 60% 70% 0 0 / 50px 50px 0 0;
+  }
+  .seabed::before {
+    content: '';
+    position: absolute;
+    top: -35px; left: 0; right: 0;
+    height: 60px;
+    background:
+      radial-gradient(ellipse 90px 45px at 8%  70%, #ffe0b2 60%, transparent 60%),
+      radial-gradient(ellipse 70px 35px at 28% 65%, #ffecb3 60%, transparent 60%),
+      radial-gradient(ellipse 100px 40px at 52% 72%, #ffe0b2 60%, transparent 60%),
+      radial-gradient(ellipse 80px 35px at 78% 62%, #ffecb3 60%, transparent 60%),
+      radial-gradient(ellipse 60px 30px at 92% 68%, #ffe0b2 60%, transparent 60%);
+  }
+
+  /* --- 海底岩石 --- */
+  .rock {
+    position: absolute;
+    bottom: 80px;
+  }
+
+  /* --- 海草 --- */
+  .seaweed {
+    position: absolute;
+    bottom: 90px;
+    animation: sway 3s ease-in-out infinite;
+    transform-origin: bottom center;
+  }
+  @keyframes sway {
+    0%, 100% { transform: rotate(-4deg); }
+    50%      { transform: rotate(4deg); }
+  }
+
+  /* --- 珊瑚 --- */
+  .coral {
+    position: absolute;
+    bottom: 80px;
+  }
+
+  /* --- 贝壳 --- */
+  .shell {
+    position: absolute;
+    bottom: 85px;
+  }
+
+  /* --- 海星 --- */
+  .starfish {
+    position: absolute;
+    bottom: 85px;
+    animation: starWiggle 4s ease-in-out infinite;
+  }
+  @keyframes starWiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25%      { transform: rotate(10deg); }
+    75%      { transform: rotate(-10deg); }
+  }
+
+  /* --- Hello Kitty 玩偶 --- */
+  .kitty-doll {
+    position: absolute;
+    animation: kittyBob 3.5s ease-in-out infinite;
+  }
+  @keyframes kittyBob {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    30%      { transform: translateY(-6px) rotate(2deg); }
+    70%      { transform: translateY(-3px) rotate(-1deg); }
+  }
+
+  /* --- 爱心 --- */
+  .heart-float {
+    position: absolute;
+    bottom: -40px;
+    animation: heartRise linear infinite;
+    font-size: 24px;
+  }
+  @keyframes heartRise {
+    0%   { transform: translateY(0) scale(0.4) rotate(0deg); opacity: 0.7; }
+    100% { transform: translateY(-110vh) scale(1.1) rotate(360deg); opacity: 0; }
+  }
+
+  /* --- 闪光星 --- */
+  .sparkle {
+    position: absolute;
+    animation: twinkle 1.5s ease-in-out infinite;
+    font-size: 16px;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+    50%      { opacity: 1; transform: scale(1.3); }
+  }
+
+  /* --- 两侧图片 --- */
+  .side-img {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.9;
+    width: 280px;
+    filter: drop-shadow(0 8px 25px rgba(0,0,0,0.2));
+  }
+  .side-img.left  { left: 20px; }
+  .side-img.right { right: 20px; }
+
+  /* ===== 主内容 ===== */
+  .container {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  /* --- 对话文字 --- */
+  .speech-text {
+    font-size: 34px;
+    font-weight: bold;
+    color: #ec407a;
+    text-shadow: 0 3px 8px rgba(236, 64, 122, 0.2);
+    opacity: 0;
+    transform: translateY(15px);
+    transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+    letter-spacing: 3px;
+  }
+  .speech-text.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .speech-text.shake {
+    animation: jiggle 0.4s ease;
+  }
+  @keyframes jiggle {
+    0%   { transform: translateY(0) rotate(0deg) scale(1); }
+    15%  { transform: translateY(-4px) rotate(-3deg) scale(1.06); }
+    30%  { transform: translateY(2px) rotate(3deg) scale(0.96); }
+    45%  { transform: translateY(-3px) rotate(-2deg) scale(1.04); }
+    60%  { transform: translateY(1px) rotate(2deg) scale(0.98); }
+    75%  { transform: translateY(-1px) rotate(-1deg) scale(1.02); }
+    100% { transform: translateY(0) rotate(0deg) scale(1); }
+  }
+
+  /* --- 鱼 --- */
+  .fish-wrapper {
+    cursor: pointer;
+    transition: transform 0.15s ease;
+    filter: drop-shadow(0 10px 25px rgba(0,0,0,0.2));
+  }
+  .fish-wrapper:hover { transform: scale(1.06); }
+  .fish-wrapper:active { transform: scale(0.9); }
+
+  .fish-float {
+    animation: bob 3s ease-in-out infinite;
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-12px); }
+  }
+
+  .hint {
+    color: rgba(255,255,255,0.85);
+    font-size: 17px;
+    letter-spacing: 3px;
+    animation: pulse 2s ease-in-out infinite;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; transform: scale(0.98); }
+    50%      { opacity: 1; transform: scale(1.03); }
+  }
+
+  .counter {
+    color: rgba(255,255,255,0.75);
+    font-size: 15px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  }
+
+  .ribbon-tag {
+    display: inline-block;
+    background: #f48fb1;
+    color: #fff;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    letter-spacing: 1px;
+    box-shadow: 0 3px 10px rgba(244,143,177,0.35);
+  }
+</style>
+</head>
+<body>
+
+<!-- ====== 场景层 ====== -->
+<div class="scene">
+
+  <!-- ========== 云朵 ========== -->
+  <svg class="cloud" width="160" height="70" style="top:3%; left:100%; animation-duration:35s;">
+    <ellipse cx="50" cy="50" rx="50" ry="25" fill="white" opacity="0.85"/>
+    <ellipse cx="90" cy="40" rx="45" ry="28" fill="white" opacity="0.9"/>
+    <ellipse cx="120" cy="50" rx="40" ry="22" fill="white" opacity="0.8"/>
+  </svg>
+  <svg class="cloud" width="130" height="55" style="top:10%; left:110%; animation-duration:42s; animation-delay:-15s;">
+    <ellipse cx="40" cy="40" rx="40" ry="20" fill="white" opacity="0.75"/>
+    <ellipse cx="75" cy="30" rx="35" ry="22" fill="white" opacity="0.8"/>
+    <ellipse cx="100" cy="40" rx="30" ry="18" fill="white" opacity="0.75"/>
+  </svg>
+  <svg class="cloud" width="100" height="45" style="top:8%; left:105%; animation-duration:38s; animation-delay:-25s;">
+    <ellipse cx="35" cy="32" rx="35" ry="18" fill="white" opacity="0.7"/>
+    <ellipse cx="65" cy="25" rx="30" ry="18" fill="white" opacity="0.75"/>
+  </svg>
+
+  <!-- ========== 闪光星 ========== -->
+  <span class="sparkle" style="top:12%; left:8%;  animation-delay:0s;">✦</span>
+  <span class="sparkle" style="top:18%; left:85%; animation-delay:0.5s;">✧</span>
+  <span class="sparkle" style="top:7%;  left:45%; animation-delay:0.8s;">✦</span>
+  <span class="sparkle" style="top:22%; left:15%; animation-delay:1.1s;">⋆</span>
+  <span class="sparkle" style="top:5%;  left:68%; animation-delay:0.3s;">✧</span>
+  <span class="sparkle" style="top:15%; left:32%; animation-delay:1.4s;">✦</span>
+  <span class="sparkle" style="top:20%; left:92%; animation-delay:0.7s;">⋆</span>
+  <span class="sparkle" style="top:9%;  left:55%; animation-delay:1.0s;">✧</span>
+
+  <!-- ========== 海底 ========== -->
+  <div class="seabed"></div>
+
+  <!-- 岩石 -->
+  <svg class="rock" width="80" height="45" viewBox="0 0 80 45" style="left:20%;">
+    <ellipse cx="35" cy="35" rx="35" ry="18" fill="#bcaaa4"/>
+    <ellipse cx="25" cy="30" rx="20" ry="12" fill="#d7ccc8"/>
+    <ellipse cx="55" cy="38" rx="25" ry="14" fill="#a1887f"/>
+  </svg>
+  <svg class="rock" width="65" height="35" viewBox="0 0 65 35" style="right:18%;">
+    <ellipse cx="30" cy="28" rx="28" ry="15" fill="#c9b99a"/>
+    <ellipse cx="45" cy="32" rx="20" ry="12" fill="#b8a888"/>
+  </svg>
+  <svg class="rock" width="55" height="30" viewBox="0 0 55 30" style="left:50%;">
+    <ellipse cx="25" cy="24" rx="24" ry="13" fill="#d7ccc8"/>
+    <ellipse cx="15" cy="20" rx="15" ry="9" fill="#e8ddd8"/>
+  </svg>
+
+  <!-- 海草 -->
+  <svg class="seaweed" width="40" height="140" viewBox="0 0 40 140" style="left:3%; animation-delay:0s;">
+    <path d="M20,140 Q6,100 20,70  Q5,45  20,25  Q8,10  17,0" fill="none" stroke="#66bb6a" stroke-width="9" stroke-linecap="round" opacity="0.75"/>
+    <path d="M20,140 Q32,95 20,60  Q34,38 20,18  Q28,6  24,0" fill="none" stroke="#81c784" stroke-width="6" stroke-linecap="round" opacity="0.65"/>
+  </svg>
+  <svg class="seaweed" width="35" height="120" viewBox="0 0 35 120" style="left:11%; animation-delay:-1s; animation-duration:3.5s;">
+    <path d="M17,120 Q5,80  17,55  Q6,35  17,15  Q10,4  15,0" fill="none" stroke="#4caf50" stroke-width="8" stroke-linecap="round" opacity="0.65"/>
+    <path d="M17,120 Q28,78 17,50  Q29,30 17,10  Q25,3  22,0" fill="none" stroke="#81c784" stroke-width="5" stroke-linecap="round" opacity="0.6"/>
+  </svg>
+  <svg class="seaweed" width="45" height="150" viewBox="0 0 45 150" style="right:4%; animation-delay:-2s; animation-duration:4s;">
+    <path d="M22,150 Q6,108 22,75  Q5,48  22,28  Q8,12  20,0" fill="none" stroke="#66bb6a" stroke-width="10" stroke-linecap="round" opacity="0.7"/>
+    <path d="M22,150 Q36,100 22,68  Q37,42 22,20  Q32,6  28,0" fill="none" stroke="#a5d6a7" stroke-width="6" stroke-linecap="round" opacity="0.65"/>
+  </svg>
+  <svg class="seaweed" width="30" height="105" viewBox="0 0 30 105" style="right:15%; animation-delay:-1.5s; animation-duration:3.2s;">
+    <path d="M15,105 Q4,73 15,48  Q5,28 15,10  Q10,3  13,0" fill="none" stroke="#43a047" stroke-width="7" stroke-linecap="round" opacity="0.6"/>
+  </svg>
+
+  <!-- 珊瑚 -->
+  <svg class="coral" width="75" height="85" viewBox="0 0 75 85" style="left:17%;">
+    <circle cx="22" cy="72" r="13" fill="#ff8a80"/>
+    <circle cx="52" cy="70" r="11" fill="#ff8a80"/>
+    <circle cx="37" cy="75" r="12" fill="#ff5252"/>
+    <path d="M22,59 Q20,30 15,10" fill="none" stroke="#ff8a80" stroke-width="8" stroke-linecap="round"/>
+    <path d="M15,10 Q7,2 9,-2" fill="none" stroke="#ff8a80" stroke-width="7" stroke-linecap="round"/>
+    <path d="M15,10 Q19,0 21,-2" fill="none" stroke="#ff8a80" stroke-width="6" stroke-linecap="round"/>
+    <path d="M37,63 Q32,32 30,8" fill="none" stroke="#ff5252" stroke-width="8" stroke-linecap="round"/>
+    <path d="M30,8 Q22,-1 24,-5" fill="none" stroke="#ff5252" stroke-width="6" stroke-linecap="round"/>
+    <path d="M30,8 Q35,-1 37,-3" fill="none" stroke="#ff5252" stroke-width="6" stroke-linecap="round"/>
+    <path d="M52,59 Q55,30 57,6" fill="none" stroke="#ff8a80" stroke-width="8" stroke-linecap="round"/>
+    <path d="M57,6 Q50,-2 52,-4" fill="none" stroke="#ff8a80" stroke-width="6" stroke-linecap="round"/>
+  </svg>
+  <svg class="coral" width="55" height="60" viewBox="0 0 55 60" style="right:8%;">
+    <circle cx="16" cy="52" r="10" fill="#ff80ab"/>
+    <circle cx="38" cy="50" r="9" fill="#ff80ab"/>
+    <path d="M16,42 Q13,22 11,4" fill="none" stroke="#ff80ab" stroke-width="7" stroke-linecap="round"/>
+    <path d="M11,4 Q5,-3 7,-5" fill="none" stroke="#ff80ab" stroke-width="5" stroke-linecap="round"/>
+    <path d="M11,4 Q15,-2 17,-4" fill="none" stroke="#ff80ab" stroke-width="5" stroke-linecap="round"/>
+    <path d="M38,41 Q41,20 39,2" fill="none" stroke="#ff80ab" stroke-width="7" stroke-linecap="round"/>
+    <path d="M39,2 Q33,-4 35,-6" fill="none" stroke="#ff80ab" stroke-width="5" stroke-linecap="round"/>
+  </svg>
+
+  <!-- 贝壳 -->
+  <svg class="shell" width="38" height="24" viewBox="0 0 38 24" style="left:24%;">
+    <ellipse cx="19" cy="14" rx="17" ry="11" fill="#fff3e0"/>
+    <path d="M2,14 Q10,5 19,9 Q28,5 36,14" fill="none" stroke="#ffcc80" stroke-width="2"/>
+    <path d="M5,16 Q12,8 19,11 Q26,8 33,16" fill="none" stroke="#ffb74d" stroke-width="1.5"/>
+    <path d="M8,18 Q14,11 19,13 Q24,11 30,18" fill="none" stroke="#ffa726" stroke-width="1" opacity="0.5"/>
+  </svg>
+  <svg class="shell" width="30" height="20" viewBox="0 0 30 20" style="right:22%;">
+    <ellipse cx="15" cy="12" rx="14" ry="9" fill="#fce4ec"/>
+    <path d="M1,12 Q8,4 15,7 Q22,4 29,12" fill="none" stroke="#f8bbd0" stroke-width="1.5"/>
+    <path d="M3,14 Q9,7 15,9 Q21,7 27,14" fill="none" stroke="#f48fb1" stroke-width="1.5"/>
+  </svg>
+  <svg class="shell" width="30" height="20" viewBox="0 0 30 20" style="left:40%;">
+    <ellipse cx="15" cy="12" rx="14" ry="9" fill="#ede7f6"/>
+    <path d="M1,12 Q8,4 15,7 Q22,4 29,12" fill="none" stroke="#b39ddb" stroke-width="1.5"/>
+    <path d="M3,14 Q9,7 15,9 Q21,7 27,14" fill="none" stroke="#ce93d8" stroke-width="1.5"/>
+  </svg>
+
+  <!-- 海星 -->
+  <svg class="starfish" width="45" height="45" viewBox="0 0 45 45" style="left:30%;">
+    <polygon points="22,0 27,14 42,14 30,23 34,38 22,30 10,38 14,23 2,14 17,14" fill="#ffab91"/>
+    <circle cx="22" cy="22" r="3.5" fill="#ff8a65"/>
+    <!-- 海星上的小斑点 -->
+    <circle cx="18" cy="12" r="1.2" fill="#ffccbc" opacity="0.6"/>
+    <circle cx="28" cy="20" r="1" fill="#ffccbc" opacity="0.6"/>
+    <circle cx="16" cy="26" r="1" fill="#ffccbc" opacity="0.6"/>
+  </svg>
+  <svg class="starfish" width="35" height="35" viewBox="0 0 35 35" style="right:28%; animation-delay:-2s; animation-duration:3.5s;">
+    <polygon points="18,0 22,11 33,11 24,18 27,30 18,24 9,30 12,18 3,11 14,11" fill="#ffcc80"/>
+    <circle cx="18" cy="17" r="2.5" fill="#ffb74d"/>
+  </svg>
+
+  <!-- ========== Hello Kitty 玩偶 × 6 ========== -->
+
+  <!--
+    Hello Kitty 标准特征:
+    - 椭圆头 (上窄下宽)
+    - 三角尖耳朵 + 粉色内耳
+    - 小椭圆黑眼睛 (分得很开)
+    - 黄色横椭圆鼻子
+    - 没有嘴巴!
+    - 每边 3 根胡须
+    - 蝴蝶结在右耳上 (画面左侧)
+    - 简单身体 + 小裙子
+  -->
+
+  <!-- Kitty #1: 坐在左边岩石上 (经典粉色) -->
+  <svg class="kitty-doll" width="60" height="70" viewBox="0 0 120 140" style="left:18%; bottom:102px;">
+    <!-- 头 -->
+    <ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/>
+    <!-- 左耳 (画面右侧) -->
+    <polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
+    <polygon points="89,30 98,4 73,20" fill="#f8bbd0"/>
+    <!-- 右耳 (画面左侧 - 蝴蝶结这边) -->
+    <polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
+    <polygon points="31,30 22,4 47,20" fill="#f8bbd0"/>
+    <!-- 蝴蝶结 (在右耳/画面左侧) -->
+    <ellipse cx="28" cy="22" rx="14" ry="9" fill="#f48fb1" transform="rotate(-15,28,22)"/>
+    <circle cx="28" cy="22" r="5" fill="#ec407a"/>
+    <!-- 眼睛 -->
+    <ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/>
+    <ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/>
+    <!-- 鼻子 -->
+    <ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/>
+    <!-- 胡须 -->
+    <line x1="30" y1="58" x2="45" y2="60" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="30" y1="64" x2="45" y2="63" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="30" y1="70" x2="45" y2="66" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="90" y1="58" x2="75" y2="60" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="90" y1="64" x2="75" y2="63" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="90" y1="70" x2="75" y2="66" stroke="#aaa" stroke-width="1.2"/>
+    <!-- 身体 -->
+    <ellipse cx="60" cy="110" rx="22" ry="18" fill="#fce4ec"/>
+    <!-- 裙子 -->
+    <path d="M38,110 Q40,130 60,132 Q80,130 82,110 Z" fill="#f48fb1"/>
+    <!-- 小脚 -->
+    <ellipse cx="50" cy="132" rx="6" ry="4" fill="#fff"/>
+    <ellipse cx="70" cy="132" rx="6" ry="4" fill="#fff"/>
+  </svg>
+
+  <!-- Kitty #2: 坐在右边岩石上 (紫色) -->
+  <svg class="kitty-doll" width="55" height="65" viewBox="0 0 120 140" style="right:16%; bottom:100px; animation-delay:-1s; animation-duration:4s;">
+    <ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/>
+    <polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
+    <polygon points="89,30 98,4 73,20" fill="#e1bee7"/>
+    <polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
+    <polygon points="31,30 22,4 47,20" fill="#e1bee7"/>
+    <ellipse cx="28" cy="22" rx="14" ry="9" fill="#ce93d8" transform="rotate(-15,28,22)"/>
+    <circle cx="28" cy="22" r="5" fill="#ab47bc"/>
+    <ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/>
+    <ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/>
+    <ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/>
+    <line x1="30" y1="58" x2="45" y2="60" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="30" y1="64" x2="45" y2="63" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="30" y1="70" x2="45" y2="66" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="90" y1="58" x2="75" y2="60" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="90" y1="64" x2="75" y2="63" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="90" y1="70" x2="75" y2="66" stroke="#aaa" stroke-width="1.2"/>
+    <ellipse cx="60" cy="110" rx="22" ry="18" fill="#ede7f6"/>
+    <path d="M38,110 Q40,130 60,132 Q80,130 82,110 Z" fill="#ce93d8"/>
+    <ellipse cx="50" cy="132" rx="6" ry="4" fill="#fff"/>
+    <ellipse cx="70" cy="132" rx="6" ry="4" fill="#fff"/>
+  </svg>
+
+  <!-- Kitty #3: 中间偏左沙地上 (黄色) -->
+  <svg class="kitty-doll" width="50" height="60" viewBox="0 0 120 140" style="left:35%; bottom:85px; animation-delay:-2.2s; animation-duration:3.8s;">
+    <ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/>
+    <polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
+    <polygon points="89,30 98,4 73,20" fill="#fff9c4"/>
+    <polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
+    <polygon points="31,30 22,4 47,20" fill="#fff9c4"/>
+    <ellipse cx="28" cy="22" rx="14" ry="9" fill="#fff176" transform="rotate(-15,28,22)"/>
+    <circle cx="28" cy="22" r="5" fill="#fdd835"/>
+    <ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/>
+    <ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/>
+    <ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/>
+    <line x1="30" y1="58" x2="45" y2="60" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="30" y1="64" x2="45" y2="63" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="30" y1="70" x2="45" y2="66" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="90" y1="58" x2="75" y2="60" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="90" y1="64" x2="75" y2="63" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="90" y1="70" x2="75" y2="66" stroke="#aaa" stroke-width="1.2"/>
+    <ellipse cx="60" cy="110" rx="22" ry="18" fill="#fffde7"/>
+    <path d="M38,110 Q40,130 60,132 Q80,130 82,110 Z" fill="#fff176"/>
+    <ellipse cx="50" cy="132" rx="6" ry="4" fill="#fff"/>
+    <ellipse cx="70" cy="132" rx="6" ry="4" fill="#fff"/>
+  </svg>
+
+  <!-- Kitty #4: 右边沙地上 (浅蓝) -->
+  <svg class="kitty-doll" width="48" height="58" viewBox="0 0 120 140" style="right:32%; bottom:85px; animation-delay:-0.8s; animation-duration:4.2s;">
+    <ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/>
+    <polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
+    <polygon points="89,30 98,4 73,20" fill="#bbdefb"/>
+    <polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
+    <polygon points="31,30 22,4 47,20" fill="#bbdefb"/>
+    <ellipse cx="28" cy="22" rx="14" ry="9" fill="#90caf9" transform="rotate(-15,28,22)"/>
+    <circle cx="28" cy="22" r="5" fill="#42a5f5"/>
+    <ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/>
+    <ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/>
+    <ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/>
+    <line x1="30" y1="58" x2="45" y2="60" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="30" y1="64" x2="45" y2="63" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="30" y1="70" x2="45" y2="66" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="90" y1="58" x2="75" y2="60" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="90" y1="64" x2="75" y2="63" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="90" y1="70" x2="75" y2="66" stroke="#aaa" stroke-width="1.2"/>
+    <ellipse cx="60" cy="110" rx="22" ry="18" fill="#e3f2fd"/>
+    <path d="M38,110 Q40,130 60,132 Q80,130 82,110 Z" fill="#90caf9"/>
+    <ellipse cx="50" cy="132" rx="6" ry="4" fill="#fff"/>
+    <ellipse cx="70" cy="132" rx="6" ry="4" fill="#fff"/>
+  </svg>
+
+  <!-- Kitty #5: 站在中间岩石上 (薄荷绿) -->
+  <svg class="kitty-doll" width="45" height="55" viewBox="0 0 120 140" style="left:48%; bottom:95px; animation-delay:-3s; animation-duration:3.3s;">
+    <ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/>
+    <polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
+    <polygon points="89,30 98,4 73,20" fill="#c8e6c9"/>
+    <polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
+    <polygon points="31,30 22,4 47,20" fill="#c8e6c9"/>
+    <ellipse cx="28" cy="22" rx="14" ry="9" fill="#a5d6a7" transform="rotate(-15,28,22)"/>
+    <circle cx="28" cy="22" r="5" fill="#66bb6a"/>
+    <ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/>
+    <ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/>
+    <ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/>
+    <line x1="30" y1="58" x2="45" y2="60" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="30" y1="64" x2="45" y2="63" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="30" y1="70" x2="45" y2="66" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="90" y1="58" x2="75" y2="60" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="90" y1="64" x2="75" y2="63" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="90" y1="70" x2="75" y2="66" stroke="#aaa" stroke-width="1.2"/>
+    <ellipse cx="60" cy="110" rx="22" ry="18" fill="#e8f5e9"/>
+    <path d="M38,110 Q40,130 60,132 Q80,130 82,110 Z" fill="#a5d6a7"/>
+    <ellipse cx="50" cy="132" rx="6" ry="4" fill="#fff"/>
+    <ellipse cx="70" cy="132" rx="6" ry="4" fill="#fff"/>
+  </svg>
+
+  <!-- Kitty #6: 躲在左边海草后面 (水蜜桃色) -->
+  <svg class="kitty-doll" width="42" height="52" viewBox="0 0 120 140" style="left:8%; bottom:88px; animation-delay:-1.8s; animation-duration:4.5s;">
+    <ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/>
+    <polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
+    <polygon points="89,30 98,4 73,20" fill="#ffccbc"/>
+    <polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
+    <polygon points="31,30 22,4 47,20" fill="#ffccbc"/>
+    <ellipse cx="28" cy="22" rx="14" ry="9" fill="#ffab91" transform="rotate(-15,28,22)"/>
+    <circle cx="28" cy="22" r="5" fill="#ff7043"/>
+    <ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/>
+    <ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/>
+    <ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/>
+    <line x1="30" y1="58" x2="45" y2="60" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="30" y1="64" x2="45" y2="63" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="30" y1="70" x2="45" y2="66" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="90" y1="58" x2="75" y2="60" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="90" y1="64" x2="75" y2="63" stroke="#aaa" stroke-width="1.2"/>
+    <line x1="90" y1="70" x2="75" y2="66" stroke="#aaa" stroke-width="1.2"/>
+    <ellipse cx="60" cy="110" rx="22" ry="18" fill="#fbe9e7"/>
+    <path d="M38,110 Q40,130 60,132 Q80,130 82,110 Z" fill="#ffab91"/>
+    <ellipse cx="50" cy="132" rx="6" ry="4" fill="#fff"/>
+    <ellipse cx="70" cy="132" rx="6" ry="4" fill="#fff"/>
+  </svg>
+
+  <!-- ========== 爱心 & 泡泡 ========== -->
+  <span class="heart-float" style="left:5%;  animation-duration:8s;  animation-delay:0s;">💕</span>
+  <span class="heart-float" style="left:18%; animation-duration:9s;  animation-delay:2s;">💖</span>
+  <span class="heart-float" style="left:35%; animation-duration:7s;  animation-delay:4s;">💗</span>
+  <span class="heart-float" style="left:55%; animation-duration:10s; animation-delay:1s;">💕</span>
+  <span class="heart-float" style="left:72%; animation-duration:8.5s;animation-delay:3s;">💖</span>
+  <span class="heart-float" style="left:85%; animation-duration:9.5s;animation-delay:5s;">💗</span>
+  <span class="heart-float" style="left:90%; animation-duration:7.5s;animation-delay:0.5s;">💝</span>
+  <span class="heart-float" style="left:12%; animation-duration:11s; animation-delay:6s;">💕</span>
+
+  <span class="heart-float" style="left:25%; animation-duration:6s;  animation-delay:1.5s;">🫧</span>
+  <span class="heart-float" style="left:48%; animation-duration:7s;  animation-delay:3.5s; font-size:18px;">🫧</span>
+  <span class="heart-float" style="left:65%; animation-duration:8s;  animation-delay:2.5s; font-size:20px;">🫧</span>
+  <span class="heart-float" style="left:80%; animation-duration:6.5s;animation-delay:4.5s;">🫧</span>
+  <span class="heart-float" style="left:40%; animation-duration:9s;  animation-delay:5.5s; font-size:22px;">🫧</span>
+</div>
+
+<!-- ====== 两侧图片 ====== -->
+<img class="side-img left"  src="微信图片_20260727144347_232_350.jpg" alt="">
+<img class="side-img right" src="微信图片_20260727144347_232_350.jpg" alt="">
+
+<!-- ====== 主内容 ====== -->
+<div class="container">
+
+  <!-- 对话框 -->
+  <div class="speech-text" id="speechText">我是傻鱼 🐟</div>
+
+  <!-- 鱼 -->
+  <div class="fish-wrapper" id="fishWrapper" title="点我！">
+    <div class="fish-float">
+      <svg width="240" height="180" viewBox="0 0 240 180">
+        <defs>
+          <radialGradient id="fishGrad" cx="40%" cy="35%">
+            <stop offset="0%" stop-color="#ffccd5"/>
+            <stop offset="50%" stop-color="#ffb3ba"/>
+            <stop offset="100%" stop-color="#ff8a80"/>
+          </radialGradient>
+          <radialGradient id="bellyGrad" cx="50%" cy="40%">
+            <stop offset="0%" stop-color="#fff5f5"/>
+            <stop offset="100%" stop-color="#ffe0e0"/>
+          </radialGradient>
+        </defs>
+
+        <!-- 水光 -->
+        <ellipse cx="120" cy="90" rx="85" ry="65" fill="rgba(255,255,255,0.12)"/>
+
+        <!-- 尾巴 -->
+        <g transform="translate(15, 80)">
+          <path d="M0,10 Q-25,-30 -12,-50 Q-5,-40 5,-30 Q10,-20 12,-5 Q18,-35 30,-55 Q35,-40 28,-20 Q30,-10 20,0 Q30,10 28,25 Q35,45 30,60 Q18,40 12,10 Q10,25 5,35 Q-5,45 -12,55 Q-25,35 0,15 Z" fill="#ffb3ba"/>
+          <path d="M0,10 Q-18,-20 -8,-40 Q-2,-30 3,-20 Q8,-10 10,0 Q10,-25 20,-40 Q24,-28 20,-12 Q22,-5 15,2 Q24,8 22,20 Q28,35 24,45 Q14,30 10,10 Q6,20 2,28 Q-2,38 -8,45 Q-18,28 0,15 Z" fill="#ff8a80" opacity="0.45"/>
+        </g>
+
+        <!-- 背鳍 -->
+        <path d="M120,30 Q130,8 145,18 Q140,28 148,35 Q138,38 130,35" fill="#ffb3ba" opacity="0.65"/>
+
+        <!-- 腹鳍 -->
+        <path d="M90,130 Q100,152 115,148 Q110,140 118,135 Q108,133 100,130" fill="#ffb3ba" opacity="0.55"/>
+
+        <!-- 鱼身 -->
+        <ellipse cx="120" cy="90" rx="75" ry="55" fill="url(#fishGrad)"/>
+
+        <!-- 鱼肚 -->
+        <ellipse cx="130" cy="100" rx="45" ry="32" fill="url(#bellyGrad)" opacity="0.75"/>
+
+        <!-- 腮红 -->
+        <ellipse cx="82" cy="75" rx="14" ry="10" fill="#ff8a80" opacity="0.32"/>
+        <ellipse cx="82" cy="105" rx="12" ry="8" fill="#ff8a80" opacity="0.28"/>
+
+        <!-- 大呆萌眼睛 -->
+        <!-- 左眼 -->
+        <circle cx="148" cy="68" r="19" fill="white" stroke="#e0e0e0" stroke-width="1.5"/>
+        <circle cx="152" cy="66" r="12" fill="#444"/>
+        <circle cx="156" cy="62" r="4.5" fill="white"/>
+        <circle cx="148" cy="70" r="1.8" fill="white"/>
+
+        <!-- 右眼 -->
+        <circle cx="148" cy="108" r="17" fill="white" stroke="#e0e0e0" stroke-width="1.5"/>
+        <circle cx="151" cy="106" r="11" fill="#444"/>
+        <circle cx="155" cy="102" r="4" fill="white"/>
+        <circle cx="146" cy="110" r="1.5" fill="white"/>
+
+        <!-- 小嘴 -->
+        <ellipse cx="175" cy="90" rx="5" ry="3.5" fill="#e57373" opacity="0.8"/>
+        <path d="M178,92 Q180,95 177,96" fill="none" stroke="#e57373" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+
+        <!-- 头上的小花 -->
+        <g transform="translate(115, 28)">
+          <circle cx="0" cy="0" r="8" fill="#fff176"/>
+          <circle cx="-7" cy="-5" r="7" fill="#ffeb3b"/>
+          <circle cx="7" cy="-5" r="7" fill="#fff176"/>
+          <circle cx="-7" cy="5" r="7" fill="#fff176"/>
+          <circle cx="7" cy="5" r="7" fill="#ffeb3b"/>
+          <circle cx="0" cy="0" r="5" fill="#fff9c4"/>
+          <circle cx="0" cy="0" r="3" fill="#ffcc80"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <p class="hint">✧ 点一下这条呆鱼 ✧</p>
+  <span class="ribbon-tag">🐟 小鱼</span>
+  <p class="counter" id="counter"></p>
+</div>
+
+<script>
+  const fishWrapper = document.getElementById('fishWrapper');
+  const speechText = document.getElementById('speechText');
+  const counterEl = document.getElementById('counter');
+  let clickCount = 0;
+  let textTimer = null;
+
+  fishWrapper.addEventListener('click', () => {
+    clickCount++;
+
+    speechText.textContent = '我是傻鱼 🐟';
+    counterEl.textContent = `这条呆鱼已经说了 ${clickCount} 次 "我是傻鱼"～`;
+
+    // 每次点击都触发抖动（先移除再添加以重播动画）
+    speechText.classList.remove('shake');
+    void speechText.offsetWidth; // 强制回流重播动画
+    speechText.classList.add('shake');
+
+    speechText.classList.add('show');
+    clearTimeout(textTimer);
+    textTimer = setTimeout(() => {
+      speechText.classList.remove('show');
+    }, 1500);
+
+    // 鱼弹跳
+    fishWrapper.style.transform = 'scale(0.82)';
+    setTimeout(() => {
+      fishWrapper.style.transform = 'scale(1.08)';
+      setTimeout(() => {
+        fishWrapper.style.transform = '';
+      }, 180);
+    }, 100);
+  });
+</script>
+
+</body>
+</html>
