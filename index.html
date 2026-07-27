@@ -232,6 +232,17 @@ body{
   </div>
 </div>
 
+<!-- ====== 彩蛋弹窗 ====== -->
+<div class="days-overlay" id="easterOverlay">
+  <div class="days-card">
+    <div class="days-emoji">😌</div>
+    <div class="days-text" id="easterMsg"></div>
+    <div class="days-num" id="easterNum" style="font-size:36px"></div>
+    <div class="days-text">🌿 休息一下眼睛，活动活动肩膀～</div>
+    <button class="days-close" onclick="closeEaster()">☕ 好的，休息一下</button>
+  </div>
+</div>
+
 <script>
 // ========== 鱼数据生成 ==========
 const RARITY = ['普通','优良','稀有','史诗','传说','隐藏','限量'];
@@ -517,6 +528,14 @@ fishWrapper.addEventListener('click',(e)=>{
   e.stopPropagation();
   playBubbleSound();clickCount++;localStorage.setItem('fishClickCount',clickCount);
   speechText.textContent='我是傻鱼 🐟';counterEl.textContent=`这条呆鱼一共说了 ${clickCount} 次 "我是傻鱼"～`;
+  // 彩蛋：50的倍数
+  if (clickCount % 50 === 0) {
+    setTimeout(() => {
+      document.getElementById('easterNum').textContent = `你已经点了 ${clickCount} 次鱼！`;
+      document.getElementById('easterMsg').innerHTML = '🐟 鱼鱼提醒你：<br>已经戳了好多下啦～';
+      document.getElementById('easterOverlay').classList.add('active');
+    }, 600);
+  }
   speechText.classList.remove('shake');void speechText.offsetWidth;speechText.classList.add('shake');
   speechText.classList.add('show');clearTimeout(textTimer);
   textTimer=setTimeout(()=>{speechText.classList.remove('show')},1500);
@@ -742,6 +761,7 @@ document.getElementById('sideImgLeft').addEventListener('click', () => {
   document.getElementById('daysOverlay').classList.add('active');
 });
 function closeDays() { document.getElementById('daysOverlay').classList.remove('active'); }
+function closeEaster() { document.getElementById('easterOverlay').classList.remove('active'); }
 
 // ========== 启动 ==========
 checkDailyGacha();
