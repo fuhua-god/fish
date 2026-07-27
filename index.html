@@ -278,6 +278,68 @@
     letter-spacing: 1px;
     box-shadow: 0 3px 10px rgba(244,143,177,0.35);
   }
+
+  /* --- 游戏区 --- */
+  .game-section {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+  }
+  .game-btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .game-btn {
+    background: rgba(255,255,255,0.85);
+    border: 2px solid #f8bbd0;
+    color: #ec407a;
+    padding: 8px 20px;
+    border-radius: 25px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .game-btn:hover { background: #fce4ec; }
+  .game-btn.active { background: #f48fb1; color: #fff; border-color: #f48fb1; }
+  .game-status {
+    color: #fff;
+    font-size: 15px;
+    background: rgba(0,0,0,0.3);
+    padding: 6px 16px;
+    border-radius: 20px;
+    min-height: 30px;
+    text-align: center;
+  }
+  .game-board { display: inline-grid; gap: 3px; background: rgba(255,255,255,0.25); padding: 6px; border-radius: 12px; }
+  .cell {
+    width: 38px; height: 38px;
+    background: rgba(255,255,255,0.75);
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+    color: #555;
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    padding: 0;
+  }
+  .cell:hover { background: #fce4ec; }
+  .cell.X { color: #e91e63; }
+  .cell.O { color: #42a5f5; }
+  .cell.win { background: #fff9c4; }
+
+  @media (max-width: 768px) {
+    .cell { width: 32px; height: 32px; font-size: 17px; }
+    .game-btn { padding: 6px 14px; font-size: 13px; }
+  }
 </style>
 </head>
 <body>
@@ -673,6 +735,16 @@
   <span class="ribbon-tag">🐟 小鱼</span>
   <p class="counter" id="counter"></p>
   <p class="clock" id="clock"></p>
+
+  <!-- 游戏区 -->
+  <div class="game-section">
+    <div class="game-btns">
+      <button class="game-btn active" id="tictactoeBtn" onclick="startGame('tictactoe', this)">🎮 井字棋</button>
+      <button class="game-btn" id="gomokuBtn" onclick="startGame('gomoku', this)">♟️ 五子棋</button>
+    </div>
+    <div class="game-status" id="gameStatus">轮到你了 ✨</div>
+    <div class="game-board" id="gameBoard"></div>
+  </div>
 </div>
 
 <script>
@@ -752,6 +824,255 @@
       }, 180);
     }, 100);
   });
+
+  // 让鱼说任意话
+  function fishSay(msg) {
+    speechText.textContent = msg;
+    speechText.classList.remove('shake');
+    void speechText.offsetWidth;
+    speechText.classList.add('shake');
+    speechText.classList.add('show');
+    clearTimeout(textTimer);
+    textTimer = setTimeout(() => {
+      speechText.classList.remove('show');
+    }, 2000);
+  }
+
+  // ========== 游戏逻辑 ==========
+  const gameStatus = document.getElementById('gameStatus');
+  const gameBoard = document.getElementById('gameBoard');
+  let currentGame = 'tictactoe';
+  let board = [];
+  let gameOver = false;
+
+  function startGame(game, btn) {
+    currentGame = game;
+    document.querySelectorAll('.game-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    gameOver = false;
+    if (game === 'tictactoe') initTicTacToe();
+    else initGomoku();
+  }
+
+  // ---- 井字棋 ----
+  function initTicTacToe() {
+    board = Array(9).fill('');
+    gameOver = false;
+    gameStatus.textContent = '轮到你了 ✨';
+    gameBoard.style.gridTemplateColumns = 'repeat(3, 1fr)';
+    gameBoard.innerHTML = '';
+    for (let i = 0; i < 9; i++) {
+      const cell = document.createElement('button');
+      cell.className = 'cell';
+      cell.onclick = () => tttClick(i);
+      gameBoard.appendChild(cell);
+    }
+  }
+
+  function tttClick(i) {
+    if (board[i] || gameOver) return;
+    board[i] = 'X';
+    renderBoard();
+    if (checkTTTWin('X')) { gameOver = true; gameStatus.textContent = '你赢了！🎉'; return; }
+    if (board.every(c => c)) { gameOver = true; gameStatus.textContent = '平局～'; return; }
+    // AI 走
+    setTimeout(() => {
+      const ai = tttBestMove();
+      board[ai] = 'O';
+      renderBoard();
+      if (checkTTTWin('O')) {
+        gameOver = true;
+        gameStatus.textContent = '你输了 😢';
+        fishSay('你才是傻鱼！🐟');
+        return;
+      }
+      if (board.every(c => c)) { gameOver = true; gameStatus.textContent = '平局～'; }
+    }, 300);
+  }
+
+  function checkTTTWin(p) {
+    const w = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    for (const [a,b,c] of w) {
+      if (board[a] === p && board[b] === p && board[c] === p) {
+        highlightCells(a,b,c);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function tttBestMove() {
+    // minimax
+    let best = -Infinity, move = 0;
+    for (let i = 0; i < 9; i++) {
+      if (!board[i]) {
+        board[i] = 'O';
+        const score = tttMinimax(false);
+        board[i] = '';
+        if (score > best) { best = score; move = i; }
+      }
+    }
+    return move;
+  }
+  function tttMinimax(isMax) {
+    if (checkTTTQuick('O')) return 10;
+    if (checkTTTQuick('X')) return -10;
+    if (board.every(c => c)) return 0;
+    let best = isMax ? -Infinity : Infinity;
+    for (let i = 0; i < 9; i++) {
+      if (!board[i]) {
+        board[i] = isMax ? 'O' : 'X';
+        const s = tttMinimax(!isMax);
+        board[i] = '';
+        best = isMax ? Math.max(best, s) : Math.min(best, s);
+      }
+    }
+    return best;
+  }
+  function checkTTTQuick(p) {
+    const w = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    return w.some(([a,b,c]) => board[a]===p && board[b]===p && board[c]===p);
+  }
+
+  // ---- 五子棋 (11×11) ----
+  const GK = 11;
+  function initGomoku() {
+    board = Array(GK * GK).fill('');
+    gameOver = false;
+    gameStatus.textContent = '你执黑先手 ✨';
+    gameBoard.style.gridTemplateColumns = `repeat(${GK}, 1fr)`;
+    gameBoard.innerHTML = '';
+    for (let i = 0; i < GK * GK; i++) {
+      const cell = document.createElement('button');
+      cell.className = 'cell';
+      cell.onclick = () => gkClick(i);
+      gameBoard.appendChild(cell);
+    }
+  }
+
+  function gkClick(i) {
+    if (board[i] || gameOver) return;
+    board[i] = 'X';
+    renderBoard();
+    if (checkGKWin('X')) { gameOver = true; gameStatus.textContent = '你赢了！🎉'; return; }
+    if (board.every(c => c)) { gameOver = true; gameStatus.textContent = '平局～'; return; }
+    setTimeout(() => {
+      const ai = gkBestMove();
+      board[ai] = 'O';
+      renderBoard();
+      if (checkGKWin('O')) {
+        gameOver = true;
+        gameStatus.textContent = '你输了 😢';
+        fishSay('你才是傻鱼！🐟');
+        return;
+      }
+      if (board.every(c => c)) { gameOver = true; gameStatus.textContent = '平局～'; }
+    }, 200);
+  }
+
+  function checkGKWin(p) {
+    const dirs = [[1,0],[0,1],[1,1],[1,-1]];
+    for (let r = 0; r < GK; r++) {
+      for (let c = 0; c < GK; c++) {
+        const idx = r * GK + c;
+        if (board[idx] !== p) continue;
+        for (const [dr,dc] of dirs) {
+          let count = 1;
+          const cells = [idx];
+          for (let d = 1; d < 5; d++) {
+            const nr = r + dr * d, nc = c + dc * d;
+            if (nr < 0 || nr >= GK || nc < 0 || nc >= GK) break;
+            if (board[nr * GK + nc] === p) { count++; cells.push(nr * GK + nc); }
+            else break;
+          }
+          for (let d = 1; d < 5; d++) {
+            const nr = r - dr * d, nc = c - dc * d;
+            if (nr < 0 || nr >= GK || nc < 0 || nc >= GK) break;
+            if (board[nr * GK + nc] === p) { count++; cells.push(nr * GK + nc); }
+            else break;
+          }
+          if (count >= 5) { highlightCells(...cells); return true; }
+        }
+      }
+    }
+    return false;
+  }
+
+  function gkScorePos(idx, p) {
+    const r = Math.floor(idx / GK), c = idx % GK;
+    const dirs = [[1,0],[0,1],[1,1],[1,-1]];
+    let score = 0;
+    for (const [dr,dc] of dirs) {
+      let count = 1, open = 0;
+      for (let d = 1; d < 5; d++) {
+        const nr = r + dr * d, nc = c + dc * d;
+        if (nr < 0 || nr >= GK || nc < 0 || nc >= GK) break;
+        const v = board[nr * GK + nc];
+        if (v === p) count++;
+        else { if (!v) open++; break; }
+      }
+      for (let d = 1; d < 5; d++) {
+        const nr = r - dr * d, nc = c - dc * d;
+        if (nr < 0 || nr >= GK || nc < 0 || nc >= GK) break;
+        const v = board[nr * GK + nc];
+        if (v === p) count++;
+        else { if (!v) open++; break; }
+      }
+      if (count >= 5) score += 100000;
+      else if (count === 4) score += open === 2 ? 10000 : 5000;
+      else if (count === 3) score += open === 2 ? 1000 : 300;
+      else if (count === 2) score += open === 2 ? 100 : 20;
+      else if (count === 1) score += open === 2 ? 10 : 2;
+    }
+    return score;
+  }
+
+  function gkBestMove() {
+    let best = -Infinity, move = Math.floor(GK * GK / 2);
+    const empty = [];
+    for (let i = 0; i < GK * GK; i++) if (!board[i]) empty.push(i);
+    // 只看已有棋子周围2格的空格
+    const near = new Set();
+    for (let i = 0; i < GK * GK; i++) {
+      if (!board[i]) continue;
+      const r = Math.floor(i / GK), c = i % GK;
+      for (let dr = -2; dr <= 2; dr++)
+        for (let dc = -2; dc <= 2; dc++) {
+          const nr = r + dr, nc = c + dc;
+          if (nr >= 0 && nr < GK && nc >= 0 && nc < GK) {
+            const ni = nr * GK + nc;
+            if (!board[ni]) near.add(ni);
+          }
+        }
+    }
+    const candidates = near.size > 0 ? [...near] : empty;
+    for (const i of candidates) {
+      board[i] = 'O';
+      const atk = gkScorePos(i, 'O');
+      board[i] = 'X';
+      const def = gkScorePos(i, 'X');
+      board[i] = '';
+      const s = Math.max(atk, def > 9000 ? def * 1.5 : def);
+      if (s > best) { best = s; move = i; }
+    }
+    return move;
+  }
+
+  // ---- 公共 ----
+  function renderBoard() {
+    const cells = gameBoard.children;
+    for (let i = 0; i < board.length; i++) {
+      cells[i].textContent = board[i];
+      cells[i].className = 'cell ' + (board[i] || '');
+    }
+  }
+
+  function highlightCells(...indices) {
+    indices.forEach(i => gameBoard.children[i].classList.add('win'));
+  }
+
+  // 初始启动井字棋
+  initTicTacToe();
 </script>
 
 </body>
