@@ -317,7 +317,7 @@ function genAccessory(rarity, idx) {
 let ALL_FISH = [];
 function buildAllFish() {
   ALL_FISH = [];
-  for (let r = 0; r < 7; r++) {
+  for (let r = 0; r < R_COUNTS.length; r++) {
     for (let i = 0; i < R_COUNTS[r]; i++) {
       ALL_FISH.push({
         id: `r${r}-${i}`,
