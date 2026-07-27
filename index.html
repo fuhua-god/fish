@@ -203,16 +203,17 @@
     font-size: 18px; font-weight: bold; color: #555; letter-spacing: 1px;
   }
 
-  /* 鱼跳入 */
+  /* 鱼弹出 */
   .fish-jumpin {
     display: none; flex-direction: column; align-items: center; gap: 10px;
-    animation: jumpIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
   }
   .fish-jumpin.show { display: flex; }
-  @keyframes jumpIn {
-    0% { transform: translateY(80px) scale(0.3); opacity: 0; }
-    60% { transform: translateY(-15px) scale(1.08); opacity: 1; }
-    100% { transform: translateY(0) scale(1); opacity: 1; }
+  .fish-jumpin.show .speech-lose {
+    animation: popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+  }
+  @keyframes popIn {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
   }
   .fish-jumpin .speech-lose {
     font-size: 28px; font-weight: bold; color: #ec407a;
@@ -222,6 +223,8 @@
   }
 
   .result-btns { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+  .result-btns.show-btns .btn-retry  { animation: popIn 0.4s 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+  .result-btns.show-btns .btn-quit   { animation: popIn 0.4s 0.35s cubic-bezier(0.175,0.885,0.32,1.275) both; }
   .btn-retry, .btn-quit {
     padding: 12px 30px; border-radius: 30px; font-size: 18px; font-weight: bold;
     cursor: pointer; font-family: inherit; letter-spacing: 2px; border: none;
@@ -490,6 +493,7 @@
   function rematch() {
     fishJumpin.classList.remove('show');
     resultBtns.style.display = 'none';
+    resultBtns.classList.remove('show-btns');
     gOver = false;
     if (currentGame === 'tictactoe') initTTT();
     else initGomoku();
@@ -646,6 +650,7 @@
     gameStatus.textContent = '你输了 😢';
     fishJumpin.classList.add('show');
     resultBtns.style.display = 'flex';
+    resultBtns.classList.add('show-btns');
   }
 </script>
 
