@@ -342,6 +342,16 @@ function renderFishSVG(fish, w, h) {
   </svg>`;
 }
 
+// ========== 鱼自由游动 ==========
+const fishWrapper = document.getElementById('fishWrapper');
+function getFishSize() {
+  const w = window.innerWidth;
+  if (w <= 480) return { w: 140, h: 105 };
+  if (w <= 768) return { w: 180, h: 135 };
+  return { w: 240, h: 180 };
+}
+let fishSize = getFishSize();
+
 function renderMainFish() {
   const displayId = localStorage.getItem('displayFishId');
   let fish = ALL_FISH[0];
@@ -354,15 +364,6 @@ function renderMainFish() {
 }
 renderMainFish();
 
-// ========== 鱼自由游动 ==========
-const fishWrapper = document.getElementById('fishWrapper');
-function getFishSize() {
-  const w = window.innerWidth;
-  if (w <= 480) return { w: 140, h: 105 };       // 小手机
-  if (w <= 768) return { w: 180, h: 135 };       // 平板/大手机
-  return { w: 240, h: 180 };                       // 桌面
-}
-let fishSize = getFishSize();
 let fishX = window.innerWidth / 2 - fishSize.w / 2;
 let fishY = window.innerHeight / 2 - fishSize.h / 2;
 let fishVX = (Math.random() - 0.5) * 2.5;
