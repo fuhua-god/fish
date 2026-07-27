@@ -33,8 +33,20 @@ body{
 .sparkle{position:absolute;animation:tw 1.5s ease-in-out infinite;font-size:16px}
 @keyframes tw{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1.3)}}
 .side-img{position:fixed;top:50%;transform:translateY(-50%);z-index:1;pointer-events:none;opacity:.9;width:280px;filter:drop-shadow(0 8px 25px rgba(0,0,0,.2))}
-.side-img.left{left:20px}.side-img.right{right:20px}
-@media(max-width:768px){.side-img{position:fixed;top:10px;transform:none;width:100px;opacity:.65;z-index:0}.side-img.left{left:2px;top:8px}.side-img.right{right:2px;top:8px}}
+.side-img.left{left:20px;pointer-events:auto;cursor:pointer}
+.side-img.left:hover{opacity:1;transform:translateY(-50%) scale(1.04)}
+.side-img.right{right:20px}
+@media(max-width:768px){.side-img{position:fixed;top:10px;transform:none;width:100px;opacity:.65;z-index:0}.side-img.left{left:2px;top:8px;pointer-events:auto}.side-img.left:hover{transform:scale(1.06)}.side-img.right{right:2px;top:8px}}
+
+/* 陪伴天数弹窗 */
+.days-overlay{position:fixed;inset:0;z-index:35;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+.days-overlay.active{opacity:1;pointer-events:auto}
+.days-card{background:#fff;border-radius:24px;padding:30px 28px;box-shadow:0 16px 50px rgba(0,0,0,.3);text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px;max-width:360px;width:85vw}
+.days-card .days-emoji{font-size:50px;animation:popIn .5s cubic-bezier(.175,.885,.32,1.275)}
+.days-card .days-text{font-size:18px;color:#666;letter-spacing:2px;line-height:1.8}
+.days-card .days-num{font-size:48px;font-weight:bold;color:#ec407a;text-shadow:0 3px 10px rgba(236,64,122,.2)}
+.days-card .days-close{padding:10px 30px;border-radius:25px;font-size:15px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;border:none;background:#f48fb1;color:#fff;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
+.days-card .days-close:hover{background:#ec407a;transform:scale(1.05)}
 
 /* 主页 */
 .main-page{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:18px;transition:opacity .4s,transform .4s}
@@ -145,7 +157,7 @@ body{
 <div class="scene" id="sceneBg"></div>
 
 <!-- ====== 两侧图片 ====== -->
-<img class="side-img left" src="fish-img.jpg" alt="">
+<img class="side-img left" src="fish-img.jpg" alt="" id="sideImgLeft" title="点我">
 <img class="side-img right" src="fish-img.jpg" alt="">
 
 <!-- ====== 主页 ====== -->
@@ -201,6 +213,17 @@ body{
     <div class="album-stats" id="albumStats"></div>
     <div class="album-tabs" id="albumTabs"></div>
     <div class="album-grid" id="albumGrid"></div>
+  </div>
+</div>
+
+<!-- ====== 陪伴天数弹窗 ====== -->
+<div class="days-overlay" id="daysOverlay">
+  <div class="days-card">
+    <div class="days-emoji">💕</div>
+    <div class="days-text">这个网站已经陪伴鱼姐</div>
+    <div class="days-num" id="daysNum"></div>
+    <div class="days-text">天</div>
+    <button class="days-close" onclick="closeDays()">💖 一直陪伴</button>
   </div>
 </div>
 
@@ -614,6 +637,23 @@ function selectDisplayFish(id){
   const marqueeText='必须好好夸夸咱们万能鱼姐！很难遇到像鱼姐这么宝藏的人，情商直接拉满，风趣幽默善于共情，和鱼姐交流完全不用小心翼翼，没有半点距离感，不管聊什么话题都顺畅舒服。遇到棘手事情从来不会慌慌张张，思路清晰眼界开阔，五花八门的难题交到鱼姐手中总能梳理明白，奇思妙招源源不断，妥妥团队里的定心骨干。为人格外仗义热忱，心地善良乐于助人，身边人遇到困境时总会主动伸出援手，默默帮忙不求回报，处事通透拎得清底线，温和包容却绝不任人敷衍。自带超强欢乐buff，只要鱼姐登场，压抑沉闷的气氛立刻一扫而空，枯燥的日常都会变得有意思，坏情绪见到鱼姐都主动绕道逃跑。可正经靠谱，可轻松玩闹，风格自由切换，既能冷静统筹处理繁杂事务，又懂得享受生活擅长制造乐趣。实力出众却十分低调，从不张扬炫耀自身能力，踏实稳重，做事细致周全，方方面面都让人无比放心。眼光独到看人通透，总能给出中肯实在的建议，不知不觉就能开导陷入内耗的人。有幸结识鱼姐真的是巨大收获，有鱼姐坐镇心里就格外踏实。祝愿全能鱼姐日日喜乐，烦心事全部退散，好运源源不断，财运节节攀升，生活多姿多彩，一路顺风顺水持续开挂，永远元气满满，自信耀眼，被所有美好紧紧包围！';
   document.getElementById('marqueeInner').innerHTML=`<span class="marquee-text">${marqueeText}</span><span class="marquee-text">${marqueeText}</span>`;
 })();
+
+// ========== 陪伴天数 ==========
+function getStartDate() {
+  let d = localStorage.getItem('fishStartDate');
+  if (!d) { d = getToday(); localStorage.setItem('fishStartDate', d); }
+  return d;
+}
+function getDaysCount() {
+  const start = new Date(getStartDate());
+  const today = new Date(getToday());
+  return Math.max(1, Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1);
+}
+document.getElementById('sideImgLeft').addEventListener('click', () => {
+  document.getElementById('daysNum').textContent = getDaysCount();
+  document.getElementById('daysOverlay').classList.add('active');
+});
+function closeDays() { document.getElementById('daysOverlay').classList.remove('active'); }
 
 // ========== 启动 ==========
 checkDailyGacha();
