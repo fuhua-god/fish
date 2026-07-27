@@ -12,8 +12,6 @@ body{
   overflow-x:hidden;font-family:"Comic Sans MS","KaiTi","STKaiti","Microsoft YaHei",cursive,sans-serif;user-select:none;cursor:default;padding-top:50px;
 }
 @media(max-width:768px){body{padding-top:38px}}
-
-/* 场景 */
 .scene{position:fixed;inset:0;pointer-events:none;z-index:0}
 .cloud{position:absolute;animation:cd linear infinite}
 @keyframes cd{0%{transform:translateX(0)}100%{transform:translateX(-130vw)}}
@@ -33,25 +31,10 @@ body{
 .sparkle{position:absolute;animation:tw 1.5s ease-in-out infinite;font-size:16px}
 @keyframes tw{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1.3)}}
 .side-img{position:fixed;top:50%;transform:translateY(-50%);z-index:1;pointer-events:none;opacity:.9;width:280px;filter:drop-shadow(0 8px 25px rgba(0,0,0,.2))}
-.side-img.left{left:20px;pointer-events:auto;cursor:pointer}
-.side-img.left:hover{opacity:1;transform:translateY(-50%) scale(1.04)}
+.side-img.left{left:20px;pointer-events:auto;cursor:pointer}.side-img.left:hover{opacity:1;transform:translateY(-50%) scale(1.04)}
 .side-img.right{right:20px}
 @media(max-width:768px){.side-img{position:fixed;top:10px;transform:none;width:100px;opacity:.65;z-index:0}.side-img.left{left:2px;top:8px;pointer-events:auto}.side-img.left:hover{transform:scale(1.06)}.side-img.right{right:2px;top:8px}}
 
-/* 陪伴天数弹窗 */
-.days-overlay{position:fixed;inset:0;z-index:35;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
-.days-overlay.active{opacity:1;pointer-events:auto}
-.days-card{background:#fff;border-radius:24px;padding:30px 28px;box-shadow:0 16px 50px rgba(0,0,0,.3);text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px;max-width:360px;width:85vw}
-.days-card .days-emoji{font-size:50px;animation:popIn .5s cubic-bezier(.175,.885,.32,1.275)}
-.days-card .days-text{font-size:18px;color:#666;letter-spacing:2px;line-height:1.8}
-.days-card .days-num{font-size:48px;font-weight:bold;color:#ec407a;text-shadow:0 3px 10px rgba(236,64,122,.2)}
-.days-card .days-close{padding:10px 30px;border-radius:25px;font-size:15px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;border:none;background:#f48fb1;color:#fff;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
-.days-card .days-close:hover{background:#ec407a;transform:scale(1.05)}
-
-/* 拖尾 */
-.trail-container{position:fixed;inset:0;z-index:4;pointer-events:none;overflow:hidden}
-
-/* 主页 */
 .main-page{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:18px;transition:opacity .4s,transform .4s}
 .main-page.hidden{opacity:0;transform:scale(.9);pointer-events:none}
 .speech-text{font-size:34px;font-weight:bold;color:#ec407a;text-shadow:0 3px 8px rgba(236,64,122,.2);opacity:0;transform:translateY(15px);transition:all .35s cubic-bezier(.175,.885,.32,1.275);pointer-events:none;letter-spacing:3px;-webkit-tap-highlight-color:transparent;outline:none}
@@ -61,7 +44,6 @@ body{
 .fish-wrapper{position:fixed;z-index:5;cursor:pointer;transition:transform .12s ease;filter:drop-shadow(0 10px 25px rgba(0,0,0,.2));-webkit-tap-highlight-color:transparent;outline:none;will-change:left,top,transform}
 .fish-wrapper:active{transform:scale(.9)}
 .fish-float{width:100%;height:100%}
-@keyframes bb{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
 .hint{color:#fff;font-size:17px;letter-spacing:3px;animation:pl 2s ease-in-out infinite;text-shadow:0 2px 6px rgba(0,0,0,.3)}
 @keyframes pl{0%,100%{opacity:.5;transform:scale(.98)}50%{opacity:1;transform:scale(1.03)}}
 .counter,.clock{color:#fff;font-size:15px;background:rgba(0,0,0,.35);padding:6px 16px;border-radius:20px;text-shadow:0 1px 2px rgba(0,0,0,.2)}
@@ -75,7 +57,6 @@ body{
 .btn-album:hover{background:#fce4ec}
 @media(max-width:768px){.speech-text{font-size:26px}.entry-btn{padding:8px 18px;font-size:14px}}
 
-/* 游戏 */
 .game-overlay{position:fixed;inset:0;z-index:10;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
 .game-overlay.active{opacity:1;pointer-events:auto}
 .game-panel{background:linear-gradient(160deg,#fff5f5,#fce4ec,#f3e5f5);border-radius:28px;padding:28px 24px 20px;box-shadow:0 20px 60px rgba(0,0,0,.35);display:flex;flex-direction:column;align-items:center;gap:16px;max-width:95vw;max-height:95vh;overflow-y:auto;position:relative}
@@ -100,7 +81,6 @@ body{
 .btn-back:hover{color:#888}
 @media(max-width:768px){.game-panel{padding:22px 14px 16px;gap:12px}.game-title{font-size:20px}.gcell{width:34px;height:34px;font-size:18px}.game-status{font-size:15px}.speech-lose{font-size:22px;padding:10px 20px}.btn-retry,.btn-quit{padding:10px 20px;font-size:15px}}
 
-/* 抽卡弹窗 */
 .gacha-overlay{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .5s}
 .gacha-overlay.active{opacity:1;pointer-events:auto}
 .gacha-card{background:#fff;border-radius:28px;padding:30px 24px;box-shadow:0 20px 60px rgba(0,0,0,.4);display:flex;flex-direction:column;align-items:center;gap:18px;max-width:400px;width:90vw;position:relative;overflow:hidden}
@@ -121,10 +101,7 @@ body{
 .gacha-fish-name{font-size:22px;font-weight:bold;color:#555;letter-spacing:2px}
 .gacha-close{padding:10px 36px;border-radius:25px;font-size:16px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;border:none;background:#f48fb1;color:#fff;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
 .gacha-close:hover{background:#ec407a;transform:scale(1.05)}
-.gacha-sparkles{position:absolute;pointer-events:none;font-size:30px;animation:spark 1s ease-out forwards}
-@keyframes spark{0%{transform:translate(0,0)scale(1);opacity:1}100%{transform:translate(var(--sx),var(--sy))scale(0);opacity:0}}
 
-/* 图鉴 */
 .album-overlay{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
 .album-overlay.active{opacity:1;pointer-events:auto}
 .album-panel{background:#fff;border-radius:28px;padding:24px 16px;box-shadow:0 20px 60px rgba(0,0,0,.35);max-width:95vw;max-height:90vh;width:700px;display:flex;flex-direction:column;gap:14px;position:relative}
@@ -142,33 +119,32 @@ body{
 .album-stats{text-align:center;font-size:14px;color:#999;letter-spacing:1px}
 @media(max-width:768px){.album-grid{grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:5px}.album-panel{padding:16px 10px}.album-title{font-size:18px}.album-tab{font-size:10px;padding:4px 8px}}
 
-/* 滚动字幕 */
 .marquee-bar{position:fixed;top:0;left:0;right:0;z-index:20;background:linear-gradient(90deg,#f48fb1,#ce93d8,#81d4fa,#f48fb1);background-size:300% 100%;animation:barShine 4s ease-in-out infinite;padding:10px 0;overflow:hidden;box-shadow:0 2px 15px rgba(244,143,177,.35)}
 @keyframes barShine{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 .marquee-inner{display:flex;width:max-content;animation:marqueeScroll 80s linear infinite}
 @keyframes marqueeScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .marquee-text{color:#fff;font-size:16px;font-weight:bold;letter-spacing:2px;white-space:nowrap;text-shadow:0 1px 4px rgba(0,0,0,.15);padding-right:60px}
 @media(max-width:768px){.marquee-bar{padding:8px 0}.marquee-text{font-size:13px;letter-spacing:1px;padding-right:30px}}
+
+.days-overlay{position:fixed;inset:0;z-index:35;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+.days-overlay.active{opacity:1;pointer-events:auto}
+.days-card{background:#fff;border-radius:24px;padding:30px 28px;box-shadow:0 16px 50px rgba(0,0,0,.3);text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px;max-width:360px;width:85vw}
+.days-card .days-emoji{font-size:50px;animation:popIn .5s cubic-bezier(.175,.885,.32,1.275)}
+.days-card .days-text{font-size:18px;color:#666;letter-spacing:2px;line-height:1.8}
+.days-card .days-num{font-size:48px;font-weight:bold;color:#ec407a;text-shadow:0 3px 10px rgba(236,64,122,.2)}
+.days-card .days-close{padding:10px 30px;border-radius:25px;font-size:15px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;border:none;background:#f48fb1;color:#fff;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
+.days-card .days-close:hover{background:#ec407a;transform:scale(1.05)}
+.trail-container{position:fixed;inset:0;z-index:4;pointer-events:none;overflow:hidden}
 </style>
 </head>
 <body>
 
-<!-- ====== 滚动字幕 ====== -->
-<div class="marquee-bar">
-  <div class="marquee-inner" id="marqueeInner"></div>
-</div>
-
-<!-- ====== 背景场景 ====== -->
+<div class="marquee-bar"><div class="marquee-inner" id="marqueeInner"></div></div>
 <div class="scene" id="sceneBg"></div>
-
-<!-- ====== 两侧图片 ====== -->
 <img class="side-img left" src="fish-img.jpg" alt="" id="sideImgLeft" title="点我">
 <img class="side-img right" src="fish-img.jpg" alt="">
 
-<!-- ====== 主页 ====== -->
-<!-- 拖尾粒子 -->
 <div class="trail-container" id="trailContainer"></div>
-<!-- 自由游动的鱼 -->
 <div class="fish-wrapper" id="fishWrapper" title="点我！"><div class="fish-float" id="mainFishSvg"></div></div>
 
 <div class="main-page" id="mainPage">
@@ -188,7 +164,6 @@ body{
   </div>
 </div>
 
-<!-- ====== 游戏 ====== -->
 <div class="game-overlay" id="gameOverlay">
   <div class="game-panel" id="gamePanel">
     <button class="btn-back" onclick="quitGame()">✕</button>
@@ -203,7 +178,6 @@ body{
   </div>
 </div>
 
-<!-- ====== 抽卡弹窗 ====== -->
 <div class="gacha-overlay" id="gachaOverlay">
   <div class="gacha-card" id="gachaCard">
     <div class="gacha-title" id="gachaTitle">🎣 今日抽鱼</div>
@@ -214,7 +188,6 @@ body{
   </div>
 </div>
 
-<!-- ====== 图鉴弹窗 ====== -->
 <div class="album-overlay" id="albumOverlay">
   <div class="album-panel">
     <button class="btn-back" onclick="closeAlbum()">✕</button>
@@ -225,7 +198,6 @@ body{
   </div>
 </div>
 
-<!-- ====== 陪伴天数弹窗 ====== -->
 <div class="days-overlay" id="daysOverlay">
   <div class="days-card">
     <div class="days-emoji">💕</div>
@@ -236,7 +208,6 @@ body{
   </div>
 </div>
 
-<!-- ====== 彩蛋弹窗 ====== -->
 <div class="days-overlay" id="easterOverlay">
   <div class="days-card">
     <div class="days-emoji" id="easterEmoji">😌</div>
@@ -247,7 +218,6 @@ body{
   </div>
 </div>
 
-<!-- ====== 喂食弹窗 ====== -->
 <div class="days-overlay" id="feedOverlay">
   <div class="days-card" id="feedCard">
     <div class="days-emoji" id="feedEmoji"></div>
@@ -258,13 +228,54 @@ body{
 </div>
 
 <script>
-// ========== 鱼数据生成 ==========
+// ========== Supabase API ==========
+const SB_URL = 'https://xgdzfxwzqocbtlomcisp.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnZHpmeHd6cW9jYnRsb21jaXNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxNDUzMTcsImV4cCI6MjEwMDcyMTMxN30.IK6AExsyPMnZ2VYjmZNxcJj04BqTRdUVTBcMXbWRdNc';
+const SB_HEAD = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' };
+
+let STATE = {};
+let UNLOCKED = [];
+
+async function loadState() {
+  const r = await fetch(`${SB_URL}/shared_state?id=eq.1`, { headers: { ...SB_HEAD, 'Accept': 'application/json' } });
+  const d = await r.json();
+  STATE = d[0] || {};
+}
+async function saveState(updates) {
+  Object.assign(STATE, updates);
+  await fetch(`${SB_URL}/shared_state?id=eq.1`, { method: 'PATCH', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' }, body: JSON.stringify(updates) }).catch(() => {});
+}
+async function loadUnlocked() {
+  const r = await fetch(`${SB_URL}/unlocked_fish?select=*`, { headers: { ...SB_HEAD, 'Accept': 'application/json' } });
+  UNLOCKED = (await r.json()) || [];
+}
+async function addUnlocked(fishId) {
+  const ex = UNLOCKED.find(f => f.fish_id === fishId);
+  if (ex) {
+    await fetch(`${SB_URL}/unlocked_fish?fish_id=eq.${encodeURIComponent(fishId)}`, {
+      method: 'PATCH', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ count: (ex.count || 1) + 1 })
+    }).catch(() => {});
+    ex.count = (ex.count || 1) + 1;
+  } else {
+    await fetch(`${SB_URL}/unlocked_fish`, {
+      method: 'POST', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ fish_id: fishId, count: 1 })
+    }).catch(() => {});
+    UNLOCKED.push({ fish_id: fishId, count: 1 });
+  }
+}
+async function switchDisplayFish(fishId) {
+  await saveState({ display_fish_id: fishId });
+}
+
+function getToday() { return new Date().toISOString().split('T')[0]; }
+
+// ========== 鱼数据 ==========
 const RARITY = ['普通','优良','稀有','史诗','传说','隐藏','限量','终极'];
 const R_COLORS = ['#bdbdbd','#81c784','#64b5f6','#ce93d8','#ffb74d','#ef5350','#f48fb1','#e91e63'];
 const R_PROB = [0.5, 0.45, 0.4, 0.33, 0.2, 0.1, 0.06, 0.03];
 const R_COUNTS = [75, 30, 20, 15, 10, 10, 5, 1];
-
-// 名字词库
 const ADJ = {
   0:['小','胖','圆','红','粉','橙','黄','绿','青','蓝','紫','白','灰','花','软','呆','萌','乖','笨','懒','馋','乐','跳','游','睡','甜','香','热','温','凉','快','慢','轻','重','长','短','厚','薄','光','暗','闪','水','火','泥','沙','石','草','树','花','云','雨','雪','风','日','月','星','海','河','湖','溪','泉','泡','波','浪','潮','涌','飘','浮','沉'],
   1:['锦','琉','珊','瑚','珍','珠','宝','翡','翠','钻','晶','莹','碧','澈','清','明','亮','耀','辉','灿','绚','丽','华','美','雅','秀','俊','俏','灵','巧'],
@@ -283,8 +294,6 @@ const NOUN = {
   5:['幽鳞','冥尾','影鳍','暗斑','幻鳞','魅尾','灵鳍','魂斑','虚鳞','空尾'],
   6:['绝鳞','独尾','特鳍','典斑','限鳞','藏尾','御鳍','赐斑','尊鳞','贵尾']
 };
-
-// 颜色方案
 const BODY_HUES = {
   0:[0,15,25,30,35,40,45,50,55,60,180,200,210,340,350],
   1:[160,170,190,220,240,260,280,300,320,10],
@@ -293,11 +302,11 @@ const BODY_HUES = {
   4:[25,40,50,60,300,320,340,10,200,220],
   5:[270,290,310,330,350,130,150,170,190,210],
   6:[0,15,30,45,55,180,270,300,340,20],
-  7:[330] // 小雯大王：玫瑰金
+  7:[330]
 };
 
 function genFishName(rarity, idx) {
-  if (rarity === 7) return '小雯大王'; // 终极款专属
+  if (rarity === 7) return '小雯大王';
   const a = ADJ[rarity][idx % ADJ[rarity].length];
   const n = NOUN[rarity][idx % NOUN[rarity].length];
   if (rarity === 0) {
@@ -306,22 +315,17 @@ function genFishName(rarity, idx) {
   }
   return a + n;
 }
-
-function genFishHue(rarity, idx) {
-  const hues = BODY_HUES[rarity];
-  return hues[idx % hues.length];
-}
-
+function genFishHue(rarity, idx) { return BODY_HUES[rarity][idx % BODY_HUES[rarity].length]; }
 function genAccessory(rarity, idx) {
   const acc = {
-    0:['', '', '', '', '', '🌸', '🎀', '⭐', '', '', '', '', '💧', '', '', '', '', '🍀', '', '', ''],
+    0:['','','','','','🌸','🎀','⭐','','','','','💧','','','','','🍀','','',''],
     1:['🌸','🎀','⭐','💎','🌺','💧','🍀','🌿','💫','✨'],
     2:['👑','💎','🌟','✨','🌙','☀️','💫','🔮','🎪','💍'],
     3:['👑','🌟','💎','🔮','⚡','🔥','🌈','💫','✨','🌙'],
     4:['👑','⚡','🔥','🌈','🌟','💎','🔮','✨','💫','☀️'],
     5:['👑','🔮','⚡','🌙','💀','🎭','👻','🖤','💫','✨'],
     6:['👑','💎','🌟','⚡','🔥','🌈','🔮','✨','💫','🏆'],
-    7:['👑'] // 小雯大王专属
+    7:['👑']
   };
   return acc[rarity][idx % acc[rarity].length];
 }
@@ -331,26 +335,15 @@ function buildAllFish() {
   ALL_FISH = [];
   for (let r = 0; r < R_COUNTS.length; r++) {
     for (let i = 0; i < R_COUNTS[r]; i++) {
-      ALL_FISH.push({
-        id: `r${r}-${i}`,
-        name: genFishName(r, i),
-        rarity: r,
-        hue: genFishHue(r, i),
-        accessory: genAccessory(r, i),
-        idx: i
-      });
+      ALL_FISH.push({ id: `r${r}-${i}`, name: genFishName(r, i), rarity: r, hue: genFishHue(r, i), accessory: genAccessory(r, i), idx: i });
     }
   }
 }
 buildAllFish();
 
-// ========== SVG渲染 ==========
 function renderFishSVG(fish, w, h) {
   const hue = fish.hue || 10;
-  const body = `hsl(${hue},70%,72%)`;
-  const bodyD = `hsl(${hue},70%,58%)`;
-  const belly = `hsl(${hue},60%,88%)`;
-  const fin = `hsl(${hue},60%,65%)`;
+  const body = `hsl(${hue},70%,72%)`, bodyD = `hsl(${hue},70%,58%)`, belly = `hsl(${hue},60%,88%)`, fin = `hsl(${hue},60%,65%)`;
   const vw = w || 240, vh = h || 180;
   const acc = fish.accessory || '';
   return `<svg width="${vw}" height="${vh}" viewBox="0 0 240 180">
@@ -381,16 +374,12 @@ function getFishSize() {
 let fishSize = getFishSize();
 
 function renderMainFish() {
-  const displayId = localStorage.getItem('displayFishId');
+  const displayId = STATE.display_fish_id || '';
   let fish = ALL_FISH[0];
-  if (displayId) {
-    const found = ALL_FISH.find(f => f.id === displayId);
-    if (found) fish = found;
-  }
+  if (displayId) { const found = ALL_FISH.find(f => f.id === displayId); if (found) fish = found; }
   fishSize = getFishSize();
   document.getElementById('mainFishSvg').innerHTML = renderFishSVG(fish, fishSize.w, fishSize.h);
 }
-renderMainFish();
 
 let fishX = window.innerWidth / 2 - fishSize.w / 2;
 let fishY = window.innerHeight / 2 - fishSize.h / 2;
@@ -403,18 +392,14 @@ let fishBouncing = false;
 
 function updateFishPos() {
   if (fishPaused) { fishAnimId = requestAnimationFrame(updateFishPos); return; }
-  if (Math.random() < 0.008) {
-    fishVX += (Math.random() - 0.5) * 1.2;
-    fishVY += (Math.random() - 0.5) * 1.2;
-  }
-  const speedScale = fishSize.w / 240; // 小屏鱼慢一点
+  if (Math.random() < 0.008) { fishVX += (Math.random() - 0.5) * 1.2; fishVY += (Math.random() - 0.5) * 1.2; }
+  const speedScale = fishSize.w / 240;
   const maxSpd = 3.5 * speedScale, minSpd = 0.3 * speedScale;
   let spd = Math.sqrt(fishVX * fishVX + fishVY * fishVY);
   if (spd < minSpd) { fishVX = (fishVX / spd) * minSpd + (Math.random() - 0.5) * 0.5; fishVY = (fishVY / spd) * minSpd + (Math.random() - 0.5) * 0.5; }
   if (spd > maxSpd) { fishVX = (fishVX / spd) * maxSpd; fishVY = (fishVY / spd) * maxSpd; }
   fishX += fishVX; fishY += fishVY;
-  const pad = 10;
-  const fw = fishSize.w, fh = fishSize.h;
+  const pad = 10, fw = fishSize.w, fh = fishSize.h;
   if (fishX < pad) { fishX = pad; fishVX = Math.abs(fishVX); }
   if (fishX > window.innerWidth - fw - pad) { fishX = window.innerWidth - fw - pad; fishVX = -Math.abs(fishVX); }
   if (fishY < 50) { fishY = 50; fishVY = Math.abs(fishVY); }
@@ -423,9 +408,7 @@ function updateFishPos() {
   if (newDir !== fishDir) { fishDir = newDir; }
   fishWrapper.style.left = fishX + 'px';
   fishWrapper.style.top = fishY + 'px';
-  if (!fishBouncing) {
-    fishWrapper.style.transform = `scaleX(${fishDir})`;
-  }
+  if (!fishBouncing) { fishWrapper.style.transform = `scaleX(${fishDir})`; }
   spawnTrail(fishX, fishY, fishDir);
   fishAnimId = requestAnimationFrame(updateFishPos);
 }
@@ -438,37 +421,17 @@ window.addEventListener('resize', () => {
 
 updateFishPos();
 
-// ========== 拖尾特效 ==========
+// ========== 拖尾 ==========
 const TRAIL_CONFIG = {
-  3: { // 史诗：紫色星光
-    perFrame: 2, life: 700, size: [3, 6],
-    colors: ['#ce93d8', '#e1bee7', '#f3e5f5', '#ba68c8', '#fff'],
-    shapes: ['circle']
-  },
-  4: { // 传说：金色星芒
-    perFrame: 3, life: 850, size: [4, 8],
-    colors: ['#ffb74d', '#ffe0b2', '#ffcc80', '#fff8e1', '#fff', '#ff9800'],
-    shapes: ['circle', 'star']
-  },
-  5: { // 隐藏：暗紫灵火
-    perFrame: 3, life: 950, size: [3, 7],
-    colors: ['#ef5350', '#b71c1c', '#7b1fa2', '#4a148c', '#ffcdd2', '#fff'],
-    shapes: ['circle', 'circle', 'star']
-  },
-  6: { // 限量：彩虹盛宴
-    perFrame: 5, life: 1100, size: [5, 10],
-    colors: ['#f48fb1', '#ce93d8', '#81d4fa', '#fff176', '#ff8a80', '#a5d6a7', '#ffe082', '#ef9a9a'],
-    shapes: ['circle', 'star', 'star', 'diamond']
-  },
-  7: { // 终极·小雯大王：至尊华彩
-    perFrame: 8, life: 1400, size: [6, 14],
-    colors: ['#ff1744','#ff4081','#ff9100','#ffd600','#76ff03','#00e5ff','#d500f9','#fff','#ff80ab','#ffe57f','#b9f6ca','#80d8ff','#ea80fc'],
-    shapes: ['circle', 'star', 'star', 'diamond', 'diamond', 'star']
-  }
+  3: { perFrame: 2, life: 700, size: [3, 6], colors: ['#ce93d8', '#e1bee7', '#f3e5f5', '#ba68c8', '#fff'], shapes: ['circle'] },
+  4: { perFrame: 3, life: 850, size: [4, 8], colors: ['#ffb74d', '#ffe0b2', '#ffcc80', '#fff8e1', '#fff', '#ff9800'], shapes: ['circle', 'star'] },
+  5: { perFrame: 3, life: 950, size: [3, 7], colors: ['#ef5350', '#b71c1c', '#7b1fa2', '#4a148c', '#ffcdd2', '#fff'], shapes: ['circle', 'circle', 'star'] },
+  6: { perFrame: 5, life: 1100, size: [5, 10], colors: ['#f48fb1', '#ce93d8', '#81d4fa', '#fff176', '#ff8a80', '#a5d6a7', '#ffe082', '#ef9a9a'], shapes: ['circle', 'star', 'star', 'diamond'] },
+  7: { perFrame: 8, life: 1400, size: [6, 14], colors: ['#ff1744','#ff4081','#ff9100','#ffd600','#76ff03','#00e5ff','#d500f9','#fff','#ff80ab','#ffe57f','#b9f6ca','#80d8ff','#ea80fc'], shapes: ['circle', 'star', 'star', 'diamond', 'diamond', 'star'] }
 };
 
 function getDisplayFishRarity() {
-  const displayId = localStorage.getItem('displayFishId');
+  const displayId = STATE.display_fish_id || '';
   if (!displayId) return 0;
   const found = ALL_FISH.find(f => f.id === displayId);
   return found ? found.rarity : 0;
@@ -477,424 +440,260 @@ function getDisplayFishRarity() {
 let trailTick = 0;
 function spawnTrail(fx, fy, dir) {
   const rarity = getDisplayFishRarity();
-  if (rarity < 3) return; // 史诗以下无特效
+  if (rarity < 3) return;
   const cfg = TRAIL_CONFIG[rarity];
   if (!cfg) return;
   trailTick++;
   if (trailTick % Math.max(1, Math.floor(3 / cfg.perFrame)) !== 0) return;
-
   const container = document.getElementById('trailContainer');
   const tailX = dir === 1 ? fx + fishSize.w * 0.16 : fx + fishSize.w * 0.84;
   const tailY = fy + fishSize.h / 2;
-
   for (let i = 0; i < cfg.perFrame; i++) {
     const p = document.createElement('div');
     const size = cfg.size[0] + Math.random() * (cfg.size[1] - cfg.size[0]);
     const color = cfg.colors[Math.floor(Math.random() * cfg.colors.length)];
     const shape = cfg.shapes[Math.floor(Math.random() * cfg.shapes.length)];
-    const ox = (Math.random() - 0.5) * 40;
-    const oy = (Math.random() - 0.5) * 40;
-
+    const ox = (Math.random() - 0.5) * 40, oy = (Math.random() - 0.5) * 40;
     p.style.cssText = `position:fixed;pointer-events:none;left:${tailX+ox}px;top:${tailY+oy}px;width:${size}px;height:${size}px;background:${color};z-index:4;`;
-    if (shape === 'circle') {
-      p.style.borderRadius = '50%';
-    } else if (shape === 'star') {
-      p.style.borderRadius = '50%';
-      p.style.boxShadow = `0 0 ${size*2}px ${color}`;
-    } else if (shape === 'diamond') {
-      p.style.borderRadius = '2px';
-      p.style.transform = 'rotate(45deg)';
-      p.style.boxShadow = `0 0 ${size*3}px ${color}`;
-    }
-
+    if (shape === 'circle') { p.style.borderRadius = '50%'; }
+    else if (shape === 'star') { p.style.borderRadius = '50%'; p.style.boxShadow = `0 0 ${size*2}px ${color}`; }
+    else if (shape === 'diamond') { p.style.borderRadius = '2px'; p.style.transform = 'rotate(45deg)'; p.style.boxShadow = `0 0 ${size*3}px ${color}`; }
     const anim = p.animate([
-      { opacity: 0.9, transform: p.style.transform + ` translate(0,0) scale(1)` },
+      { opacity: 0.9, transform: p.style.transform + ' translate(0,0) scale(1)' },
       { opacity: 0, transform: p.style.transform + ` translate(${ox*2}px,${oy*2-20}px) scale(0)` }
     ], { duration: cfg.life, easing: 'ease-out' });
-
     container.appendChild(p);
     anim.onfinish = () => p.remove();
-    // 兜底清理
     setTimeout(() => { if (p.parentNode) p.remove(); }, cfg.life + 100);
   }
 }
 
-// ========== 主页 ==========
+// ========== 主页逻辑 ==========
 const speechText = document.getElementById('speechText');
 const counterEl = document.getElementById('counter');
 const clockEl = document.getElementById('clock');
-let clickCount = parseInt(localStorage.getItem('fishClickCount') || '0');
+
+function updateClock() {
+  const n = new Date();
+  clockEl.textContent = n.toLocaleString('zh-CN', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false });
+}
+updateClock(); setInterval(updateClock, 1000);
+
+function playBubbleSound() {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.connect(g); g.connect(ctx.destination); o.type = 'sine';
+  o.frequency.setValueAtTime(600, ctx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + .15);
+  g.gain.setValueAtTime(.3, ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(.01, ctx.currentTime + .2);
+  o.start(ctx.currentTime); o.stop(ctx.currentTime + .2);
+}
+
 let textTimer = null;
-if(clickCount>0) counterEl.textContent = `这条呆鱼一共说了 ${clickCount} 次 "我是傻鱼"～`;
-
-function updateClock(){
-  const n=new Date();
-  clockEl.textContent=n.toLocaleString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
-}
-updateClock();setInterval(updateClock,1000);
-
-function playBubbleSound(){
-  const ctx=new(window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator();const g=ctx.createGain();
-  o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.setValueAtTime(600,ctx.currentTime);
-  o.frequency.exponentialRampToValueAtTime(300,ctx.currentTime+.15);g.gain.setValueAtTime(.3,ctx.currentTime);
-  g.gain.exponentialRampToValueAtTime(.01,ctx.currentTime+.2);o.start(ctx.currentTime);o.stop(ctx.currentTime+.2);
+function fishSay(msg) {
+  speechText.textContent = msg;
+  speechText.classList.remove('shake'); void speechText.offsetWidth;
+  speechText.classList.add('shake'); speechText.classList.add('show');
+  clearTimeout(textTimer);
+  textTimer = setTimeout(() => { speechText.classList.remove('show'); }, 2000);
 }
 
-function fishSay(msg){
-  speechText.textContent=msg;speechText.classList.remove('shake');void speechText.offsetWidth;
-  speechText.classList.add('shake');speechText.classList.add('show');clearTimeout(textTimer);
-  textTimer=setTimeout(()=>{speechText.classList.remove('show')},2000);
-}
-
-fishWrapper.addEventListener('click',(e)=>{
+fishWrapper.addEventListener('click', async (e) => {
   e.stopPropagation();
-  playBubbleSound();clickCount++;localStorage.setItem('fishClickCount',clickCount);
-  speechText.textContent='我是傻鱼 🐟';counterEl.textContent=`这条呆鱼一共说了 ${clickCount} 次 "我是傻鱼"～`;
-  // 彩蛋：50的倍数
-  if (clickCount % 50 === 0) {
+  playBubbleSound();
+  STATE.click_count = (STATE.click_count || 0) + 1;
+  counterEl.textContent = `这条呆鱼一共说了 ${STATE.click_count} 次 "我是傻鱼"～`;
+  await saveState({ click_count: STATE.click_count });
+
+  speechText.textContent = '我是傻鱼 🐟';
+  speechText.classList.remove('shake'); void speechText.offsetWidth; speechText.classList.add('shake');
+  speechText.classList.add('show');
+  clearTimeout(textTimer);
+  textTimer = setTimeout(() => { speechText.classList.remove('show'); }, 1500);
+
+  fishBouncing = true;
+  const curScale = `scaleX(${fishDir})`;
+  fishWrapper.style.transform = curScale + ' scale(0.82)';
+  setTimeout(() => { fishWrapper.style.transform = curScale + ' scale(1.08)';
+    setTimeout(() => { fishWrapper.style.transform = curScale; fishBouncing = false; }, 180);
+  }, 100);
+
+  // 彩蛋：50倍数
+  if (STATE.click_count % 50 === 0) {
     setTimeout(() => {
       window._bonusDraw = false;
       document.getElementById('easterEmoji').textContent = '😌';
-      document.getElementById('easterNum').textContent = `你已经点了 ${clickCount} 次鱼！`;
+      document.getElementById('easterNum').textContent = `你或别人已经点了 ${STATE.click_count} 次鱼！`;
       document.getElementById('easterMsg').innerHTML = '🐟 鱼鱼提醒你：<br>已经戳了好多下啦～';
       document.getElementById('easterHint').textContent = '🌿 休息一下眼睛，活动活动肩膀～';
       document.getElementById('easterCloseBtn').textContent = '☕ 好的，休息一下';
       document.getElementById('easterOverlay').classList.add('active');
     }, 600);
   }
-  speechText.classList.remove('shake');void speechText.offsetWidth;speechText.classList.add('shake');
-  speechText.classList.add('show');clearTimeout(textTimer);
-  textTimer=setTimeout(()=>{speechText.classList.remove('show')},1500);
-  // 弹跳动画（保留方向翻转）
-  fishBouncing = true;
-  const curScale = `scaleX(${fishDir})`;
-  fishWrapper.style.transform = curScale + ' scale(0.82)';
-  setTimeout(()=>{ fishWrapper.style.transform = curScale + ' scale(1.08)';
-    setTimeout(()=>{ fishWrapper.style.transform = curScale; fishBouncing = false; }, 180);
-  }, 100);
 });
 
 // ========== 游戏 ==========
-const gameOverlay=document.getElementById('gameOverlay'),gameBoard=document.getElementById('gameBoard'),
-      gameStatus=document.getElementById('gameStatus'),gameTitle=document.getElementById('gameTitle'),
-      fishJumpin=document.getElementById('fishJumpin'),resultBtns=document.getElementById('resultBtns'),
-      mainPage=document.getElementById('mainPage');
-let currentGame='tictactoe',gboard=[],gOver=false;
+const gameOverlay = document.getElementById('gameOverlay'), gameBoard = document.getElementById('gameBoard');
+const gameStatus = document.getElementById('gameStatus'), gameTitle = document.getElementById('gameTitle');
+const fishJumpin = document.getElementById('fishJumpin'), resultBtns = document.getElementById('resultBtns');
+const mainPage = document.getElementById('mainPage');
+let currentGame = 'tictactoe', gboard = [], gOver = false;
 
-function enterGame(game){
-  currentGame=game;mainPage.classList.add('hidden');gameOverlay.classList.add('active');
-  fishJumpin.classList.remove('show');resultBtns.style.display='none';resultBtns.classList.remove('show-btns');gOver=false;
-  fishPaused=true; fishWrapper.style.opacity='0';
-  if(game==='tictactoe')initTTT();else initGomoku();
+function enterGame(game) {
+  currentGame = game; mainPage.classList.add('hidden'); gameOverlay.classList.add('active');
+  fishJumpin.classList.remove('show'); resultBtns.style.display = 'none'; resultBtns.classList.remove('show-btns'); gOver = false;
+  fishPaused = true; fishWrapper.style.opacity = '0';
+  if (game === 'tictactoe') initTTT(); else initGomoku();
 }
-function quitGame(){gameOverlay.classList.remove('active');mainPage.classList.remove('hidden');fishPaused=false; fishWrapper.style.opacity='1'}
-function rematch(){fishJumpin.classList.remove('show');resultBtns.style.display='none';resultBtns.classList.remove('show-btns');gOver=false;if(currentGame==='tictactoe')initTTT();else initGomoku()}
-function admitLose(){gameOverlay.classList.remove('active');mainPage.classList.remove('hidden');fishPaused=false; fishWrapper.style.opacity='1'; setTimeout(()=>fishSay('我是傻鱼 🐟'),400)}
+function quitGame() { gameOverlay.classList.remove('active'); mainPage.classList.remove('hidden'); fishPaused = false; fishWrapper.style.opacity = '1'; }
+function rematch() { fishJumpin.classList.remove('show'); resultBtns.style.display = 'none'; resultBtns.classList.remove('show-btns'); gOver = false; if (currentGame === 'tictactoe') initTTT(); else initGomoku(); }
+function admitLose() { gameOverlay.classList.remove('active'); mainPage.classList.remove('hidden'); fishPaused = false; fishWrapper.style.opacity = '1'; setTimeout(() => fishSay('我是傻鱼 🐟'), 400); }
 
-function initTTT(){
-  gboard=Array(9).fill('');gOver=false;gameTitle.textContent='🎮 井字棋';gameStatus.textContent='轮到你了 ✨';
-  gameBoard.style.gridTemplateColumns='repeat(3,1fr)';gameBoard.innerHTML='';
-  for(let i=0;i<9;i++){const c=document.createElement('button');c.className='gcell';c.onclick=()=>tttClick(i);gameBoard.appendChild(c)}
+function initTTT() {
+  gboard = Array(9).fill(''); gOver = false; gameTitle.textContent = '🎮 井字棋'; gameStatus.textContent = '轮到你了 ✨';
+  gameBoard.style.gridTemplateColumns = 'repeat(3, 1fr)'; gameBoard.innerHTML = '';
+  for (let i = 0; i < 9; i++) { const c = document.createElement('button'); c.className = 'gcell'; c.onclick = () => tttClick(i); gameBoard.appendChild(c); }
 }
-function tttClick(i){
-  if(gboard[i]||gOver)return;gboard[i]='X';renderGBoard();
-  if(tttWin('X')){gOver=true;gameStatus.textContent='你赢了！🎉';return}
-  if(gboard.every(c=>c)){gOver=true;gameStatus.textContent='平局～';return}
-  setTimeout(()=>{gboard[tttAI()]='O';renderGBoard();if(tttWin('O')){gOver=true;onLose()}else if(gboard.every(c=>c)){gOver=true;gameStatus.textContent='平局～'}},300);
+function tttClick(i) {
+  if (gboard[i] || gOver) return; gboard[i] = 'X'; renderGBoard();
+  if (tttWin('X')) { gOver = true; gameStatus.textContent = '你赢了！🎉'; return; }
+  if (gboard.every(c => c)) { gOver = true; gameStatus.textContent = '平局～'; return; }
+  setTimeout(() => { gboard[tttAI()] = 'O'; renderGBoard(); if (tttWin('O')) { gOver = true; onLose(); } else if (gboard.every(c => c)) { gOver = true; gameStatus.textContent = '平局～'; } }, 300);
 }
-function tttWin(p){const w=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];for(const[a,b,c] of w)if(gboard[a]===p&&gboard[b]===p&&gboard[c]===p){hiCells(a,b,c);return true}return false}
-function tttAI(){let b=-Infinity,m=0;for(let i=0;i<9;i++)if(!gboard[i]){gboard[i]='O';let s=tttMM(false);gboard[i]='';if(s>b){b=s;m=i}}return m}
-function tttMM(isM){if(tttQ('O'))return 10;if(tttQ('X'))return-10;if(gboard.every(c=>c))return 0;let b=isM?-Infinity:Infinity;for(let i=0;i<9;i++)if(!gboard[i]){gboard[i]=isM?'O':'X';let s=tttMM(!isM);gboard[i]='';b=isM?Math.max(b,s):Math.min(b,s)}return b}
-function tttQ(p){const w=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];return w.some(([a,b,c])=>gboard[a]===p&&gboard[b]===p&&gboard[c]===p)}
+function tttWin(p) { const w = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; for (const [a,b,c] of w) if (gboard[a] === p && gboard[b] === p && gboard[c] === p) { hiCells(a,b,c); return true; } return false; }
+function tttAI() { let b = -Infinity, m = 0; for (let i = 0; i < 9; i++) if (!gboard[i]) { gboard[i] = 'O'; let s = tttMM(false); gboard[i] = ''; if (s > b) { b = s; m = i; } } return m; }
+function tttMM(isM) { if (tttQ('O')) return 10; if (tttQ('X')) return -10; if (gboard.every(c => c)) return 0; let b = isM ? -Infinity : Infinity; for (let i = 0; i < 9; i++) if (!gboard[i]) { gboard[i] = isM ? 'O' : 'X'; let s = tttMM(!isM); gboard[i] = ''; b = isM ? Math.max(b, s) : Math.min(b, s); } return b; }
+function tttQ(p) { const w = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; return w.some(([a,b,c]) => gboard[a] === p && gboard[b] === p && gboard[c] === p); }
 
-const GK=11;
-function initGomoku(){
-  gboard=Array(GK*GK).fill('');gOver=false;gameTitle.textContent='♟️ 五子棋';gameStatus.textContent='你执黑先手 ✨';
-  gameBoard.style.gridTemplateColumns=`repeat(${GK},1fr)`;gameBoard.innerHTML='';
-  for(let i=0;i<GK*GK;i++){const c=document.createElement('button');c.className='gcell';c.onclick=()=>gkClick(i);gameBoard.appendChild(c)}
+const GK = 11;
+function initGomoku() {
+  gboard = Array(GK * GK).fill(''); gOver = false; gameTitle.textContent = '♟️ 五子棋'; gameStatus.textContent = '你执黑先手 ✨';
+  gameBoard.style.gridTemplateColumns = `repeat(${GK}, 1fr)`; gameBoard.innerHTML = '';
+  for (let i = 0; i < GK * GK; i++) { const c = document.createElement('button'); c.className = 'gcell'; c.onclick = () => gkClick(i); gameBoard.appendChild(c); }
 }
-function gkClick(i){if(gboard[i]||gOver)return;gboard[i]='X';renderGBoard();if(gkWin('X')){gOver=true;gameStatus.textContent='你赢了！🎉';return}if(gboard.every(c=>c)){gOver=true;gameStatus.textContent='平局～';return}setTimeout(()=>{gboard[gkAI()]='O';renderGBoard();if(gkWin('O')){gOver=true;onLose()}else if(gboard.every(c=>c)){gOver=true;gameStatus.textContent='平局～'}},200)}
-function gkWin(p){const dirs=[[1,0],[0,1],[1,1],[1,-1]];for(let r=0;r<GK;r++)for(let c=0;c<GK;c++){const idx=r*GK+c;if(gboard[idx]!==p)continue;for(const[dr,dc] of dirs){let cnt=1;const cells=[idx];for(let d=1;d<5;d++){const nr=r+dr*d,nc=c+dc*d;if(nr<0||nr>=GK||nc<0||nc>=GK)break;if(gboard[nr*GK+nc]===p){cnt++;cells.push(nr*GK+nc)}else break}for(let d=1;d<5;d++){const nr=r-dr*d,nc=c-dc*d;if(nr<0||nr>=GK||nc<0||nc>=GK)break;if(gboard[nr*GK+nc]===p){cnt++;cells.push(nr*GK+nc)}else break}if(cnt>=5){hiCells(...cells);return true}}}return false}
-function gkScore(idx,p){const r=Math.floor(idx/GK),c=idx%GK;const dirs=[[1,0],[0,1],[1,1],[1,-1]];let score=0;for(const[dr,dc] of dirs){let cnt=1,open=0;for(let d=1;d<5;d++){const nr=r+dr*d,nc=c+dc*d;if(nr<0||nr>=GK||nc<0||nc>=GK)break;const v=gboard[nr*GK+nc];if(v===p)cnt++;else{if(!v)open++;break}}for(let d=1;d<5;d++){const nr=r-dr*d,nc=c-dc*d;if(nr<0||nr>=GK||nc<0||nc>=GK)break;const v=gboard[nr*GK+nc];if(v===p)cnt++;else{if(!v)open++;break}}if(cnt>=5)score+=100000;else if(cnt===4)score+=open===2?10000:5000;else if(cnt===3)score+=open===2?1000:300;else if(cnt===2)score+=open===2?100:20;else if(cnt===1)score+=open===2?10:2}return score}
-function gkAI(){let best=-Infinity,move=Math.floor(GK*GK/2);const near=new Set();for(let i=0;i<GK*GK;i++){if(!gboard[i])continue;const r=Math.floor(i/GK),c=i%GK;for(let dr=-2;dr<=2;dr++)for(let dc=-2;dc<=2;dc++){const nr=r+dr,nc=c+dc;if(nr>=0&&nr<GK&&nc>=0&&nc<GK){const ni=nr*GK+nc;if(!gboard[ni])near.add(ni)}}}const candidates=near.size>0?[...near]:gboard.map((_,i)=>i).filter(i=>!gboard[i]);for(const i of candidates){gboard[i]='O';const atk=gkScore(i,'O');gboard[i]='X';const def=gkScore(i,'X');gboard[i]='';const s=Math.max(atk,def>9000?def*1.5:def);if(s>best){best=s;move=i}}return move}
-function renderGBoard(){const cells=gameBoard.children;for(let i=0;i<gboard.length;i++){cells[i].textContent=gboard[i];cells[i].className='gcell '+(gboard[i]||'')}}
-function hiCells(...indices){indices.forEach(i=>gameBoard.children[i].classList.add('win'))}
-function onLose(){
-  gameStatus.textContent='你输了 😢';
-  fishJumpin.innerHTML=renderFishSVG(ALL_FISH[0],140,100)+'<div class="speech-lose">你才是傻鱼！🐟</div>';
-  fishJumpin.classList.remove('show');resultBtns.classList.remove('show-btns');void fishJumpin.offsetWidth;
-  fishJumpin.classList.add('show');resultBtns.style.display='flex';void resultBtns.offsetWidth;resultBtns.classList.add('show-btns');
-}
-
-// ========== 抽卡系统 ==========
-function getUnlockedFish(){try{return JSON.parse(localStorage.getItem('unlockedFish')||'[]')}catch(e){return[]}}
-function saveUnlockedFish(arr){localStorage.setItem('unlockedFish',JSON.stringify(arr))}
-function getToday(){return new Date().toISOString().split('T')[0]}
-
-function drawFish(){
-  const r=Math.random();let cum=0;const total=R_PROB.reduce((a,b)=>a+b,0);
-  let tier=0;
-  for(let i=0;i<R_PROB.length;i++){cum+=R_PROB[i]/total;if(r<=cum){tier=i;break}}
-  const start=ALL_FISH.findIndex(f=>f.rarity===tier);
-  const pool=ALL_FISH.filter(f=>f.rarity===tier);
-  return pool[Math.floor(Math.random()*pool.length)];
+function gkClick(i) { if (gboard[i] || gOver) return; gboard[i] = 'X'; renderGBoard(); if (gkWin('X')) { gOver = true; gameStatus.textContent = '你赢了！🎉'; return; } if (gboard.every(c => c)) { gOver = true; gameStatus.textContent = '平局～'; return; } setTimeout(() => { gboard[gkAI()] = 'O'; renderGBoard(); if (gkWin('O')) { gOver = true; onLose(); } else if (gboard.every(c => c)) { gOver = true; gameStatus.textContent = '平局～'; } }, 200); }
+function gkWin(p) { const dirs = [[1,0],[0,1],[1,1],[1,-1]]; for (let r = 0; r < GK; r++) for (let c = 0; c < GK; c++) { const idx = r * GK + c; if (gboard[idx] !== p) continue; for (const [dr,dc] of dirs) { let cnt = 1; const cells = [idx]; for (let d = 1; d < 5; d++) { const nr = r + dr * d, nc = c + dc * d; if (nr < 0 || nr >= GK || nc < 0 || nc >= GK) break; if (gboard[nr * GK + nc] === p) { cnt++; cells.push(nr * GK + nc); } else break; } for (let d = 1; d < 5; d++) { const nr = r - dr * d, nc = c - dc * d; if (nr < 0 || nr >= GK || nc < 0 || nc >= GK) break; if (gboard[nr * GK + nc] === p) { cnt++; cells.push(nr * GK + nc); } else break; } if (cnt >= 5) { hiCells(...cells); return true; } } } return false; }
+function gkScore(idx, p) { const r = Math.floor(idx / GK), c = idx % GK; const dirs = [[1,0],[0,1],[1,1],[1,-1]]; let score = 0; for (const [dr,dc] of dirs) { let cnt = 1, open = 0; for (let d = 1; d < 5; d++) { const nr = r + dr * d, nc = c + dc * d; if (nr < 0 || nr >= GK || nc < 0 || nc >= GK) break; const v = gboard[nr * GK + nc]; if (v === p) cnt++; else { if (!v) open++; break; } } for (let d = 1; d < 5; d++) { const nr = r - dr * d, nc = c - dc * d; if (nr < 0 || nr >= GK || nc < 0 || nc >= GK) break; const v = gboard[nr * GK + nc]; if (v === p) cnt++; else { if (!v) open++; break; } } if (cnt >= 5) score += 100000; else if (cnt === 4) score += open === 2 ? 10000 : 5000; else if (cnt === 3) score += open === 2 ? 1000 : 300; else if (cnt === 2) score += open === 2 ? 100 : 20; else if (cnt === 1) score += open === 2 ? 10 : 2; } return score; }
+function gkAI() { let best = -Infinity, move = Math.floor(GK * GK / 2); const near = new Set(); for (let i = 0; i < GK * GK; i++) { if (!gboard[i]) continue; const r = Math.floor(i / GK), c = i % GK; for (let dr = -2; dr <= 2; dr++) for (let dc = -2; dc <= 2; dc++) { const nr = r + dr, nc = c + dc; if (nr >= 0 && nr < GK && nc >= 0 && nc < GK) { const ni = nr * GK + nc; if (!gboard[ni]) near.add(ni); } } } const candidates = near.size > 0 ? [...near] : gboard.map((_, i) => i).filter(i => !gboard[i]); for (const i of candidates) { gboard[i] = 'O'; const atk = gkScore(i, 'O'); gboard[i] = 'X'; const def = gkScore(i, 'X'); gboard[i] = ''; const s = Math.max(atk, def > 9000 ? def * 1.5 : def); if (s > best) { best = s; move = i; } } return move; }
+function renderGBoard() { const cells = gameBoard.children; for (let i = 0; i < gboard.length; i++) { cells[i].textContent = gboard[i]; cells[i].className = 'gcell ' + (gboard[i] || ''); } }
+function hiCells(...indices) { indices.forEach(i => gameBoard.children[i].classList.add('win')); }
+function onLose() {
+  gameStatus.textContent = '你输了 😢';
+  fishJumpin.innerHTML = renderFishSVG(ALL_FISH[0], 140, 100) + '<div class="speech-lose">你才是傻鱼！🐟</div>';
+  fishJumpin.classList.remove('show'); resultBtns.classList.remove('show-btns'); void fishJumpin.offsetWidth;
+  fishJumpin.classList.add('show'); resultBtns.style.display = 'flex'; void resultBtns.offsetWidth; resultBtns.classList.add('show-btns');
 }
 
-function showGacha(fish, customTitle){
-  const overlay=document.getElementById('gachaOverlay');
-  const card=document.getElementById('gachaCard');
-  card.className='gacha-card r'+fish.rarity;
+// ========== 抽卡 ==========
+function drawFish() {
+  const r = Math.random(); let cum = 0; const total = R_PROB.reduce((a, b) => a + b, 0);
+  let tier = 0;
+  for (let i = 0; i < R_PROB.length; i++) { cum += R_PROB[i] / total; if (r <= cum) { tier = i; break; } }
+  const pool = ALL_FISH.filter(f => f.rarity === tier);
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function showGacha(fish, customTitle) {
+  const overlay = document.getElementById('gachaOverlay');
+  const card = document.getElementById('gachaCard');
+  card.className = 'gacha-card r' + fish.rarity;
   document.getElementById('gachaTitle').textContent = customTitle || '🎣 今日抽鱼';
-  document.getElementById('gachaFishImg').innerHTML=renderFishSVG(fish,180,130);
-  document.getElementById('gachaRarity').textContent=RARITY[fish.rarity]+'款';
-  document.getElementById('gachaRarity').className='gacha-rarity rarity-'+fish.rarity;
-  document.getElementById('gachaFishName').textContent=fish.name;
+  document.getElementById('gachaFishImg').innerHTML = renderFishSVG(fish, 180, 130);
+  document.getElementById('gachaRarity').textContent = RARITY[fish.rarity] + '款';
+  document.getElementById('gachaRarity').className = 'gacha-rarity rarity-' + fish.rarity;
+  document.getElementById('gachaFishName').textContent = fish.name;
   overlay.classList.add('active');
-  const img=document.getElementById('gachaFishImg');
-  img.style.animation='none';void img.offsetWidth;img.style.animation='gachaReveal .6s cubic-bezier(.175,.885,.32,1.275)';
+  const img = document.getElementById('gachaFishImg');
+  img.style.animation = 'none'; void img.offsetWidth;
+  img.style.animation = 'gachaReveal .6s cubic-bezier(.175,.885,.32,1.275)';
 }
 
-let pendingFish=null;
-function collectGacha(){
+let pendingFish = null;
+async function collectGacha() {
   document.getElementById('gachaOverlay').classList.remove('active');
-  if(pendingFish){
-    const unlocked=getUnlockedFish();
-    const existing=unlocked.find(f=>f.id===pendingFish.id);
-    if(existing){existing.count=(existing.count||1)+1}
-    else{unlocked.push({...pendingFish,count:1})}
-    saveUnlockedFish(unlocked);
-    localStorage.setItem('lastDrawDate',getToday());
-    localStorage.setItem('displayFishId',pendingFish.id);
-    fishSize = getFishSize();
+  if (pendingFish) {
+    await addUnlocked(pendingFish.id);
+    await saveState({ last_draw_date: getToday(), display_fish_id: pendingFish.id });
     renderMainFish();
-    pendingFish=null;
+    pendingFish = null;
   }
 }
 
-function checkDailyGacha(){
-  const last=localStorage.getItem('lastDrawDate');
-  if(last!==getToday()){
-    pendingFish=drawFish();
-    setTimeout(()=>showGacha(pendingFish),600);
+function checkDailyGacha() {
+  const last = STATE.last_draw_date || '';
+  if (last !== getToday()) {
+    pendingFish = drawFish();
+    setTimeout(() => showGacha(pendingFish), 600);
   }
 }
 
 // ========== 图鉴 ==========
-function openAlbum(){
-  const overlay=document.getElementById('albumOverlay');
-  overlay.classList.add('active');
-  renderAlbum();
-}
-function closeAlbum(){document.getElementById('albumOverlay').classList.remove('active')}
+function openAlbum() { document.getElementById('albumOverlay').classList.add('active'); renderAlbum(); }
+function closeAlbum() { document.getElementById('albumOverlay').classList.remove('active'); }
 
-function renderAlbum(tierFilter=null){
-  const unlocked=getUnlockedFish();
-  const unlockedMap={};unlocked.forEach(f=>{unlockedMap[f.id]=f.count||1});
-  let total=R_COUNTS.reduce((a,b)=>a+b,0);
-  const totalOwned=unlocked.reduce((s,f)=>s+(f.count||1),0);
+function renderAlbum(tierFilter = null) {
+  const unlockedMap = {}; UNLOCKED.forEach(f => { unlockedMap[f.fish_id] = f.count || 1; });
+  const total = R_COUNTS.reduce((a, b) => a + b, 0);
+  const totalOwned = UNLOCKED.reduce((s, f) => s + (f.count || 1), 0);
+  document.getElementById('albumStats').textContent = `已解锁 ${UNLOCKED.length} / ${total} 种（含重复共 ${totalOwned} 条）`;
 
-  document.getElementById('albumStats').textContent=`已解锁 ${unlocked.length} / ${total} 种（含重复共 ${totalOwned} 条）`;
-
-  // tabs
-  const tabs=document.getElementById('albumTabs');
-  tabs.innerHTML='<button class="album-tab" style="background:#999" onclick="renderAlbum(null)">全部</button>';
-  for(let r=0;r<RARITY.length;r++){
-    const rc=R_COLORS[r];
-    tabs.innerHTML+=`<button class="album-tab" style="background:${rc}" onclick="renderAlbum(${r})">${RARITY[r]}</button>`;
+  const tabs = document.getElementById('albumTabs');
+  tabs.innerHTML = '<button class="album-tab" style="background:#999" onclick="renderAlbum(null)">全部</button>';
+  for (let r = 0; r < RARITY.length; r++) {
+    tabs.innerHTML += `<button class="album-tab" style="background:${R_COLORS[r]}" onclick="renderAlbum(${r})">${RARITY[r]}</button>`;
   }
 
-  // grid
-  const grid=document.getElementById('albumGrid');
-  let fishList=ALL_FISH;
-  if(tierFilter!==null) fishList=ALL_FISH.filter(f=>f.rarity===tierFilter);
-  grid.innerHTML=fishList.map(f=>{
-    const isOwned=!!unlockedMap[f.id];
-    const count=unlockedMap[f.id]||0;
-    const trailIcons = ['','✨','🌟','💫','⚡','🔥','👑'];
-    const trailHint = isOwned && f.rarity >= 3 ? trailIcons[Math.min(f.rarity-2,5)] : '';
-    return `<div class="album-item ${isOwned?'owned':'locked'}" ${isOwned?`onclick="selectDisplayFish('${f.id}')"`:''} title="${f.name}${isOwned?' ×'+count:''}${trailHint?' 🔥拖尾特效':''}">
-      <div class="fish-icon">${isOwned?renderFishSVG(f,50,38):'<svg width="50" height="38" viewBox="0 0 50 38"><ellipse cx="25" cy="19" rx="18" ry="12" fill="#ddd"/><text x="25" y="23" text-anchor="middle" font-size="14">❓</text></svg>'}</div>
-      <div class="fish-name">${isOwned?f.name:'???'}</div>
-      ${isOwned?`<span class="owned-tag">${count>1?'×'+count:''}${trailHint}</span>`:''}
+  const grid = document.getElementById('albumGrid');
+  let fishList = ALL_FISH;
+  if (tierFilter !== null) fishList = ALL_FISH.filter(f => f.rarity === tierFilter);
+  const trailIcons = ['', '✨', '🌟', '💫', '⚡', '🔥', '👑'];
+  grid.innerHTML = fishList.map(f => {
+    const isOwned = !!unlockedMap[f.fish_id] || !!unlockedMap[f.id];
+    const count = unlockedMap[f.fish_id] || unlockedMap[f.id] || 0;
+    const trailHint = isOwned && f.rarity >= 3 ? trailIcons[Math.min(f.rarity - 2, 5)] : '';
+    return `<div class="album-item ${isOwned ? 'owned' : 'locked'}" ${isOwned ? `onclick="pickDisplayFish('${f.id}')"` : ''} title="${f.name}${isOwned ? ' ×' + count : ''}${trailHint ? ' 🔥拖尾特效' : ''}">
+      <div class="fish-icon">${isOwned ? renderFishSVG(f, 50, 38) : '<svg width="50" height="38" viewBox="0 0 50 38"><ellipse cx="25" cy="19" rx="18" ry="12" fill="#ddd"/><text x="25" y="23" text-anchor="middle" font-size="14">❓</text></svg>'}</div>
+      <div class="fish-name">${isOwned ? f.name : '???'}</div>
+      ${isOwned ? `<span class="owned-tag">${count > 1 ? '×' + count : ''}${trailHint}</span>` : ''}
     </div>`;
   }).join('');
 }
 
-function selectDisplayFish(id){
-  localStorage.setItem('displayFishId',id);
+async function pickDisplayFish(id) {
+  await switchDisplayFish(id);
   renderMainFish();
   closeAlbum();
   fishSay('换新皮肤啦～ 🐟');
 }
 
-// ========== 初始化场景和字母 ==========
-(function initScene(){
-  // 场景HTML太长，直接用JS生成简化版
-  const scene=document.getElementById('sceneBg');
-  let h='';
-  // clouds
-  h+=`<svg class="cloud" width="160" height="70" style="top:3%;left:100%;animation-duration:35s"><ellipse cx="50" cy="50" rx="50" ry="25" fill="white" opacity=".85"/><ellipse cx="90" cy="40" rx="45" ry="28" fill="white" opacity=".9"/><ellipse cx="120" cy="50" rx="40" ry="22" fill="white" opacity=".8"/></svg>`;
-  h+=`<svg class="cloud" width="130" height="55" style="top:10%;left:110%;animation-duration:42s;animation-delay:-15s"><ellipse cx="40" cy="40" rx="40" ry="20" fill="white" opacity=".75"/><ellipse cx="75" cy="30" rx="35" ry="22" fill="white" opacity=".8"/><ellipse cx="100" cy="40" rx="30" ry="18" fill="white" opacity=".75"/></svg>`;
-  h+=`<svg class="cloud" width="100" height="45" style="top:8%;left:105%;animation-duration:38s;animation-delay:-25s"><ellipse cx="35" cy="32" rx="35" ry="18" fill="white" opacity=".7"/><ellipse cx="65" cy="25" rx="30" ry="18" fill="white" opacity=".75"/></svg>`;
-  // sparkles
-  const stars=['✦','✧','⋆'];
-  for(let i=0;i<8;i++) h+=`<span class="sparkle" style="top:${5+Math.random()*18}%;left:${5+Math.random()*85}%;animation-delay:${Math.random()*1.5}s">${stars[i%3]}</span>`;
-  // seabed
-  h+=`<div class="seabed"></div>`;
-  // rocks
-  h+=`<svg class="rock" width="80" height="45" viewBox="0 0 80 45" style="left:20%"><ellipse cx="35" cy="35" rx="35" ry="18" fill="#bcaaa4"/><ellipse cx="25" cy="30" rx="20" ry="12" fill="#d7ccc8"/><ellipse cx="55" cy="38" rx="25" ry="14" fill="#a1887f"/></svg>`;
-  h+=`<svg class="rock" width="65" height="35" viewBox="0 0 65 35" style="right:18%"><ellipse cx="30" cy="28" rx="28" ry="15" fill="#c9b99a"/><ellipse cx="45" cy="32" rx="20" ry="12" fill="#b8a888"/></svg>`;
-  h+=`<svg class="rock" width="55" height="30" viewBox="0 0 55 30" style="left:50%"><ellipse cx="25" cy="24" rx="24" ry="13" fill="#d7ccc8"/><ellipse cx="15" cy="20" rx="15" ry="9" fill="#e8ddd8"/></svg>`;
-  // seaweed
-  for(let i=0;i<4;i++) h+=`<svg class="seaweed" width="${30+i*5}" height="${100+i*15}" viewBox="0 0 ${30+i*5} ${100+i*15}" style="left:${3+i*8}%;animation-delay:${-i}s;animation-duration:${3+i*.5}s"><path d="M${15+i*2},${100+i*15} Q${5+i},${70+i*10} ${15+i*2},${45+i*8} Q${4+i},${25+i*5} ${15+i*2},${10+i*3}" fill="none" stroke="#66bb6a" stroke-width="${7+i}" stroke-linecap="round" opacity="${.75-i*.05}"/></svg>`;
-  // corals
-  h+=`<svg class="coral" width="75" height="85" viewBox="0 0 75 85" style="left:17%"><circle cx="22" cy="72" r="13" fill="#ff8a80"/><circle cx="52" cy="70" r="11" fill="#ff8a80"/><circle cx="37" cy="75" r="12" fill="#ff5252"/></svg>`;
-  h+=`<svg class="coral" width="55" height="60" viewBox="0 0 55 60" style="right:8%"><circle cx="16" cy="52" r="10" fill="#ff80ab"/><circle cx="38" cy="50" r="9" fill="#ff80ab"/></svg>`;
-  // shells & starfish
-  h+=`<svg class="shell" width="38" height="24" viewBox="0 0 38 24" style="left:24%"><ellipse cx="19" cy="14" rx="17" ry="11" fill="#fff3e0"/></svg>`;
-  h+=`<svg class="shell" width="30" height="20" viewBox="0 0 30 20" style="right:22%"><ellipse cx="15" cy="12" rx="14" ry="9" fill="#fce4ec"/></svg>`;
-  h+=`<svg class="starfish" width="45" height="45" viewBox="0 0 45 45" style="left:30%"><polygon points="22,0 27,14 42,14 30,23 34,38 22,30 10,38 14,23 2,14 17,14" fill="#ffab91"/><circle cx="22" cy="22" r="3.5" fill="#ff8a65"/></svg>`;
-  h+=`<svg class="starfish" width="35" height="35" viewBox="0 0 35 35" style="right:28%;animation-delay:-2s;animation-duration:3.5s"><polygon points="18,0 22,11 33,11 24,18 27,30 18,24 9,30 12,18 3,11 14,11" fill="#ffcc80"/><circle cx="18" cy="17" r="2.5" fill="#ffb74d"/></svg>`;
-  // kitty dolls
-  const kittyColors=[['#f8bbd0','#f48fb1','#ec407a'],['#e1bee7','#ce93d8','#ab47bc'],['#fff9c4','#fff176','#fdd835'],['#bbdefb','#90caf9','#42a5f5'],['#c8e6c9','#a5d6a7','#66bb6a'],['#ffccbc','#ffab91','#ff7043']];
-  const kittyPos=[[18,102],[84,100],[35,85],[68,85],[48,95],[8,88]];
-  kittyPos.forEach((pos,i)=>{
-    const[c1,c2,c3]=kittyColors[i];
-    h+=`<svg class="kitty-doll" width="${60-i*3}" height="${70-i*3}" viewBox="0 0 120 140" style="left:${pos[0]}%;bottom:${pos[1]}px;animation-delay:${-i*.5}s;animation-duration:${3.5+i*.3}s"><ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="89,30 98,4 73,20" fill="${c1}"/><polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="31,30 22,4 47,20" fill="${c1}"/><ellipse cx="28" cy="22" rx="14" ry="9" fill="${c2}" transform="rotate(-15,28,22)"/><circle cx="28" cy="22" r="5" fill="${c3}"/><ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/><ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/><ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/></svg>`;
-  });
-  // hearts
-  const hearts=['💕','💖','💗','💝','🫧'];
-  for(let i=0;i<13;i++) h+=`<span class="heart-float" style="left:${5+Math.random()*85}%;animation-duration:${6+Math.random()*6}s;animation-delay:${Math.random()*7}s;font-size:${18+Math.random()*10}px">${hearts[i%5]}</span>`;
-  scene.innerHTML=h;
-
-  // 滚动字幕
-  const marqueeText='必须好好夸夸咱们万能鱼姐！很难遇到像鱼姐这么宝藏的人，情商直接拉满，风趣幽默善于共情，和鱼姐交流完全不用小心翼翼，没有半点距离感，不管聊什么话题都顺畅舒服。遇到棘手事情从来不会慌慌张张，思路清晰眼界开阔，五花八门的难题交到鱼姐手中总能梳理明白，奇思妙招源源不断，妥妥团队里的定心骨干。为人格外仗义热忱，心地善良乐于助人，身边人遇到困境时总会主动伸出援手，默默帮忙不求回报，处事通透拎得清底线，温和包容却绝不任人敷衍。自带超强欢乐buff，只要鱼姐登场，压抑沉闷的气氛立刻一扫而空，枯燥的日常都会变得有意思，坏情绪见到鱼姐都主动绕道逃跑。可正经靠谱，可轻松玩闹，风格自由切换，既能冷静统筹处理繁杂事务，又懂得享受生活擅长制造乐趣。实力出众却十分低调，从不张扬炫耀自身能力，踏实稳重，做事细致周全，方方面面都让人无比放心。眼光独到看人通透，总能给出中肯实在的建议，不知不觉就能开导陷入内耗的人。有幸结识鱼姐真的是巨大收获，有鱼姐坐镇心里就格外踏实。祝愿全能鱼姐日日喜乐，烦心事全部退散，好运源源不断，财运节节攀升，生活多姿多彩，一路顺风顺水持续开挂，永远元气满满，自信耀眼，被所有美好紧紧包围！';
-  document.getElementById('marqueeInner').innerHTML=`<span class="marquee-text">${marqueeText}</span><span class="marquee-text">${marqueeText}</span>`;
-})();
-
 // ========== 陪伴天数 ==========
 function getStartDate() {
-  let d = localStorage.getItem('fishStartDate');
-  if (!d) { d = getToday(); localStorage.setItem('fishStartDate', d); }
+  let d = STATE.start_date;
+  if (!d) { d = getToday(); saveState({ start_date: d }); }
   return d;
 }
-function getDaysCount() {
+document.getElementById('sideImgLeft').addEventListener('click', () => {
   const start = new Date(getStartDate());
   const today = new Date(getToday());
-  return Math.max(1, Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1);
-}
-document.getElementById('sideImgLeft').addEventListener('click', () => {
-  document.getElementById('daysNum').textContent = getDaysCount();
+  const days = Math.max(1, Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1);
+  document.getElementById('daysNum').textContent = days;
   document.getElementById('daysOverlay').classList.add('active');
 });
 function closeDays() { document.getElementById('daysOverlay').classList.remove('active'); }
+
+// ========== 彩蛋 & 节日 ==========
 function closeEaster() {
   const bonusDraw = window._bonusDraw;
   const bonusMsg = window._bonusMsg || '';
   document.getElementById('easterOverlay').classList.remove('active');
   if (bonusDraw) {
-    window._bonusDraw = false;
-    window._bonusMsg = '';
-    setTimeout(() => {
-      pendingFish = drawFish();
-      showGacha(pendingFish, bonusMsg);
-    }, 400);
-  }
-}
-function closeFeed() {
-  const bonusDraw = window._bonusDraw;
-  const bonusMsg = window._bonusMsg || '';
-  document.getElementById('feedOverlay').classList.remove('active');
-  if (bonusDraw) {
-    window._bonusDraw = false;
-    window._bonusMsg = '';
-    pendingFish = drawFish();
-    setTimeout(() => showGacha(pendingFish, bonusMsg), 400);
+    window._bonusDraw = false; window._bonusMsg = '';
+    setTimeout(() => { pendingFish = drawFish(); showGacha(pendingFish, bonusMsg); }, 400);
   }
 }
 
-// ========== 喂食系统 ==========
-function getFeedData() {
-  const d = JSON.parse(localStorage.getItem('fishFeedData') || '{}');
-  if (d.date !== getToday()) {
-    d.date = getToday();
-    d.remaining = 10;
-    d.bonusUsed = false;
-    saveFeedData(d);
-  }
-  return d;
-}
-function saveFeedData(d) { localStorage.setItem('fishFeedData', JSON.stringify(d)); }
-
-function getAffection() { return parseInt(localStorage.getItem('fishAffection') || '0'); }
-function saveAffection(v) { localStorage.setItem('fishAffection', v); updateAffectionBar(); }
-
-function updateAffectionBar() {
-  const a = getAffection();
-  document.getElementById('affectionBar').textContent = `💖 好感度 ${a}`;
-  const btn = document.getElementById('feedBtn');
-  const d = getFeedData();
-  btn.textContent = d.remaining > 0 ? `🍥 喂食(${d.remaining})` : '🍥 喂食(0)';
-}
-
-function feedFish() {
-  const d = getFeedData();
-  if (d.remaining <= 0) {
-    document.getElementById('feedEmoji').textContent = '😿';
-    document.getElementById('feedMsg').textContent = '今天的鱼饲料已经喂完啦～';
-    document.getElementById('feedDetail').textContent = '明天再来吧！';
-    document.getElementById('feedOverlay').classList.add('active');
-    return;
-  }
-  d.remaining--;
-  saveFeedData(d);
-
-  // 随机品质
-  const r = Math.random();
-  let quality, points, emoji, label;
-  if (r < 0.5) { quality=0; points=10; emoji='🍞'; label='普通饲料'; }
-  else if (r < 0.8) { quality=1; points=20; emoji='🍰'; label='优质饲料'; }
-  else { quality=2; points=50; emoji='🍣'; label='上等饲料'; }
-
-  const oldAff = getAffection();
-  const newAff = oldAff + points;
-  saveAffection(newAff);
-
-  // 呛到彩蛋 0.33
-  const choked = Math.random() < 0.33;
-
-  // 好感度里程碑
-  const oldMilestone = Math.floor(oldAff / 200);
-  const newMilestone = Math.floor(newAff / 200);
-  let bonusMsg = '';
-
-  if (newMilestone > oldMilestone && !d.bonusUsed) {
-    d.bonusUsed = true;
-    saveFeedData(d);
-    window._bonusDraw = true;
-    window._bonusMsg = '💖 好感度 ' + (newMilestone * 200) + ' 奖励抽卡';
-    bonusMsg = '<br>🎉 好感度突破 ' + (newMilestone * 200) + '！<br>今天鱼吃爽了，让你再抽一次卡！';
-  }
-
-  const cEmoji = choked ? '😤' : '😋';
-  const cMsg = choked ? '鱼吃太快呛到了！咳咳咳…' : '鱼吃得津津有味～';
-  document.getElementById('feedEmoji').textContent = cEmoji;
-  document.getElementById('feedMsg').innerHTML = cMsg + bonusMsg;
-  document.getElementById('feedDetail').textContent = `${emoji} ${label} +${points}好感度 | 剩余饲料:${d.remaining}`;
-  document.getElementById('feedOverlay').classList.add('active');
-  updateAffectionBar();
-
-  if (choked) {
-    setTimeout(() => fishSay('咳咳咳…呛到了！😤'), 400);
-  }
-}
-
-// 初始化
-updateAffectionBar();
-
-// ========== 节日检测 ==========
 const HOLIDAYS = {
-  // 农历节日（每年日期不同，需手动更新）
   '2026-02-16': { name: '除夕', emoji: '🧧', msg: '辞旧迎新，鱼姐新年快乐！' },
   '2026-03-03': { name: '元宵节', emoji: '🏮', msg: '团团圆圆，甜甜蜜蜜～' },
   '2026-04-05': { name: '清明节', emoji: '🌿', msg: '踏青赏春，万物清明～' },
@@ -908,7 +707,6 @@ const HOLIDAYS = {
   '2028-04-04': { name: '清明节', emoji: '🌿', msg: '踏青赏春，万物清明～' },
   '2028-10-03': { name: '中秋节', emoji: '🥮', msg: '月圆人圆，鱼姐中秋快乐！' },
 };
-// 阳历固定节日
 const SOLAR_HOLIDAYS = [
   { mmdd: '05-01', name: '劳动节', emoji: '💪', msg: '劳动最光荣，鱼姐辛苦啦！' },
   { mmdd: '06-01', name: '儿童节', emoji: '🎈', msg: '不管几岁，开心万岁！' },
@@ -917,11 +715,9 @@ const SOLAR_HOLIDAYS = [
 
 function checkHoliday() {
   const today = getToday();
-  // 检查阴历节日
   const lunar = HOLIDAYS[today];
   if (lunar) return lunar;
-  // 检查阳历节日 (MM-DD)
-  const mmdd = today.slice(5); // 'MM-DD'
+  const mmdd = today.slice(5);
   return SOLAR_HOLIDAYS.find(h => h.mmdd === mmdd) || null;
 }
 
@@ -934,19 +730,131 @@ function showHolidayPopup(holiday) {
   document.getElementById('easterOverlay').classList.add('active');
 }
 
-// ========== 启动（异常保护，不影响核心功能） ==========
-try { getFeedData(); } catch(e) { console.log('feed init error:', e); }
-try { checkDailyGacha(); } catch(e) { console.log('gacha init error:', e); }
-try {
+// ========== 喂食 ==========
+function closeFeed() {
+  const bonusDraw = window._bonusDraw;
+  const bonusMsg = window._bonusMsg || '';
+  document.getElementById('feedOverlay').classList.remove('active');
+  if (bonusDraw) {
+    window._bonusDraw = false; window._bonusMsg = '';
+    setTimeout(() => { pendingFish = drawFish(); showGacha(pendingFish, bonusMsg); }, 400);
+  }
+}
+
+function updateAffectionBar() {
+  const a = STATE.affection || 0;
+  document.getElementById('affectionBar').textContent = `💖 好感度 ${a}`;
+  const d = { date: STATE.feed_date, remaining: STATE.feed_remaining || 10, bonusUsed: STATE.feed_bonus_used || false };
+  const today = getToday();
+  if (d.date !== today) { d.remaining = 10; d.bonusUsed = false; }
+  document.getElementById('feedBtn').textContent = d.remaining > 0 ? `🍥 喂食(${d.remaining})` : '🍥 喂食(0)';
+}
+
+async function feedFish() {
+  let remaining = STATE.feed_remaining || 10;
+  let feedDate = STATE.feed_date || '';
+  const today = getToday();
+  if (feedDate !== today) { remaining = 10; feedDate = today; }
+  if (remaining <= 0) {
+    document.getElementById('feedEmoji').textContent = '😿';
+    document.getElementById('feedMsg').textContent = '今天的鱼饲料已经喂完啦～';
+    document.getElementById('feedDetail').textContent = '明天再来吧！';
+    document.getElementById('feedOverlay').classList.add('active');
+    return;
+  }
+  remaining--;
+  await saveState({ feed_remaining: remaining, feed_date: feedDate });
+
+  const rnd = Math.random();
+  let points, emoji, label;
+  if (rnd < 0.5) { points = 10; emoji = '🍞'; label = '普通饲料'; }
+  else if (rnd < 0.8) { points = 20; emoji = '🍰'; label = '优质饲料'; }
+  else { points = 50; emoji = '🍣'; label = '上等饲料'; }
+
+  const oldAff = STATE.affection || 0;
+  const newAff = oldAff + points;
+  await saveState({ affection: newAff });
+
+  const choked = Math.random() < 0.33;
+  const oldMilestone = Math.floor(oldAff / 200);
+  const newMilestone = Math.floor(newAff / 200);
+  let bonusMsg = '';
+
+  if (newMilestone > oldMilestone && !(STATE.feed_bonus_used)) {
+    await saveState({ feed_bonus_used: true });
+    window._bonusDraw = true;
+    window._bonusMsg = '💖 好感度 ' + (newMilestone * 200) + ' 奖励抽卡';
+    bonusMsg = '<br>🎉 好感度突破 ' + (newMilestone * 200) + '！<br>今天鱼吃爽了，让你再抽一次卡！';
+  }
+
+  const cEmoji = choked ? '😤' : '😋';
+  const cMsg = choked ? '鱼吃太快呛到了！咳咳咳…' : '鱼吃得津津有味～';
+  document.getElementById('feedEmoji').textContent = cEmoji;
+  document.getElementById('feedMsg').innerHTML = cMsg + bonusMsg;
+  document.getElementById('feedDetail').textContent = `${emoji} ${label} +${points}好感度 | 剩余饲料:${remaining}`;
+  document.getElementById('feedOverlay').classList.add('active');
+  updateAffectionBar();
+
+  if (choked) { setTimeout(() => fishSay('咳咳咳…呛到了！😤'), 400); }
+}
+
+// ========== 场景初始化 ==========
+(function initScene() {
+  const scene = document.getElementById('sceneBg');
+  let h = '';
+  h += `<svg class="cloud" width="160" height="70" style="top:3%;left:100%;animation-duration:35s"><ellipse cx="50" cy="50" rx="50" ry="25" fill="white" opacity=".85"/><ellipse cx="90" cy="40" rx="45" ry="28" fill="white" opacity=".9"/><ellipse cx="120" cy="50" rx="40" ry="22" fill="white" opacity=".8"/></svg>`;
+  h += `<svg class="cloud" width="130" height="55" style="top:10%;left:110%;animation-duration:42s;animation-delay:-15s"><ellipse cx="40" cy="40" rx="40" ry="20" fill="white" opacity=".75"/><ellipse cx="75" cy="30" rx="35" ry="22" fill="white" opacity=".8"/><ellipse cx="100" cy="40" rx="30" ry="18" fill="white" opacity=".75"/></svg>`;
+  h += `<svg class="cloud" width="100" height="45" style="top:8%;left:105%;animation-duration:38s;animation-delay:-25s"><ellipse cx="35" cy="32" rx="35" ry="18" fill="white" opacity=".7"/><ellipse cx="65" cy="25" rx="30" ry="18" fill="white" opacity=".75"/></svg>`;
+  const stars = ['✦', '✧', '⋆'];
+  for (let i = 0; i < 8; i++) h += `<span class="sparkle" style="top:${5 + Math.random() * 18}%;left:${5 + Math.random() * 85}%;animation-delay:${Math.random() * 1.5}s">${stars[i % 3]}</span>`;
+  h += '<div class="seabed"></div>';
+  h += '<svg class="rock" width="80" height="45" viewBox="0 0 80 45" style="left:20%"><ellipse cx="35" cy="35" rx="35" ry="18" fill="#bcaaa4"/><ellipse cx="25" cy="30" rx="20" ry="12" fill="#d7ccc8"/><ellipse cx="55" cy="38" rx="25" ry="14" fill="#a1887f"/></svg>';
+  h += '<svg class="rock" width="65" height="35" viewBox="0 0 65 35" style="right:18%"><ellipse cx="30" cy="28" rx="28" ry="15" fill="#c9b99a"/><ellipse cx="45" cy="32" rx="20" ry="12" fill="#b8a888"/></svg>';
+  h += '<svg class="rock" width="55" height="30" viewBox="0 0 55 30" style="left:50%"><ellipse cx="25" cy="24" rx="24" ry="13" fill="#d7ccc8"/><ellipse cx="15" cy="20" rx="15" ry="9" fill="#e8ddd8"/></svg>';
+  for (let i = 0; i < 4; i++) h += `<svg class="seaweed" width="${30 + i * 5}" height="${100 + i * 15}" viewBox="0 0 ${30 + i * 5} ${100 + i * 15}" style="left:${3 + i * 8}%;animation-delay:${-i}s;animation-duration:${3 + i * .5}s"><path d="M${15 + i * 2},${100 + i * 15} Q${5 + i},${70 + i * 10} ${15 + i * 2},${45 + i * 8} Q${4 + i},${25 + i * 5} ${15 + i * 2},${10 + i * 3}" fill="none" stroke="#66bb6a" stroke-width="${7 + i}" stroke-linecap="round" opacity="${.75 - i * .05}"/></svg>`;
+  h += '<svg class="coral" width="75" height="85" viewBox="0 0 75 85" style="left:17%"><circle cx="22" cy="72" r="13" fill="#ff8a80"/><circle cx="52" cy="70" r="11" fill="#ff8a80"/><circle cx="37" cy="75" r="12" fill="#ff5252"/></svg>';
+  h += '<svg class="coral" width="55" height="60" viewBox="0 0 55 60" style="right:8%"><circle cx="16" cy="52" r="10" fill="#ff80ab"/><circle cx="38" cy="50" r="9" fill="#ff80ab"/></svg>';
+  h += '<svg class="shell" width="38" height="24" viewBox="0 0 38 24" style="left:24%"><ellipse cx="19" cy="14" rx="17" ry="11" fill="#fff3e0"/></svg>';
+  h += '<svg class="shell" width="30" height="20" viewBox="0 0 30 20" style="right:22%"><ellipse cx="15" cy="12" rx="14" ry="9" fill="#fce4ec"/></svg>';
+  h += '<svg class="starfish" width="45" height="45" viewBox="0 0 45 45" style="left:30%"><polygon points="22,0 27,14 42,14 30,23 34,38 22,30 10,38 14,23 2,14 17,14" fill="#ffab91"/><circle cx="22" cy="22" r="3.5" fill="#ff8a65"/></svg>';
+  h += '<svg class="starfish" width="35" height="35" viewBox="0 0 35 35" style="right:28%;animation-delay:-2s;animation-duration:3.5s"><polygon points="18,0 22,11 33,11 24,18 27,30 18,24 9,30 12,18 3,11 14,11" fill="#ffcc80"/><circle cx="18" cy="17" r="2.5" fill="#ffb74d"/></svg>';
+  const kittyColors = [['#f8bbd0','#f48fb1','#ec407a'],['#e1bee7','#ce93d8','#ab47bc'],['#fff9c4','#fff176','#fdd835'],['#bbdefb','#90caf9','#42a5f5'],['#c8e6c9','#a5d6a7','#66bb6a'],['#ffccbc','#ffab91','#ff7043']];
+  const kittyPos = [[18,102],[84,100],[35,85],[68,85],[48,95],[8,88]];
+  kittyPos.forEach((pos, i) => {
+    const [c1, c2, c3] = kittyColors[i];
+    h += `<svg class="kitty-doll" width="${60 - i * 3}" height="${70 - i * 3}" viewBox="0 0 120 140" style="left:${pos[0]}%;bottom:${pos[1]}px;animation-delay:${-i * .5}s;animation-duration:${3.5 + i * .3}s"><ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="89,30 98,4 73,20" fill="${c1}"/><polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="31,30 22,4 47,20" fill="${c1}"/><ellipse cx="28" cy="22" rx="14" ry="9" fill="${c2}" transform="rotate(-15,28,22)"/><circle cx="28" cy="22" r="5" fill="${c3}"/><ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/><ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/><ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/></svg>`;
+  });
+  const hearts = ['💕','💖','💗','💝','🫧'];
+  for (let i = 0; i < 13; i++) h += `<span class="heart-float" style="left:${5 + Math.random() * 85}%;animation-duration:${6 + Math.random() * 6}s;animation-delay:${Math.random() * 7}s;font-size:${18 + Math.random() * 10}px">${hearts[i % 5]}</span>`;
+  scene.innerHTML = h;
+
+  const marqueeText = '必须好好夸夸咱们万能鱼姐！很难遇到像鱼姐这么宝藏的人，情商直接拉满，风趣幽默善于共情，和鱼姐交流完全不用小心翼翼，没有半点距离感，不管聊什么话题都顺畅舒服。遇到棘手事情从来不会慌慌张张，思路清晰眼界开阔，五花八门的难题交到鱼姐手中总能梳理明白，奇思妙招源源不断，妥妥团队里的定心骨干。为人格外仗义热忱，心地善良乐于助人，身边人遇到困境时总会主动伸出援手，默默帮忙不求回报，处事通透拎得清底线，温和包容却绝不任人敷衍。自带超强欢乐buff，只要鱼姐登场，压抑沉闷的气氛立刻一扫而空，枯燥的日常都会变得有意思，坏情绪见到鱼姐都主动绕道逃跑。可正经靠谱，可轻松玩闹，风格自由切换，既能冷静统筹处理繁杂事务，又懂得享受生活擅长制造乐趣。实力出众却十分低调，从不张扬炫耀自身能力，踏实稳重，做事细致周全，方方面面都让人无比放心。眼光独到看人通透，总能给出中肯实在的建议，不知不觉就能开导陷入内耗的人。有幸结识鱼姐真的是巨大收获，有鱼姐坐镇心里就格外踏实。祝愿全能鱼姐日日喜乐，烦心事全部退散，好运源源不断，财运节节攀升，生活多姿多彩，一路顺风顺水持续开挂，永远元气满满，自信耀眼，被所有美好紧紧包围！';
+  document.getElementById('marqueeInner').innerHTML = `<span class="marquee-text">${marqueeText}</span><span class="marquee-text">${marqueeText}</span>`;
+})();
+
+// ========== 启动 ==========
+(async function startup() {
+  await loadState();
+  await loadUnlocked();
+
+  // 初始化显示
+  renderMainFish();
+  counterEl.textContent = (STATE.click_count || 0) > 0 ? `这条呆鱼一共说了 ${STATE.click_count} 次 "我是傻鱼"～` : '';
+  updateAffectionBar();
+
+  // 每日抽卡
+  checkDailyGacha();
+
+  // 节日检查
   const todayHoliday = checkHoliday();
-  const holidayShown = localStorage.getItem('holidayShownDate');
+  const holidayShown = STATE.holiday_shown_date || '';
   if (todayHoliday && holidayShown !== getToday()) {
     showHolidayPopup(todayHoliday);
-    localStorage.setItem('holidayShownDate', getToday());
+    await saveState({ holiday_shown_date: getToday() });
     window._bonusDraw = true;
     window._bonusMsg = `🎉 ${todayHoliday.name}额外抽卡机会`;
   }
-} catch(e) { console.log('holiday init error:', e); }
+})();
 </script>
 </body>
 </html>
