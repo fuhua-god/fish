@@ -43,9 +43,9 @@ body{
 .speech-text.show{opacity:1;transform:translateY(0)}
 .speech-text.shake{animation:jg .4s ease}
 @keyframes jg{0%{transform:translateY(0)rotate(0)scale(1)}15%{transform:translateY(-4px)rotate(-3deg)scale(1.06)}30%{transform:translateY(2px)rotate(3deg)scale(.96)}45%{transform:translateY(-3px)rotate(-2deg)scale(1.04)}60%{transform:translateY(1px)rotate(2deg)scale(.98)}75%{transform:translateY(-1px)rotate(-1deg)scale(1.02)}100%{transform:translateY(0)rotate(0)scale(1)}}
-.fish-wrapper{cursor:pointer;transition:transform .15s ease;filter:drop-shadow(0 10px 25px rgba(0,0,0,.2));-webkit-tap-highlight-color:transparent;outline:none}
-.fish-wrapper:hover{transform:scale(1.06)}.fish-wrapper:active{transform:scale(.9)}
-.fish-float{animation:bb 3s ease-in-out infinite}
+.fish-wrapper{position:fixed;z-index:5;cursor:pointer;transition:transform .12s ease;filter:drop-shadow(0 10px 25px rgba(0,0,0,.2));-webkit-tap-highlight-color:transparent;outline:none;will-change:left,top,transform}
+.fish-wrapper:active{transform:scale(.9)}
+.fish-float{width:100%;height:100%}
 @keyframes bb{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
 .hint{color:#fff;font-size:17px;letter-spacing:3px;animation:pl 2s ease-in-out infinite;text-shadow:0 2px 6px rgba(0,0,0,.3)}
 @keyframes pl{0%,100%{opacity:.5;transform:scale(.98)}50%{opacity:1;transform:scale(1.03)}}
@@ -149,9 +149,11 @@ body{
 <img class="side-img right" src="fish-img.jpg" alt="">
 
 <!-- ====== 主页 ====== -->
+<!-- 自由游动的鱼 -->
+<div class="fish-wrapper" id="fishWrapper" title="点我！"><div class="fish-float" id="mainFishSvg"></div></div>
+
 <div class="main-page" id="mainPage">
   <div class="speech-text" id="speechText">我是傻鱼 🐟</div>
-  <div class="fish-wrapper" id="fishWrapper" title="点我！"><div class="fish-float" id="mainFishSvg"></div></div>
   <p class="hint">✧ 点一下这条呆鱼 ✧</p>
   <span class="ribbon-tag">🐟 小鱼</span>
   <p class="counter" id="counter"></p>
@@ -323,8 +325,59 @@ function renderMainFish() {
 }
 renderMainFish();
 
-// ========== 主页 ==========
+// ========== 鱼自由游动 ==========
 const fishWrapper = document.getElementById('fishWrapper');
+const FISH_W = 240, FISH_H = 180;
+let fishX = window.innerWidth / 2 - FISH_W / 2;
+let fishY = window.innerHeight / 2 - FISH_H / 2;
+let fishVX = (Math.random() - 0.5) * 2.5;
+let fishVY = (Math.random() - 0.5) * 2.5;
+let fishDir = 1; // 1=right, -1=left
+let fishAnimId = null;
+let fishPaused = false;
+let fishBouncing = false;
+
+function updateFishPos() {
+  if (fishPaused) { fishAnimId = requestAnimationFrame(updateFishPos); return; }
+  // 随机微调方向
+  if (Math.random() < 0.008) {
+    fishVX += (Math.random() - 0.5) * 1.2;
+    fishVY += (Math.random() - 0.5) * 1.2;
+  }
+  // 限速
+  const maxSpd = 3.5, minSpd = 0.4;
+  let spd = Math.sqrt(fishVX * fishVX + fishVY * fishVY);
+  if (spd < minSpd) { fishVX = (fishVX / spd) * minSpd + (Math.random() - 0.5) * 0.5; fishVY = (fishVY / spd) * minSpd + (Math.random() - 0.5) * 0.5; }
+  if (spd > maxSpd) { fishVX = (fishVX / spd) * maxSpd; fishVY = (fishVY / spd) * maxSpd; }
+  // 更新位置
+  fishX += fishVX; fishY += fishVY;
+  // 边界反弹
+  const pad = 20;
+  if (fishX < pad) { fishX = pad; fishVX = Math.abs(fishVX); }
+  if (fishX > window.innerWidth - FISH_W - pad) { fishX = window.innerWidth - FISH_W - pad; fishVX = -Math.abs(fishVX); }
+  if (fishY < 50) { fishY = 50; fishVY = Math.abs(fishVY); }
+  if (fishY > window.innerHeight - FISH_H - pad) { fishY = window.innerHeight - FISH_H - pad; fishVY = -Math.abs(fishVY); }
+  // 翻转方向
+  const newDir = fishVX >= 0 ? 1 : -1;
+  if (newDir !== fishDir) { fishDir = newDir; }
+  // 应用位置
+  fishWrapper.style.left = fishX + 'px';
+  fishWrapper.style.top = fishY + 'px';
+  if (!fishBouncing) {
+    fishWrapper.style.transform = `scaleX(${fishDir})`;
+  }
+  fishAnimId = requestAnimationFrame(updateFishPos);
+}
+
+// 窗口大小改变时调整
+window.addEventListener('resize', () => {
+  fishX = Math.min(Math.max(fishX, 20), window.innerWidth - FISH_W - 20);
+  fishY = Math.min(Math.max(fishY, 50), window.innerHeight - FISH_H - 20);
+});
+
+updateFishPos();
+
+// ========== 主页 ==========
 const speechText = document.getElementById('speechText');
 const counterEl = document.getElementById('counter');
 const clockEl = document.getElementById('clock');
@@ -351,14 +404,20 @@ function fishSay(msg){
   textTimer=setTimeout(()=>{speechText.classList.remove('show')},2000);
 }
 
-fishWrapper.addEventListener('click',()=>{
+fishWrapper.addEventListener('click',(e)=>{
+  e.stopPropagation();
   playBubbleSound();clickCount++;localStorage.setItem('fishClickCount',clickCount);
   speechText.textContent='我是傻鱼 🐟';counterEl.textContent=`这条呆鱼一共说了 ${clickCount} 次 "我是傻鱼"～`;
   speechText.classList.remove('shake');void speechText.offsetWidth;speechText.classList.add('shake');
   speechText.classList.add('show');clearTimeout(textTimer);
   textTimer=setTimeout(()=>{speechText.classList.remove('show')},1500);
-  fishWrapper.style.transform='scale(0.82)';setTimeout(()=>{fishWrapper.style.transform='scale(1.08)';
-    setTimeout(()=>{fishWrapper.style.transform=''},180)},100);
+  // 弹跳动画（保留方向翻转）
+  fishBouncing = true;
+  const curScale = `scaleX(${fishDir})`;
+  fishWrapper.style.transform = curScale + ' scale(0.82)';
+  setTimeout(()=>{ fishWrapper.style.transform = curScale + ' scale(1.08)';
+    setTimeout(()=>{ fishWrapper.style.transform = curScale; fishBouncing = false; }, 180);
+  }, 100);
 });
 
 // ========== 游戏 ==========
@@ -371,11 +430,12 @@ let currentGame='tictactoe',gboard=[],gOver=false;
 function enterGame(game){
   currentGame=game;mainPage.classList.add('hidden');gameOverlay.classList.add('active');
   fishJumpin.classList.remove('show');resultBtns.style.display='none';resultBtns.classList.remove('show-btns');gOver=false;
+  fishPaused=true; fishWrapper.style.opacity='0';
   if(game==='tictactoe')initTTT();else initGomoku();
 }
-function quitGame(){gameOverlay.classList.remove('active');mainPage.classList.remove('hidden')}
+function quitGame(){gameOverlay.classList.remove('active');mainPage.classList.remove('hidden');fishPaused=false; fishWrapper.style.opacity='1'}
 function rematch(){fishJumpin.classList.remove('show');resultBtns.style.display='none';resultBtns.classList.remove('show-btns');gOver=false;if(currentGame==='tictactoe')initTTT();else initGomoku()}
-function admitLose(){gameOverlay.classList.remove('active');mainPage.classList.remove('hidden');setTimeout(()=>fishSay('我是傻鱼 🐟'),400)}
+function admitLose(){gameOverlay.classList.remove('active');mainPage.classList.remove('hidden');fishPaused=false; fishWrapper.style.opacity='1'; setTimeout(()=>fishSay('我是傻鱼 🐟'),400)}
 
 function initTTT(){
   gboard=Array(9).fill('');gOver=false;gameTitle.textContent='🎮 井字棋';gameStatus.textContent='轮到你了 ✨';
