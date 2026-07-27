@@ -48,6 +48,9 @@ body{
 .days-card .days-close{padding:10px 30px;border-radius:25px;font-size:15px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;border:none;background:#f48fb1;color:#fff;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
 .days-card .days-close:hover{background:#ec407a;transform:scale(1.05)}
 
+/* 拖尾 */
+.trail-container{position:fixed;inset:0;z-index:4;pointer-events:none;overflow:hidden}
+
 /* 主页 */
 .main-page{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:18px;transition:opacity .4s,transform .4s}
 .main-page.hidden{opacity:0;transform:scale(.9);pointer-events:none}
@@ -161,6 +164,8 @@ body{
 <img class="side-img right" src="fish-img.jpg" alt="">
 
 <!-- ====== 主页 ====== -->
+<!-- 拖尾粒子 -->
+<div class="trail-container" id="trailContainer"></div>
 <!-- 自由游动的鱼 -->
 <div class="fish-wrapper" id="fishWrapper" title="点我！"><div class="fish-float" id="mainFishSvg"></div></div>
 
@@ -389,6 +394,8 @@ function updateFishPos() {
   if (!fishBouncing) {
     fishWrapper.style.transform = `scaleX(${fishDir})`;
   }
+  // 拖尾特效
+  spawnTrail(fishX, fishY, fishDir);
   fishAnimId = requestAnimationFrame(updateFishPos);
 }
 
@@ -399,6 +406,82 @@ window.addEventListener('resize', () => {
 });
 
 updateFishPos();
+
+// ========== 拖尾特效 ==========
+const TRAIL_CONFIG = {
+  3: { // 史诗：紫色星光
+    perFrame: 2, life: 700, size: [3, 6],
+    colors: ['#ce93d8', '#e1bee7', '#f3e5f5', '#ba68c8', '#fff'],
+    shapes: ['circle']
+  },
+  4: { // 传说：金色星芒
+    perFrame: 3, life: 850, size: [4, 8],
+    colors: ['#ffb74d', '#ffe0b2', '#ffcc80', '#fff8e1', '#fff', '#ff9800'],
+    shapes: ['circle', 'star']
+  },
+  5: { // 隐藏：暗紫灵火
+    perFrame: 3, life: 950, size: [3, 7],
+    colors: ['#ef5350', '#b71c1c', '#7b1fa2', '#4a148c', '#ffcdd2', '#fff'],
+    shapes: ['circle', 'circle', 'star']
+  },
+  6: { // 限量：彩虹盛宴
+    perFrame: 5, life: 1100, size: [5, 10],
+    colors: ['#f48fb1', '#ce93d8', '#81d4fa', '#fff176', '#ff8a80', '#a5d6a7', '#ffe082', '#ef9a9a'],
+    shapes: ['circle', 'star', 'star', 'diamond']
+  }
+};
+
+function getDisplayFishRarity() {
+  const displayId = localStorage.getItem('displayFishId');
+  if (!displayId) return 0;
+  const found = ALL_FISH.find(f => f.id === displayId);
+  return found ? found.rarity : 0;
+}
+
+let trailTick = 0;
+function spawnTrail(fx, fy, dir) {
+  const rarity = getDisplayFishRarity();
+  if (rarity < 3) return; // 史诗以下无特效
+  const cfg = TRAIL_CONFIG[rarity];
+  if (!cfg) return;
+  trailTick++;
+  if (trailTick % Math.max(1, Math.floor(3 / cfg.perFrame)) !== 0) return;
+
+  const container = document.getElementById('trailContainer');
+  const tailX = dir === 1 ? fx + 40 : fx + FISH_W - 40;
+  const tailY = fy + FISH_H / 2;
+
+  for (let i = 0; i < cfg.perFrame; i++) {
+    const p = document.createElement('div');
+    const size = cfg.size[0] + Math.random() * (cfg.size[1] - cfg.size[0]);
+    const color = cfg.colors[Math.floor(Math.random() * cfg.colors.length)];
+    const shape = cfg.shapes[Math.floor(Math.random() * cfg.shapes.length)];
+    const ox = (Math.random() - 0.5) * 40;
+    const oy = (Math.random() - 0.5) * 40;
+
+    p.style.cssText = `position:fixed;pointer-events:none;left:${tailX+ox}px;top:${tailY+oy}px;width:${size}px;height:${size}px;background:${color};z-index:4;`;
+    if (shape === 'circle') {
+      p.style.borderRadius = '50%';
+    } else if (shape === 'star') {
+      p.style.borderRadius = '50%';
+      p.style.boxShadow = `0 0 ${size*2}px ${color}`;
+    } else if (shape === 'diamond') {
+      p.style.borderRadius = '2px';
+      p.style.transform = 'rotate(45deg)';
+      p.style.boxShadow = `0 0 ${size*3}px ${color}`;
+    }
+
+    const anim = p.animate([
+      { opacity: 0.9, transform: p.style.transform + ` translate(0,0) scale(1)` },
+      { opacity: 0, transform: p.style.transform + ` translate(${ox*2}px,${oy*2-20}px) scale(0)` }
+    ], { duration: cfg.life, easing: 'ease-out' });
+
+    container.appendChild(p);
+    anim.onfinish = () => p.remove();
+    // 兜底清理
+    setTimeout(() => { if (p.parentNode) p.remove(); }, cfg.life + 100);
+  }
+}
 
 // ========== 主页 ==========
 const speechText = document.getElementById('speechText');
@@ -578,10 +661,11 @@ function renderAlbum(tierFilter=null){
   grid.innerHTML=fishList.map(f=>{
     const isOwned=!!unlockedMap[f.id];
     const count=unlockedMap[f.id]||0;
-    return `<div class="album-item ${isOwned?'owned':'locked'}" ${isOwned?`onclick="selectDisplayFish('${f.id}')"`:''} title="${f.name}${isOwned?' ×'+count:''}">
+    const trailHint = isOwned && f.rarity >= 3 ? ['','✨','🌟','💫','⚡'][Math.min(f.rarity-2,4)] : '';
+    return `<div class="album-item ${isOwned?'owned':'locked'}" ${isOwned?`onclick="selectDisplayFish('${f.id}')"`:''} title="${f.name}${isOwned?' ×'+count:''}${trailHint?' 🔥拖尾特效':''}">
       <div class="fish-icon">${isOwned?renderFishSVG(f,50,38):'<svg width="50" height="38" viewBox="0 0 50 38"><ellipse cx="25" cy="19" rx="18" ry="12" fill="#ddd"/><text x="25" y="23" text-anchor="middle" font-size="14">❓</text></svg>'}</div>
       <div class="fish-name">${isOwned?f.name:'???'}</div>
-      ${isOwned?`<span class="owned-tag">${count>1?'×'+count:''}</span>`:''}
+      ${isOwned?`<span class="owned-tag">${count>1?'×'+count:''}${trailHint}</span>`:''}
     </div>`;
   }).join('');
 }
