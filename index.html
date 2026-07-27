@@ -5,702 +5,558 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🐟 我是傻鱼 ~ ♪</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,#fce4ec 0%,#f8bbd0 8%,#f48fb1 16%,#ce93d8 32%,#b39ddb 48%,#81d4fa 64%,#4fc3f7 80%,#b2dfdb 90%,#e8f5e9 100%);
+  overflow-x:hidden;font-family:"Comic Sans MS","KaiTi","STKaiti","Microsoft YaHei",cursive,sans-serif;user-select:none;cursor:default;padding-top:50px;
+}
+@media(max-width:768px){body{padding-top:38px}}
 
-  body {
-    min-height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-    padding-top: 50px;
-    background: linear-gradient(180deg,
-      #fce4ec 0%, #f8bbd0 8%, #f48fb1 16%, #ce93d8 32%,
-      #b39ddb 48%, #81d4fa 64%, #4fc3f7 80%, #b2dfdb 90%, #e8f5e9 100%
-    );
-    overflow-x: hidden;
-    font-family: "Comic Sans MS", "KaiTi", "STKaiti", "Microsoft YaHei", cursive, sans-serif;
-    user-select: none; cursor: default;
-  }
+/* 场景 */
+.scene{position:fixed;inset:0;pointer-events:none;z-index:0}
+.cloud{position:absolute;animation:cd linear infinite}
+@keyframes cd{0%{transform:translateX(0)}100%{transform:translateX(-130vw)}}
+.seabed{position:absolute;bottom:0;left:0;right:0;height:110px;background:linear-gradient(180deg,#ffe0b2,#ffcc80 40%,#ffb74d 100%);border-radius:60% 70% 0 0/50px 50px 0 0}
+.seabed::before{content:'';position:absolute;top:-35px;left:0;right:0;height:60px;background:radial-gradient(ellipse 90px 45px at 8% 70%,#ffe0b2 60%,transparent 60%),radial-gradient(ellipse 70px 35px at 28% 65%,#ffecb3 60%,transparent 60%),radial-gradient(ellipse 100px 40px at 52% 72%,#ffe0b2 60%,transparent 60%),radial-gradient(ellipse 80px 35px at 78% 62%,#ffecb3 60%,transparent 60%),radial-gradient(ellipse 60px 30px at 92% 68%,#ffe0b2 60%,transparent 60%)}
+.rock{position:absolute;bottom:80px}
+.seaweed{position:absolute;bottom:90px;animation:sw 3s ease-in-out infinite;transform-origin:bottom center}
+@keyframes sw{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+.coral{position:absolute;bottom:80px}
+.shell{position:absolute;bottom:85px}
+.starfish{position:absolute;bottom:85px;animation:sw2 4s ease-in-out infinite}
+@keyframes sw2{0%,100%{transform:rotate(0)}25%{transform:rotate(10deg)}75%{transform:rotate(-10deg)}}
+.kitty-doll{position:absolute;animation:kb 3.5s ease-in-out infinite}
+@keyframes kb{0%,100%{transform:translateY(0)rotate(0)}30%{transform:translateY(-6px)rotate(2deg)}70%{transform:translateY(-3px)rotate(-1deg)}}
+.heart-float{position:absolute;bottom:-40px;animation:hr linear infinite;font-size:24px}
+@keyframes hr{0%{transform:translateY(0)scale(.4)rotate(0);opacity:.7}100%{transform:translateY(-110vh)scale(1.1)rotate(360deg);opacity:0}}
+.sparkle{position:absolute;animation:tw 1.5s ease-in-out infinite;font-size:16px}
+@keyframes tw{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1.3)}}
+.side-img{position:fixed;top:50%;transform:translateY(-50%);z-index:1;pointer-events:none;opacity:.9;width:280px;filter:drop-shadow(0 8px 25px rgba(0,0,0,.2))}
+.side-img.left{left:20px}.side-img.right{right:20px}
+@media(max-width:768px){.side-img{position:fixed;top:10px;transform:none;width:100px;opacity:.65;z-index:0}.side-img.left{left:2px;top:8px}.side-img.right{right:2px;top:8px}}
 
-  /* ===== 滚动字幕 ===== */
-  .marquee-bar {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 20;
-    background: linear-gradient(90deg, #f48fb1, #ce93d8, #81d4fa, #f48fb1);
-    background-size: 300% 100%;
-    animation: barShine 4s ease-in-out infinite;
-    padding: 10px 0; overflow: hidden;
-    box-shadow: 0 2px 15px rgba(244,143,177,0.35);
-  }
-  @keyframes barShine {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-  }
-  .marquee-inner {
-    display: flex; width: max-content;
-    animation: marqueeScroll 80s linear infinite;
-  }
-  @keyframes marqueeScroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-  .marquee-text {
-    color: #fff; font-size: 16px; font-weight: bold;
-    letter-spacing: 2px; white-space: nowrap;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.15);
-    padding-right: 60px;
-  }
-  @media (max-width: 768px) {
-    body { padding-top: 38px; }
-    .marquee-bar { padding: 8px 0; }
-    .marquee-text { font-size: 13px; letter-spacing: 1px; padding-right: 30px; }
-  }
-  .scene {
-    position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  }
-  .cloud {
-    position: absolute;
-    animation: cloudDrift linear infinite;
-  }
-  @keyframes cloudDrift {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-130vw); }
-  }
-  .seabed {
-    position: absolute; bottom: 0; left: 0; right: 0; height: 110px;
-    background: linear-gradient(180deg, #ffe0b2, #ffcc80 40%, #ffb74d 100%);
-    border-radius: 60% 70% 0 0 / 50px 50px 0 0;
-  }
-  .seabed::before {
-    content: ''; position: absolute; top: -35px; left: 0; right: 0; height: 60px;
-    background:
-      radial-gradient(ellipse 90px 45px at 8%  70%, #ffe0b2 60%, transparent 60%),
-      radial-gradient(ellipse 70px 35px at 28% 65%, #ffecb3 60%, transparent 60%),
-      radial-gradient(ellipse 100px 40px at 52% 72%, #ffe0b2 60%, transparent 60%),
-      radial-gradient(ellipse 80px 35px at 78% 62%, #ffecb3 60%, transparent 60%),
-      radial-gradient(ellipse 60px 30px at 92% 68%, #ffe0b2 60%, transparent 60%);
-  }
-  .rock { position: absolute; bottom: 80px; }
-  .seaweed {
-    position: absolute; bottom: 90px;
-    animation: sway 3s ease-in-out infinite; transform-origin: bottom center;
-  }
-  @keyframes sway { 0%,100%{transform:rotate(-4deg)} 50%{transform:rotate(4deg)} }
-  .coral { position: absolute; bottom: 80px; }
-  .shell { position: absolute; bottom: 85px; }
-  .starfish {
-    position: absolute; bottom: 85px;
-    animation: starWiggle 4s ease-in-out infinite;
-  }
-  @keyframes starWiggle { 0%,100%{transform:rotate(0)} 25%{transform:rotate(10deg)} 75%{transform:rotate(-10deg)} }
-  .kitty-doll {
-    position: absolute;
-    animation: kittyBob 3.5s ease-in-out infinite;
-  }
-  @keyframes kittyBob { 0%,100%{transform:translateY(0)rotate(0)} 30%{transform:translateY(-6px)rotate(2deg)} 70%{transform:translateY(-3px)rotate(-1deg)} }
-  .heart-float {
-    position: absolute; bottom: -40px;
-    animation: heartRise linear infinite; font-size: 24px;
-  }
-  @keyframes heartRise {
-    0%{transform:translateY(0)scale(0.4)rotate(0);opacity:0.7}
-    100%{transform:translateY(-110vh)scale(1.1)rotate(360deg);opacity:0}
-  }
-  .sparkle {
-    position: absolute; animation: twinkle 1.5s ease-in-out infinite; font-size: 16px;
-  }
-  @keyframes twinkle { 0%,100%{opacity:0.2;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.3)} }
-  .side-img {
-    position: fixed; top: 50%; transform: translateY(-50%); z-index: 1;
-    pointer-events: none; opacity: 0.9; width: 280px;
-    filter: drop-shadow(0 8px 25px rgba(0,0,0,0.2));
-  }
-  .side-img.left  { left: 20px; }
-  .side-img.right { right: 20px; }
-  @media (max-width: 768px) {
-    .side-img { position: fixed; top: 10px; transform:none; width:100px; opacity:0.65; z-index:0; }
-    .side-img.left { left:2px; top:8px; }
-    .side-img.right { right:2px; top:8px; }
-  }
+/* 主页 */
+.main-page{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:18px;transition:opacity .4s,transform .4s}
+.main-page.hidden{opacity:0;transform:scale(.9);pointer-events:none}
+.speech-text{font-size:34px;font-weight:bold;color:#ec407a;text-shadow:0 3px 8px rgba(236,64,122,.2);opacity:0;transform:translateY(15px);transition:all .35s cubic-bezier(.175,.885,.32,1.275);pointer-events:none;letter-spacing:3px;-webkit-tap-highlight-color:transparent;outline:none}
+.speech-text.show{opacity:1;transform:translateY(0)}
+.speech-text.shake{animation:jg .4s ease}
+@keyframes jg{0%{transform:translateY(0)rotate(0)scale(1)}15%{transform:translateY(-4px)rotate(-3deg)scale(1.06)}30%{transform:translateY(2px)rotate(3deg)scale(.96)}45%{transform:translateY(-3px)rotate(-2deg)scale(1.04)}60%{transform:translateY(1px)rotate(2deg)scale(.98)}75%{transform:translateY(-1px)rotate(-1deg)scale(1.02)}100%{transform:translateY(0)rotate(0)scale(1)}}
+.fish-wrapper{cursor:pointer;transition:transform .15s ease;filter:drop-shadow(0 10px 25px rgba(0,0,0,.2));-webkit-tap-highlight-color:transparent;outline:none}
+.fish-wrapper:hover{transform:scale(1.06)}.fish-wrapper:active{transform:scale(.9)}
+.fish-float{animation:bb 3s ease-in-out infinite}
+@keyframes bb{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.hint{color:#fff;font-size:17px;letter-spacing:3px;animation:pl 2s ease-in-out infinite;text-shadow:0 2px 6px rgba(0,0,0,.3)}
+@keyframes pl{0%,100%{opacity:.5;transform:scale(.98)}50%{opacity:1;transform:scale(1.03)}}
+.counter,.clock{color:#fff;font-size:15px;background:rgba(0,0,0,.35);padding:6px 16px;border-radius:20px;text-shadow:0 1px 2px rgba(0,0,0,.2)}
+.clock{font-size:14px;background:rgba(0,0,0,.3);padding:5px 16px;letter-spacing:1px}
+.ribbon-tag{display:inline-block;background:#f48fb1;color:#fff;padding:4px 14px;border-radius:20px;font-size:13px;letter-spacing:1px;box-shadow:0 3px 10px rgba(244,143,177,.35)}
+.game-entry{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+.entry-btn{background:rgba(255,255,255,.85);border:2px solid #f8bbd0;color:#ec407a;padding:10px 24px;border-radius:25px;font-size:16px;font-weight:bold;cursor:pointer;letter-spacing:1px;font-family:inherit;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
+.entry-btn:hover{background:#fce4ec}
+.main-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.btn-album{background:#fff;border:2px solid #f8bbd0;color:#ec407a;padding:8px 18px;border-radius:25px;font-size:14px;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
+.btn-album:hover{background:#fce4ec}
+@media(max-width:768px){.speech-text{font-size:26px}.entry-btn{padding:8px 18px;font-size:14px}}
 
-  /* ===== 主页 ===== */
-  .main-page {
-    position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 18px;
-    transition: opacity 0.4s, transform 0.4s;
-  }
-  .main-page.hidden { opacity: 0; transform: scale(0.9); pointer-events: none; }
+/* 游戏 */
+.game-overlay{position:fixed;inset:0;z-index:10;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+.game-overlay.active{opacity:1;pointer-events:auto}
+.game-panel{background:linear-gradient(160deg,#fff5f5,#fce4ec,#f3e5f5);border-radius:28px;padding:28px 24px 20px;box-shadow:0 20px 60px rgba(0,0,0,.35);display:flex;flex-direction:column;align-items:center;gap:16px;max-width:95vw;max-height:95vh;overflow-y:auto;position:relative}
+.game-title{font-size:24px;font-weight:bold;color:#ec407a;letter-spacing:2px}
+.game-board{display:inline-grid;gap:4px;background:rgba(236,64,122,.12);padding:8px;border-radius:14px}
+.gcell{width:46px;height:46px;background:rgba(255,255,255,.9);border-radius:8px;border:2px solid #f8bbd0;cursor:pointer;font-size:24px;font-weight:bold;display:flex;align-items:center;justify-content:center;transition:background .15s;color:#555;font-family:inherit;padding:0;-webkit-tap-highlight-color:transparent;outline:none}
+.gcell:hover{background:#fce4ec}.gcell.X{color:#e91e63;border-color:#f48fb1}.gcell.O{color:#42a5f5;border-color:#90caf9}.gcell.win{background:#fff9c4;border-color:#ffcc80}
+.game-status{font-size:18px;font-weight:bold;color:#555;letter-spacing:1px}
+.fish-jumpin{display:none;flex-direction:column;align-items:center;gap:10px}
+.fish-jumpin.show{display:flex}
+.fish-jumpin.show>svg{animation:popIn .4s cubic-bezier(.175,.885,.32,1.275) both}
+.fish-jumpin.show .speech-lose{animation:popIn .4s .15s cubic-bezier(.175,.885,.32,1.275) both}
+@keyframes popIn{0%{transform:scale(0)rotate(-10deg);opacity:0}100%{transform:scale(1)rotate(0);opacity:1}}
+.speech-lose{font-size:28px;font-weight:bold;color:#ec407a;background:#fff;padding:12px 28px;border-radius:24px;box-shadow:0 4px 20px rgba(236,64,122,.2)}
+.result-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.result-btns.show-btns .btn-retry{animation:popIn .4s .2s cubic-bezier(.175,.885,.32,1.275) both}
+.result-btns.show-btns .btn-quit{animation:popIn .4s .35s cubic-bezier(.175,.885,.32,1.275) both}
+.btn-retry,.btn-quit{padding:12px 30px;border-radius:30px;font-size:18px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;border:none;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
+.btn-retry{background:#f48fb1;color:#fff;box-shadow:0 4px 15px rgba(244,143,177,.5)}.btn-retry:hover{background:#ec407a;transform:scale(1.05)}
+.btn-quit{background:#fff;color:#999;border:2px solid #ddd}.btn-quit:hover{border-color:#999;color:#666}
+.btn-back{position:absolute;top:12px;left:18px;background:none;border:none;font-size:22px;cursor:pointer;color:#bbb;padding:4px 8px;-webkit-tap-highlight-color:transparent;outline:none}
+.btn-back:hover{color:#888}
+@media(max-width:768px){.game-panel{padding:22px 14px 16px;gap:12px}.game-title{font-size:20px}.gcell{width:34px;height:34px;font-size:18px}.game-status{font-size:15px}.speech-lose{font-size:22px;padding:10px 20px}.btn-retry,.btn-quit{padding:10px 20px;font-size:15px}}
 
-  .speech-text {
-    font-size: 34px; font-weight: bold; color: #ec407a;
-    text-shadow: 0 3px 8px rgba(236,64,122,0.2);
-    opacity: 0; transform: translateY(15px);
-    transition: all 0.35s cubic-bezier(0.175,0.885,0.32,1.275);
-    pointer-events: none; letter-spacing: 3px;
-    -webkit-tap-highlight-color: transparent; outline: none;
-  }
-  .speech-text.show { opacity:1; transform:translateY(0); }
-  .speech-text.shake { animation: jiggle 0.4s ease; }
-  @keyframes jiggle {
-    0%{transform:translateY(0)rotate(0)scale(1)}
-    15%{transform:translateY(-4px)rotate(-3deg)scale(1.06)}
-    30%{transform:translateY(2px)rotate(3deg)scale(0.96)}
-    45%{transform:translateY(-3px)rotate(-2deg)scale(1.04)}
-    60%{transform:translateY(1px)rotate(2deg)scale(0.98)}
-    75%{transform:translateY(-1px)rotate(-1deg)scale(1.02)}
-    100%{transform:translateY(0)rotate(0)scale(1)}
-  }
-  .fish-wrapper {
-    cursor: pointer; transition: transform 0.15s ease;
-    filter: drop-shadow(0 10px 25px rgba(0,0,0,0.2));
-    -webkit-tap-highlight-color: transparent; outline: none;
-  }
-  .fish-wrapper:hover { transform: scale(1.06); }
-  .fish-wrapper:active { transform: scale(0.9); }
-  .fish-float { animation: bob 3s ease-in-out infinite; }
-  @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
-  .hint {
-    color: #fff; font-size: 17px; letter-spacing: 3px;
-    animation: pulse 2s ease-in-out infinite; text-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  }
-  @keyframes pulse { 0%,100%{opacity:0.5;transform:scale(0.98)} 50%{opacity:1;transform:scale(1.03)} }
-  .counter {
-    color: #fff; font-size: 15px; background: rgba(0,0,0,0.35);
-    padding: 6px 16px; border-radius: 20px; text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-  }
-  .clock {
-    color: #fff; font-size: 14px; background: rgba(0,0,0,0.3);
-    padding: 5px 16px; border-radius: 20px; letter-spacing: 1px;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-  }
-  .ribbon-tag {
-    display: inline-block; background: #f48fb1; color: #fff;
-    padding: 4px 14px; border-radius: 20px; font-size: 13px; letter-spacing: 1px;
-    box-shadow: 0 3px 10px rgba(244,143,177,0.35);
-  }
-  .game-entry {
-    display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 6px;
-  }
-  .entry-btn {
-    background: rgba(255,255,255,0.85); border: 2px solid #f8bbd0; color: #ec407a;
-    padding: 10px 24px; border-radius: 25px; font-size: 16px; font-weight: bold;
-    cursor: pointer; letter-spacing: 1px; font-family: inherit;
-    transition: all 0.2s; -webkit-tap-highlight-color: transparent; outline: none;
-  }
-  .entry-btn:hover { background: #fce4ec; }
-  @media (max-width: 768px) {
-    .speech-text { font-size: 26px; }
-    .entry-btn { padding: 8px 18px; font-size: 14px; }
-  }
+/* 抽卡弹窗 */
+.gacha-overlay{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .5s}
+.gacha-overlay.active{opacity:1;pointer-events:auto}
+.gacha-card{background:#fff;border-radius:28px;padding:30px 24px;box-shadow:0 20px 60px rgba(0,0,0,.4);display:flex;flex-direction:column;align-items:center;gap:18px;max-width:400px;width:90vw;position:relative;overflow:hidden}
+.gacha-card::before{content:'';position:absolute;top:0;left:0;right:0;height:6px}
+.gacha-card.r0::before{background:#bdbdbd}.gacha-card.r1::before{background:#81c784}
+.gacha-card.r2::before{background:#64b5f6}.gacha-card.r3::before{background:#ce93d8}
+.gacha-card.r4::before{background:#ffb74d}.gacha-card.r5::before{background:#ef5350}
+.gacha-card.r6::before{background:linear-gradient(90deg,#f48fb1,#ce93d8,#81d4fa,#f48fb1)}
+.gacha-title{font-size:24px;font-weight:bold;letter-spacing:2px}
+.gacha-rarity{font-size:14px;padding:3px 14px;border-radius:12px;color:#fff;letter-spacing:1px}
+.rarity-0{background:#bdbdbd}.rarity-1{background:#81c784}.rarity-2{background:#64b5f6}
+.rarity-3{background:#ce93d8}.rarity-4{background:#ffb74d}.rarity-5{background:#ef5350}
+.rarity-6{background:linear-gradient(90deg,#f48fb1,#ce93d8,#81d4fa)}
+.gacha-fish-img{animation:gachaReveal .6s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes gachaReveal{0%{transform:scale(0)rotate(180deg);opacity:0}60%{transform:scale(1.1)rotate(-10deg);opacity:1}100%{transform:scale(1)rotate(0);opacity:1}}
+.gacha-fish-name{font-size:22px;font-weight:bold;color:#555;letter-spacing:2px}
+.gacha-close{padding:10px 36px;border-radius:25px;font-size:16px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;border:none;background:#f48fb1;color:#fff;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
+.gacha-close:hover{background:#ec407a;transform:scale(1.05)}
+.gacha-sparkles{position:absolute;pointer-events:none;font-size:30px;animation:spark 1s ease-out forwards}
+@keyframes spark{0%{transform:translate(0,0)scale(1);opacity:1}100%{transform:translate(var(--sx),var(--sy))scale(0);opacity:0}}
 
-  /* ===== 游戏全屏页 ===== */
-  .game-overlay {
-    position: fixed; inset: 0; z-index: 10;
-    background: rgba(0,0,0,0.6);
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.4s;
-  }
-  .game-overlay.active { opacity: 1; pointer-events: auto; }
+/* 图鉴 */
+.album-overlay{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+.album-overlay.active{opacity:1;pointer-events:auto}
+.album-panel{background:#fff;border-radius:28px;padding:24px 16px;box-shadow:0 20px 60px rgba(0,0,0,.35);max-width:95vw;max-height:90vh;width:700px;display:flex;flex-direction:column;gap:14px;position:relative}
+.album-title{font-size:22px;font-weight:bold;text-align:center;color:#ec407a;letter-spacing:2px}
+.album-tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.album-tab{padding:5px 12px;border-radius:15px;border:none;font-size:12px;cursor:pointer;font-family:inherit;font-weight:bold;color:#fff;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
+.album-tab:hover{opacity:.8}
+.album-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:8px;overflow-y:auto;max-height:55vh;padding:4px}
+.album-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:12px;background:#fafafa;transition:all .2s;position:relative}
+.album-item.owned{cursor:pointer}.album-item.owned:hover{background:#fce4ec;transform:scale(1.05)}
+.album-item.locked{opacity:.35}
+.album-item .fish-icon{width:50px;height:40px}
+.album-item .fish-name{font-size:10px;text-align:center;color:#666;line-height:1.2}
+.album-item .owned-tag{position:absolute;top:2px;right:4px;font-size:10px}
+.album-stats{text-align:center;font-size:14px;color:#999;letter-spacing:1px}
+@media(max-width:768px){.album-grid{grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:5px}.album-panel{padding:16px 10px}.album-title{font-size:18px}.album-tab{font-size:10px;padding:4px 8px}}
 
-  .game-panel {
-    background: linear-gradient(160deg, #fff5f5, #fce4ec, #f3e5f5);
-    border-radius: 28px; padding: 28px 24px 20px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
-    display: flex; flex-direction: column; align-items: center; gap: 16px;
-    max-width: 95vw; max-height: 95vh; overflow-y: auto;
-    position: relative;
-  }
-
-  .game-title {
-    font-size: 24px; font-weight: bold; color: #ec407a; letter-spacing: 2px;
-  }
-
-  .game-board {
-    display: inline-grid; gap: 4px;
-    background: rgba(236,64,122,0.12); padding: 8px; border-radius: 14px;
-  }
-  .gcell {
-    width: 46px; height: 46px;
-    background: rgba(255,255,255,0.9); border-radius: 8px; border: 2px solid #f8bbd0;
-    cursor: pointer;
-    font-size: 24px; font-weight: bold;
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.15s; color: #555;
-    font-family: inherit; padding: 0;
-    -webkit-tap-highlight-color: transparent; outline: none;
-  }
-  .gcell:hover { background: #fce4ec; }
-  .gcell.X { color: #e91e63; border-color: #f48fb1; }
-  .gcell.O { color: #42a5f5; border-color: #90caf9; }
-  .gcell.win { background: #fff9c4; border-color: #ffcc80; }
-
-  .game-status {
-    font-size: 18px; font-weight: bold; color: #555; letter-spacing: 1px;
-  }
-
-  /* 鱼弹出 */
-  .fish-jumpin {
-    display: none; flex-direction: column; align-items: center; gap: 10px;
-  }
-  .fish-jumpin.show { display: flex; }
-  .fish-jumpin.show > svg {
-    animation: popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275) both;
-  }
-  .fish-jumpin.show .speech-lose {
-    animation: popIn 0.4s 0.15s cubic-bezier(0.175,0.885,0.32,1.275) both;
-  }
-  @keyframes popIn {
-    0% { transform: scale(0) rotate(-10deg); opacity: 0; }
-    100% { transform: scale(1) rotate(0deg); opacity: 1; }
-  }
-  .fish-jumpin .speech-lose {
-    font-size: 28px; font-weight: bold; color: #ec407a;
-    background: #fff; padding: 12px 28px; border-radius: 24px;
-    box-shadow: 0 4px 20px rgba(236,64,122,0.2);
-    animation: jiggle 0.4s ease;
-  }
-
-  .result-btns { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
-  .result-btns.show-btns .btn-retry  { animation: popIn 0.4s 0.2s cubic-bezier(0.175,0.885,0.32,1.275) both; }
-  .result-btns.show-btns .btn-quit   { animation: popIn 0.4s 0.35s cubic-bezier(0.175,0.885,0.32,1.275) both; }
-  .btn-retry, .btn-quit {
-    padding: 12px 30px; border-radius: 30px; font-size: 18px; font-weight: bold;
-    cursor: pointer; font-family: inherit; letter-spacing: 2px; border: none;
-    transition: all 0.2s; -webkit-tap-highlight-color: transparent; outline: none;
-  }
-  .btn-retry { background: #f48fb1; color: #fff; box-shadow: 0 4px 15px rgba(244,143,177,0.5); }
-  .btn-retry:hover { background: #ec407a; transform: scale(1.05); }
-  .btn-quit { background: #fff; color: #999; border: 2px solid #ddd; }
-  .btn-quit:hover { border-color: #999; color: #666; }
-
-  .btn-back {
-    position: absolute; top: 12px; left: 18px;
-    background: none; border: none; font-size: 22px;
-    cursor: pointer; color: #bbb; padding: 4px 8px;
-    -webkit-tap-highlight-color: transparent; outline: none;
-  }
-  .btn-back:hover { color: #888; }
-
-  @media (max-width: 768px) {
-    .game-panel { padding: 22px 14px 16px; gap: 12px; }
-    .game-title { font-size: 20px; }
-    .gcell { width: 34px; height: 34px; font-size: 18px; }
-    .game-status { font-size: 15px; }
-    .fish-jumpin .speech-lose { font-size: 22px; padding: 10px 20px; }
-    .btn-retry, .btn-quit { padding: 10px 20px; font-size: 15px; }
-  }
+/* 滚动字幕 */
+.marquee-bar{position:fixed;top:0;left:0;right:0;z-index:20;background:linear-gradient(90deg,#f48fb1,#ce93d8,#81d4fa,#f48fb1);background-size:300% 100%;animation:barShine 4s ease-in-out infinite;padding:10px 0;overflow:hidden;box-shadow:0 2px 15px rgba(244,143,177,.35)}
+@keyframes barShine{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.marquee-inner{display:flex;width:max-content;animation:marqueeScroll 80s linear infinite}
+@keyframes marqueeScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.marquee-text{color:#fff;font-size:16px;font-weight:bold;letter-spacing:2px;white-space:nowrap;text-shadow:0 1px 4px rgba(0,0,0,.15);padding-right:60px}
+@media(max-width:768px){.marquee-bar{padding:8px 0}.marquee-text{font-size:13px;letter-spacing:1px;padding-right:30px}}
 </style>
 </head>
 <body>
 
 <!-- ====== 滚动字幕 ====== -->
 <div class="marquee-bar">
-  <div class="marquee-inner">
-    <span class="marquee-text">必须好好夸夸咱们万能鱼姐！很难遇到像鱼姐这么宝藏的人，情商直接拉满，风趣幽默善于共情，和鱼姐交流完全不用小心翼翼，没有半点距离感，不管聊什么话题都顺畅舒服。遇到棘手事情从来不会慌慌张张，思路清晰眼界开阔，五花八门的难题交到鱼姐手中总能梳理明白，奇思妙招源源不断，妥妥团队里的定心骨干。为人格外仗义热忱，心地善良乐于助人，身边人遇到困境时总会主动伸出援手，默默帮忙不求回报，处事通透拎得清底线，温和包容却绝不任人敷衍。自带超强欢乐buff，只要鱼姐登场，压抑沉闷的气氛立刻一扫而空，枯燥的日常都会变得有意思，坏情绪见到鱼姐都主动绕道逃跑。可正经靠谱，可轻松玩闹，风格自由切换，既能冷静统筹处理繁杂事务，又懂得享受生活擅长制造乐趣。实力出众却十分低调，从不张扬炫耀自身能力，踏实稳重，做事细致周全，方方面面都让人无比放心。眼光独到看人通透，总能给出中肯实在的建议，不知不觉就能开导陷入内耗的人。有幸结识鱼姐真的是巨大收获，有鱼姐坐镇心里就格外踏实。祝愿全能鱼姐日日喜乐，烦心事全部退散，好运源源不断，财运节节攀升，生活多姿多彩，一路顺风顺水持续开挂，永远元气满满，自信耀眼，被所有美好紧紧包围！</span>
-    <span class="marquee-text">必须好好夸夸咱们万能鱼姐！很难遇到像鱼姐这么宝藏的人，情商直接拉满，风趣幽默善于共情，和鱼姐交流完全不用小心翼翼，没有半点距离感，不管聊什么话题都顺畅舒服。遇到棘手事情从来不会慌慌张张，思路清晰眼界开阔，五花八门的难题交到鱼姐手中总能梳理明白，奇思妙招源源不断，妥妥团队里的定心骨干。为人格外仗义热忱，心地善良乐于助人，身边人遇到困境时总会主动伸出援手，默默帮忙不求回报，处事通透拎得清底线，温和包容却绝不任人敷衍。自带超强欢乐buff，只要鱼姐登场，压抑沉闷的气氛立刻一扫而空，枯燥的日常都会变得有意思，坏情绪见到鱼姐都主动绕道逃跑。可正经靠谱，可轻松玩闹，风格自由切换，既能冷静统筹处理繁杂事务，又懂得享受生活擅长制造乐趣。实力出众却十分低调，从不张扬炫耀自身能力，踏实稳重，做事细致周全，方方面面都让人无比放心。眼光独到看人通透，总能给出中肯实在的建议，不知不觉就能开导陷入内耗的人。有幸结识鱼姐真的是巨大收获，有鱼姐坐镇心里就格外踏实。祝愿全能鱼姐日日喜乐，烦心事全部退散，好运源源不断，财运节节攀升，生活多姿多彩，一路顺风顺水持续开挂，永远元气满满，自信耀眼，被所有美好紧紧包围！</span>
-  </div>
+  <div class="marquee-inner" id="marqueeInner"></div>
 </div>
 
 <!-- ====== 背景场景 ====== -->
-<div class="scene">
-  <!-- 云 -->
-  <svg class="cloud" width="160" height="70" style="top:3%;left:100%;animation-duration:35s;"><ellipse cx="50" cy="50" rx="50" ry="25" fill="white" opacity="0.85"/><ellipse cx="90" cy="40" rx="45" ry="28" fill="white" opacity="0.9"/><ellipse cx="120" cy="50" rx="40" ry="22" fill="white" opacity="0.8"/></svg>
-  <svg class="cloud" width="130" height="55" style="top:10%;left:110%;animation-duration:42s;animation-delay:-15s;"><ellipse cx="40" cy="40" rx="40" ry="20" fill="white" opacity="0.75"/><ellipse cx="75" cy="30" rx="35" ry="22" fill="white" opacity="0.8"/><ellipse cx="100" cy="40" rx="30" ry="18" fill="white" opacity="0.75"/></svg>
-  <svg class="cloud" width="100" height="45" style="top:8%;left:105%;animation-duration:38s;animation-delay:-25s;"><ellipse cx="35" cy="32" rx="35" ry="18" fill="white" opacity="0.7"/><ellipse cx="65" cy="25" rx="30" ry="18" fill="white" opacity="0.75"/></svg>
-
-  <!-- 星星 -->
-  <span class="sparkle" style="top:12%;left:8%;animation-delay:0s;">✦</span>
-  <span class="sparkle" style="top:18%;left:85%;animation-delay:.5s;">✧</span>
-  <span class="sparkle" style="top:7%;left:45%;animation-delay:.8s;">✦</span>
-  <span class="sparkle" style="top:22%;left:15%;animation-delay:1.1s;">⋆</span>
-  <span class="sparkle" style="top:5%;left:68%;animation-delay:.3s;">✧</span>
-  <span class="sparkle" style="top:15%;left:32%;animation-delay:1.4s;">✦</span>
-  <span class="sparkle" style="top:20%;left:92%;animation-delay:.7s;">⋆</span>
-  <span class="sparkle" style="top:9%;left:55%;animation-delay:1s;">✧</span>
-
-  <!-- 海底 -->
-  <div class="seabed"></div>
-
-  <!-- 岩石 -->
-  <svg class="rock" width="80" height="45" viewBox="0 0 80 45" style="left:20%;"><ellipse cx="35" cy="35" rx="35" ry="18" fill="#bcaaa4"/><ellipse cx="25" cy="30" rx="20" ry="12" fill="#d7ccc8"/><ellipse cx="55" cy="38" rx="25" ry="14" fill="#a1887f"/></svg>
-  <svg class="rock" width="65" height="35" viewBox="0 0 65 35" style="right:18%;"><ellipse cx="30" cy="28" rx="28" ry="15" fill="#c9b99a"/><ellipse cx="45" cy="32" rx="20" ry="12" fill="#b8a888"/></svg>
-  <svg class="rock" width="55" height="30" viewBox="0 0 55 30" style="left:50%;"><ellipse cx="25" cy="24" rx="24" ry="13" fill="#d7ccc8"/><ellipse cx="15" cy="20" rx="15" ry="9" fill="#e8ddd8"/></svg>
-
-  <!-- 海草 -->
-  <svg class="seaweed" width="40" height="140" viewBox="0 0 40 140" style="left:3%;"><path d="M20,140 Q6,100 20,70 Q5,45 20,25 Q8,10 17,0" fill="none" stroke="#66bb6a" stroke-width="9" stroke-linecap="round" opacity="0.75"/><path d="M20,140 Q32,95 20,60 Q34,38 20,18 Q28,6 24,0" fill="none" stroke="#81c784" stroke-width="6" stroke-linecap="round" opacity="0.65"/></svg>
-  <svg class="seaweed" width="35" height="120" viewBox="0 0 35 120" style="left:11%;animation-delay:-1s;animation-duration:3.5s;"><path d="M17,120 Q5,80 17,55 Q6,35 17,15 Q10,4 15,0" fill="none" stroke="#4caf50" stroke-width="8" stroke-linecap="round" opacity="0.65"/><path d="M17,120 Q28,78 17,50 Q29,30 17,10 Q25,3 22,0" fill="none" stroke="#81c784" stroke-width="5" stroke-linecap="round" opacity="0.6"/></svg>
-  <svg class="seaweed" width="45" height="150" viewBox="0 0 45 150" style="right:4%;animation-delay:-2s;animation-duration:4s;"><path d="M22,150 Q6,108 22,75 Q5,48 22,28 Q8,12 20,0" fill="none" stroke="#66bb6a" stroke-width="10" stroke-linecap="round" opacity="0.7"/><path d="M22,150 Q36,100 22,68 Q37,42 22,20 Q32,6 28,0" fill="none" stroke="#a5d6a7" stroke-width="6" stroke-linecap="round" opacity="0.65"/></svg>
-  <svg class="seaweed" width="30" height="105" viewBox="0 0 30 105" style="right:15%;animation-delay:-1.5s;animation-duration:3.2s;"><path d="M15,105 Q4,73 15,48 Q5,28 15,10 Q10,3 13,0" fill="none" stroke="#43a047" stroke-width="7" stroke-linecap="round" opacity="0.6"/></svg>
-
-  <!-- 珊瑚 -->
-  <svg class="coral" width="75" height="85" viewBox="0 0 75 85" style="left:17%;"><circle cx="22" cy="72" r="13" fill="#ff8a80"/><circle cx="52" cy="70" r="11" fill="#ff8a80"/><circle cx="37" cy="75" r="12" fill="#ff5252"/><path d="M22,59 Q20,30 15,10" fill="none" stroke="#ff8a80" stroke-width="8" stroke-linecap="round"/><path d="M15,10 Q7,2 9,-2" fill="none" stroke="#ff8a80" stroke-width="7" stroke-linecap="round"/><path d="M15,10 Q19,0 21,-2" fill="none" stroke="#ff8a80" stroke-width="6" stroke-linecap="round"/><path d="M37,63 Q32,32 30,8" fill="none" stroke="#ff5252" stroke-width="8" stroke-linecap="round"/><path d="M30,8 Q22,-1 24,-5" fill="none" stroke="#ff5252" stroke-width="6" stroke-linecap="round"/><path d="M30,8 Q35,-1 37,-3" fill="none" stroke="#ff5252" stroke-width="6" stroke-linecap="round"/><path d="M52,59 Q55,30 57,6" fill="none" stroke="#ff8a80" stroke-width="8" stroke-linecap="round"/><path d="M57,6 Q50,-2 52,-4" fill="none" stroke="#ff8a80" stroke-width="6" stroke-linecap="round"/></svg>
-  <svg class="coral" width="55" height="60" viewBox="0 0 55 60" style="right:8%;"><circle cx="16" cy="52" r="10" fill="#ff80ab"/><circle cx="38" cy="50" r="9" fill="#ff80ab"/><path d="M16,42 Q13,22 11,4" fill="none" stroke="#ff80ab" stroke-width="7" stroke-linecap="round"/><path d="M11,4 Q5,-3 7,-5" fill="none" stroke="#ff80ab" stroke-width="5" stroke-linecap="round"/><path d="M11,4 Q15,-2 17,-4" fill="none" stroke="#ff80ab" stroke-width="5" stroke-linecap="round"/><path d="M38,41 Q41,20 39,2" fill="none" stroke="#ff80ab" stroke-width="7" stroke-linecap="round"/><path d="M39,2 Q33,-4 35,-6" fill="none" stroke="#ff80ab" stroke-width="5" stroke-linecap="round"/></svg>
-
-  <!-- 贝壳 -->
-  <svg class="shell" width="38" height="24" viewBox="0 0 38 24" style="left:24%;"><ellipse cx="19" cy="14" rx="17" ry="11" fill="#fff3e0"/><path d="M2,14 Q10,5 19,9 Q28,5 36,14" fill="none" stroke="#ffcc80" stroke-width="2"/><path d="M5,16 Q12,8 19,11 Q26,8 33,16" fill="none" stroke="#ffb74d" stroke-width="1.5"/></svg>
-  <svg class="shell" width="30" height="20" viewBox="0 0 30 20" style="right:22%;"><ellipse cx="15" cy="12" rx="14" ry="9" fill="#fce4ec"/><path d="M1,12 Q8,4 15,7 Q22,4 29,12" fill="none" stroke="#f8bbd0" stroke-width="1.5"/><path d="M3,14 Q9,7 15,9 Q21,7 27,14" fill="none" stroke="#f48fb1" stroke-width="1.5"/></svg>
-  <svg class="shell" width="30" height="20" viewBox="0 0 30 20" style="left:40%;"><ellipse cx="15" cy="12" rx="14" ry="9" fill="#ede7f6"/><path d="M1,12 Q8,4 15,7 Q22,4 29,12" fill="none" stroke="#b39ddb" stroke-width="1.5"/><path d="M3,14 Q9,7 15,9 Q21,7 27,14" fill="none" stroke="#ce93d8" stroke-width="1.5"/></svg>
-
-  <!-- 海星 -->
-  <svg class="starfish" width="45" height="45" viewBox="0 0 45 45" style="left:30%;"><polygon points="22,0 27,14 42,14 30,23 34,38 22,30 10,38 14,23 2,14 17,14" fill="#ffab91"/><circle cx="22" cy="22" r="3.5" fill="#ff8a65"/></svg>
-  <svg class="starfish" width="35" height="35" viewBox="0 0 35 35" style="right:28%;animation-delay:-2s;animation-duration:3.5s;"><polygon points="18,0 22,11 33,11 24,18 27,30 18,24 9,30 12,18 3,11 14,11" fill="#ffcc80"/><circle cx="18" cy="17" r="2.5" fill="#ffb74d"/></svg>
-
-  <!-- Hello Kitty ×6 -->
-  <svg class="kitty-doll" width="60" height="70" viewBox="0 0 120 140" style="left:18%;bottom:102px;"><ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="89,30 98,4 73,20" fill="#f8bbd0"/><polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="31,30 22,4 47,20" fill="#f8bbd0"/><ellipse cx="28" cy="22" rx="14" ry="9" fill="#f48fb1" transform="rotate(-15,28,22)"/><circle cx="28" cy="22" r="5" fill="#ec407a"/><ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/><ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/><ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/><line x1="30" y1="58" x2="45" y2="60" stroke="#aaa" stroke-width="1.2"/><line x1="30" y1="64" x2="45" y2="63" stroke="#aaa" stroke-width="1.2"/><line x1="30" y1="70" x2="45" y2="66" stroke="#aaa" stroke-width="1.2"/><line x1="90" y1="58" x2="75" y2="60" stroke="#aaa" stroke-width="1.2"/><line x1="90" y1="64" x2="75" y2="63" stroke="#aaa" stroke-width="1.2"/><line x1="90" y1="70" x2="75" y2="66" stroke="#aaa" stroke-width="1.2"/><ellipse cx="60" cy="110" rx="22" ry="18" fill="#fce4ec"/><path d="M38,110 Q40,130 60,132 Q80,130 82,110 Z" fill="#f48fb1"/><ellipse cx="50" cy="132" rx="6" ry="4" fill="#fff"/><ellipse cx="70" cy="132" rx="6" ry="4" fill="#fff"/></svg>
-  <svg class="kitty-doll" width="55" height="65" viewBox="0 0 120 140" style="right:16%;bottom:100px;animation-delay:-1s;animation-duration:4s;"><ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="89,30 98,4 73,20" fill="#e1bee7"/><polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="31,30 22,4 47,20" fill="#e1bee7"/><ellipse cx="28" cy="22" rx="14" ry="9" fill="#ce93d8" transform="rotate(-15,28,22)"/><circle cx="28" cy="22" r="5" fill="#ab47bc"/><ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/><ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/><ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/><line x1="30" y1="58" x2="45" y2="60" stroke="#aaa" stroke-width="1.2"/><line x1="30" y1="64" x2="45" y2="63" stroke="#aaa" stroke-width="1.2"/><line x1="30" y1="70" x2="45" y2="66" stroke="#aaa" stroke-width="1.2"/><line x1="90" y1="58" x2="75" y2="60" stroke="#aaa" stroke-width="1.2"/><line x1="90" y1="64" x2="75" y2="63" stroke="#aaa" stroke-width="1.2"/><line x1="90" y1="70" x2="75" y2="66" stroke="#aaa" stroke-width="1.2"/><ellipse cx="60" cy="110" rx="22" ry="18" fill="#ede7f6"/><path d="M38,110 Q40,130 60,132 Q80,130 82,110 Z" fill="#ce93d8"/><ellipse cx="50" cy="132" rx="6" ry="4" fill="#fff"/><ellipse cx="70" cy="132" rx="6" ry="4" fill="#fff"/></svg>
-  <svg class="kitty-doll" width="50" height="60" viewBox="0 0 120 140" style="left:35%;bottom:85px;animation-delay:-2.2s;animation-duration:3.8s;"><ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="89,30 98,4 73,20" fill="#fff9c4"/><polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="31,30 22,4 47,20" fill="#fff9c4"/><ellipse cx="28" cy="22" rx="14" ry="9" fill="#fff176" transform="rotate(-15,28,22)"/><circle cx="28" cy="22" r="5" fill="#fdd835"/><ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/><ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/><ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/><line x1="30" y1="58" x2="45" y2="60" stroke="#aaa" stroke-width="1.2"/><line x1="30" y1="64" x2="45" y2="63" stroke="#aaa" stroke-width="1.2"/><line x1="30" y1="70" x2="45" y2="66" stroke="#aaa" stroke-width="1.2"/><line x1="90" y1="58" x2="75" y2="60" stroke="#aaa" stroke-width="1.2"/><line x1="90" y1="64" x2="75" y2="63" stroke="#aaa" stroke-width="1.2"/><line x1="90" y1="70" x2="75" y2="66" stroke="#aaa" stroke-width="1.2"/><ellipse cx="60" cy="110" rx="22" ry="18" fill="#fffde7"/><path d="M38,110 Q40,130 60,132 Q80,130 82,110 Z" fill="#fff176"/><ellipse cx="50" cy="132" rx="6" ry="4" fill="#fff"/><ellipse cx="70" cy="132" rx="6" ry="4" fill="#fff"/></svg>
-  <svg class="kitty-doll" width="48" height="58" viewBox="0 0 120 140" style="right:32%;bottom:85px;animation-delay:-.8s;animation-duration:4.2s;"><ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="89,30 98,4 73,20" fill="#bbdefb"/><polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="31,30 22,4 47,20" fill="#bbdefb"/><ellipse cx="28" cy="22" rx="14" ry="9" fill="#90caf9" transform="rotate(-15,28,22)"/><circle cx="28" cy="22" r="5" fill="#42a5f5"/><ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/><ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/><ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/><line x1="30" y1="58" x2="45" y2="60" stroke="#aaa" stroke-width="1.2"/><line x1="30" y1="64" x2="45" y2="63" stroke="#aaa" stroke-width="1.2"/><line x1="30" y1="70" x2="45" y2="66" stroke="#aaa" stroke-width="1.2"/><line x1="90" y1="58" x2="75" y2="60" stroke="#aaa" stroke-width="1.2"/><line x1="90" y1="64" x2="75" y2="63" stroke="#aaa" stroke-width="1.2"/><line x1="90" y1="70" x2="75" y2="66" stroke="#aaa" stroke-width="1.2"/><ellipse cx="60" cy="110" rx="22" ry="18" fill="#e3f2fd"/><path d="M38,110 Q40,130 60,132 Q80,130 82,110 Z" fill="#90caf9"/><ellipse cx="50" cy="132" rx="6" ry="4" fill="#fff"/><ellipse cx="70" cy="132" rx="6" ry="4" fill="#fff"/></svg>
-  <svg class="kitty-doll" width="45" height="55" viewBox="0 0 120 140" style="left:48%;bottom:95px;animation-delay:-3s;animation-duration:3.3s;"><ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="89,30 98,4 73,20" fill="#c8e6c9"/><polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="31,30 22,4 47,20" fill="#c8e6c9"/><ellipse cx="28" cy="22" rx="14" ry="9" fill="#a5d6a7" transform="rotate(-15,28,22)"/><circle cx="28" cy="22" r="5" fill="#66bb6a"/><ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/><ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/><ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/><line x1="30" y1="58" x2="45" y2="60" stroke="#aaa" stroke-width="1.2"/><line x1="30" y1="64" x2="45" y2="63" stroke="#aaa" stroke-width="1.2"/><line x1="30" y1="70" x2="45" y2="66" stroke="#aaa" stroke-width="1.2"/><line x1="90" y1="58" x2="75" y2="60" stroke="#aaa" stroke-width="1.2"/><line x1="90" y1="64" x2="75" y2="63" stroke="#aaa" stroke-width="1.2"/><line x1="90" y1="70" x2="75" y2="66" stroke="#aaa" stroke-width="1.2"/><ellipse cx="60" cy="110" rx="22" ry="18" fill="#e8f5e9"/><path d="M38,110 Q40,130 60,132 Q80,130 82,110 Z" fill="#a5d6a7"/><ellipse cx="50" cy="132" rx="6" ry="4" fill="#fff"/><ellipse cx="70" cy="132" rx="6" ry="4" fill="#fff"/></svg>
-  <svg class="kitty-doll" width="42" height="52" viewBox="0 0 120 140" style="left:8%;bottom:88px;animation-delay:-1.8s;animation-duration:4.5s;"><ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="89,30 98,4 73,20" fill="#ffccbc"/><polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="31,30 22,4 47,20" fill="#ffccbc"/><ellipse cx="28" cy="22" rx="14" ry="9" fill="#ffab91" transform="rotate(-15,28,22)"/><circle cx="28" cy="22" r="5" fill="#ff7043"/><ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/><ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/><ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/><line x1="30" y1="58" x2="45" y2="60" stroke="#aaa" stroke-width="1.2"/><line x1="30" y1="64" x2="45" y2="63" stroke="#aaa" stroke-width="1.2"/><line x1="30" y1="70" x2="45" y2="66" stroke="#aaa" stroke-width="1.2"/><line x1="90" y1="58" x2="75" y2="60" stroke="#aaa" stroke-width="1.2"/><line x1="90" y1="64" x2="75" y2="63" stroke="#aaa" stroke-width="1.2"/><line x1="90" y1="70" x2="75" y2="66" stroke="#aaa" stroke-width="1.2"/><ellipse cx="60" cy="110" rx="22" ry="18" fill="#fbe9e7"/><path d="M38,110 Q40,130 60,132 Q80,130 82,110 Z" fill="#ffab91"/><ellipse cx="50" cy="132" rx="6" ry="4" fill="#fff"/><ellipse cx="70" cy="132" rx="6" ry="4" fill="#fff"/></svg>
-
-  <!-- 爱心 & 泡泡 -->
-  <span class="heart-float" style="left:5%;animation-duration:8s;animation-delay:0s;">💕</span>
-  <span class="heart-float" style="left:18%;animation-duration:9s;animation-delay:2s;">💖</span>
-  <span class="heart-float" style="left:35%;animation-duration:7s;animation-delay:4s;">💗</span>
-  <span class="heart-float" style="left:55%;animation-duration:10s;animation-delay:1s;">💕</span>
-  <span class="heart-float" style="left:72%;animation-duration:8.5s;animation-delay:3s;">💖</span>
-  <span class="heart-float" style="left:85%;animation-duration:9.5s;animation-delay:5s;">💗</span>
-  <span class="heart-float" style="left:90%;animation-duration:7.5s;animation-delay:.5s;">💝</span>
-  <span class="heart-float" style="left:12%;animation-duration:11s;animation-delay:6s;">💕</span>
-  <span class="heart-float" style="left:25%;animation-duration:6s;animation-delay:1.5s;">🫧</span>
-  <span class="heart-float" style="left:48%;animation-duration:7s;animation-delay:3.5s;font-size:18px;">🫧</span>
-  <span class="heart-float" style="left:65%;animation-duration:8s;animation-delay:2.5s;font-size:20px;">🫧</span>
-  <span class="heart-float" style="left:80%;animation-duration:6.5s;animation-delay:4.5s;">🫧</span>
-  <span class="heart-float" style="left:40%;animation-duration:9s;animation-delay:5.5s;font-size:22px;">🫧</span>
-</div>
+<div class="scene" id="sceneBg"></div>
 
 <!-- ====== 两侧图片 ====== -->
-<img class="side-img left"  src="fish-img.jpg" alt="">
+<img class="side-img left" src="fish-img.jpg" alt="">
 <img class="side-img right" src="fish-img.jpg" alt="">
 
 <!-- ====== 主页 ====== -->
 <div class="main-page" id="mainPage">
   <div class="speech-text" id="speechText">我是傻鱼 🐟</div>
-
-  <div class="fish-wrapper" id="fishWrapper" title="点我！">
-    <div class="fish-float">
-      <svg width="240" height="180" viewBox="0 0 240 180">
-        <defs>
-          <radialGradient id="fishGrad" cx="40%" cy="35%"><stop offset="0%" stop-color="#ffccd5"/><stop offset="50%" stop-color="#ffb3ba"/><stop offset="100%" stop-color="#ff8a80"/></radialGradient>
-          <radialGradient id="bellyGrad" cx="50%" cy="40%"><stop offset="0%" stop-color="#fff5f5"/><stop offset="100%" stop-color="#ffe0e0"/></radialGradient>
-        </defs>
-        <ellipse cx="120" cy="90" rx="85" ry="65" fill="rgba(255,255,255,0.12)"/>
-        <g transform="translate(15,80)"><path d="M0,10 Q-25,-30 -12,-50 Q-5,-40 5,-30 Q10,-20 12,-5 Q18,-35 30,-55 Q35,-40 28,-20 Q30,-10 20,0 Q30,10 28,25 Q35,45 30,60 Q18,40 12,10 Q10,25 5,35 Q-5,45 -12,55 Q-25,35 0,15 Z" fill="#ffb3ba"/><path d="M0,10 Q-18,-20 -8,-40 Q-2,-30 3,-20 Q8,-10 10,0 Q10,-25 20,-40 Q24,-28 20,-12 Q22,-5 15,2 Q24,8 22,20 Q28,35 24,45 Q14,30 10,10 Q6,20 2,28 Q-2,38 -8,45 Q-18,28 0,15 Z" fill="#ff8a80" opacity="0.45"/></g>
-        <path d="M120,30 Q130,8 145,18 Q140,28 148,35 Q138,38 130,35" fill="#ffb3ba" opacity="0.65"/>
-        <path d="M90,130 Q100,152 115,148 Q110,140 118,135 Q108,133 100,130" fill="#ffb3ba" opacity="0.55"/>
-        <ellipse cx="120" cy="90" rx="75" ry="55" fill="url(#fishGrad)"/>
-        <ellipse cx="130" cy="100" rx="45" ry="32" fill="url(#bellyGrad)" opacity="0.75"/>
-        <ellipse cx="82" cy="75" rx="14" ry="10" fill="#ff8a80" opacity="0.32"/>
-        <ellipse cx="82" cy="105" rx="12" ry="8" fill="#ff8a80" opacity="0.28"/>
-        <circle cx="148" cy="68" r="19" fill="white" stroke="#e0e0e0" stroke-width="1.5"/><circle cx="152" cy="66" r="12" fill="#444"/><circle cx="156" cy="62" r="4.5" fill="white"/><circle cx="148" cy="70" r="1.8" fill="white"/>
-        <circle cx="148" cy="108" r="17" fill="white" stroke="#e0e0e0" stroke-width="1.5"/><circle cx="151" cy="106" r="11" fill="#444"/><circle cx="155" cy="102" r="4" fill="white"/><circle cx="146" cy="110" r="1.5" fill="white"/>
-        <ellipse cx="175" cy="90" rx="5" ry="3.5" fill="#e57373" opacity="0.8"/><path d="M178,92 Q180,95 177,96" fill="none" stroke="#e57373" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
-        <g transform="translate(115,28)"><circle cx="0" cy="0" r="8" fill="#fff176"/><circle cx="-7" cy="-5" r="7" fill="#ffeb3b"/><circle cx="7" cy="-5" r="7" fill="#fff176"/><circle cx="-7" cy="5" r="7" fill="#fff176"/><circle cx="7" cy="5" r="7" fill="#ffeb3b"/><circle cx="0" cy="0" r="5" fill="#fff9c4"/><circle cx="0" cy="0" r="3" fill="#ffcc80"/></g>
-      </svg>
-    </div>
-  </div>
-
+  <div class="fish-wrapper" id="fishWrapper" title="点我！"><div class="fish-float" id="mainFishSvg"></div></div>
   <p class="hint">✧ 点一下这条呆鱼 ✧</p>
   <span class="ribbon-tag">🐟 小鱼</span>
   <p class="counter" id="counter"></p>
   <p class="clock" id="clock"></p>
-
+  <div class="main-btns">
+    <button class="btn-album" onclick="openAlbum()">📖 图鉴</button>
+  </div>
   <div class="game-entry">
     <button class="entry-btn" onclick="enterGame('tictactoe')">🎮 井字棋</button>
     <button class="entry-btn" onclick="enterGame('gomoku')">♟️ 五子棋</button>
   </div>
 </div>
 
-<!-- ====== 游戏全屏 ====== -->
+<!-- ====== 游戏 ====== -->
 <div class="game-overlay" id="gameOverlay">
   <div class="game-panel" id="gamePanel">
-    <button class="btn-back" onclick="quitGame()" title="退出">✕</button>
+    <button class="btn-back" onclick="quitGame()">✕</button>
     <div class="game-title" id="gameTitle"></div>
     <div class="game-board" id="gameBoard"></div>
     <div class="game-status" id="gameStatus"></div>
-
-    <!-- 输了后的鱼 -->
-    <div class="fish-jumpin" id="fishJumpin">
-      <svg width="140" height="100" viewBox="0 0 240 180">
-        <defs><radialGradient id="fg2" cx="40%" cy="35%"><stop offset="0%" stop-color="#ffccd5"/><stop offset="50%" stop-color="#ffb3ba"/><stop offset="100%" stop-color="#ff8a80"/></radialGradient></defs>
-        <g transform="translate(15,80)"><path d="M0,10 Q-20,-20 -10,-40 Q-4,-30 2,-20 Q6,-10 8,0 Q12,-25 22,-35 Q24,-22 20,-8 Q22,-2 15,4 Q22,8 20,18 Q26,28 22,38 Q12,24 8,8 Q5,16 2,22 Q-2,30 -6,38 Q-14,24 0,12 Z" fill="#ffb3ba"/></g>
-        <ellipse cx="120" cy="90" rx="65" ry="48" fill="url(#fg2)"/>
-        <ellipse cx="128" cy="98" rx="38" ry="28" fill="rgba(255,255,255,0.35)"/>
-        <ellipse cx="82" cy="75" rx="12" ry="8" fill="#ff8a80" opacity="0.3"/>
-        <circle cx="145" cy="68" r="16" fill="white" stroke="#e0e0e0" stroke-width="1"/><circle cx="148" cy="66" r="10" fill="#444"/><circle cx="152" cy="62" r="3.5" fill="white"/><circle cx="145" cy="70" r="1.5" fill="white"/>
-        <circle cx="145" cy="105" r="14" fill="white" stroke="#e0e0e0" stroke-width="1"/><circle cx="148" cy="103" r="9" fill="#444"/><circle cx="151" cy="100" r="3" fill="white"/><circle cx="144" cy="107" r="1.2" fill="white"/>
-        <ellipse cx="170" cy="90" rx="5" ry="4" fill="#e57373" opacity="0.8"/>
-      </svg>
-      <div class="speech-lose">你才是傻鱼！🐟</div>
-    </div>
-
-    <!-- 结果按钮 -->
-    <div class="result-btns" id="resultBtns" style="display:none;">
+    <div class="fish-jumpin" id="fishJumpin"></div>
+    <div class="result-btns" id="resultBtns" style="display:none">
       <button class="btn-retry" onclick="rematch()">💪 我不服！</button>
       <button class="btn-quit" onclick="admitLose()">🥺 我承认我是傻鱼</button>
     </div>
   </div>
 </div>
 
+<!-- ====== 抽卡弹窗 ====== -->
+<div class="gacha-overlay" id="gachaOverlay">
+  <div class="gacha-card" id="gachaCard">
+    <div class="gacha-title">🎣 今日抽鱼</div>
+    <div class="gacha-fish-img" id="gachaFishImg"></div>
+    <div class="gacha-rarity" id="gachaRarity"></div>
+    <div class="gacha-fish-name" id="gachaFishName"></div>
+    <button class="gacha-close" onclick="collectGacha()">🎒 收下！</button>
+  </div>
+</div>
+
+<!-- ====== 图鉴弹窗 ====== -->
+<div class="album-overlay" id="albumOverlay">
+  <div class="album-panel">
+    <button class="btn-back" onclick="closeAlbum()">✕</button>
+    <div class="album-title">📖 鱼鱼图鉴</div>
+    <div class="album-stats" id="albumStats"></div>
+    <div class="album-tabs" id="albumTabs"></div>
+    <div class="album-grid" id="albumGrid"></div>
+  </div>
+</div>
+
 <script>
-  // ========== 主页逻辑 ==========
-  const fishWrapper = document.getElementById('fishWrapper');
-  const speechText = document.getElementById('speechText');
-  const counterEl = document.getElementById('counter');
-  const clockEl = document.getElementById('clock');
-  let clickCount = parseInt(localStorage.getItem('fishClickCount') || '0');
-  let textTimer = null;
+// ========== 鱼数据生成 ==========
+const RARITY = ['普通','优良','稀有','史诗','传说','隐藏','限量'];
+const R_COLORS = ['#bdbdbd','#81c784','#64b5f6','#ce93d8','#ffb74d','#ef5350','#f48fb1'];
+const R_PROB = [0.5, 0.45, 0.4, 0.33, 0.2, 0.1, 0.06];
+const R_COUNTS = [75, 30, 20, 15, 10, 10, 5];
 
-  if (clickCount > 0) {
-    counterEl.textContent = `这条呆鱼一共说了 ${clickCount} 次 "我是傻鱼"～`;
+// 名字词库
+const ADJ = {
+  0:['小','胖','圆','红','粉','橙','黄','绿','青','蓝','紫','白','灰','花','软','呆','萌','乖','笨','懒','馋','乐','跳','游','睡','甜','香','热','温','凉','快','慢','轻','重','长','短','厚','薄','光','暗','闪','水','火','泥','沙','石','草','树','花','云','雨','雪','风','日','月','星','海','河','湖','溪','泉','泡','波','浪','潮','涌','飘','浮','沉'],
+  1:['锦','琉','珊','瑚','珍','珠','宝','翡','翠','钻','晶','莹','碧','澈','清','明','亮','耀','辉','灿','绚','丽','华','美','雅','秀','俊','俏','灵','巧'],
+  2:['幻','玄','秘','奇','仙','神','龙','凤','麟','鲲','鹏','鹤','鸾','鲸','鲨','豚','鳗','鳐','鲷','鲑'],
+  3:['天','地','玄','黄','宇','宙','洪','荒','太','极','乾','坤','混','沌','鸿','蒙','苍','穹','星','辰'],
+  4:['圣','尊','帝','皇','霸','王','神','鬼','魔','妖'],
+  5:['幽','冥','影','暗','幻','魅','灵','魂','虚','空'],
+  6:['绝','独','特','典','限','藏','御','赐','尊','贵']
+};
+const NOUN = {
+  0:['鱼','鲤','鲫','鲢','鳅','鲶','鳊','鲈','鳜','鳕','鳗','鲷','鲑','鳟','鲀','豚','鲸','鲨','鳐','鲲','泡','珠','玉','宝','贝','晶','钻','石','星','月','日','云','花','草','叶','果','糖','饼','包','丸','球','点','斑','纹','条','线','圈','环','波','浪','涛','潮','汐','流','溪','泉','露','霜','雪','霓','虹','彩','霞','曦','辉','光','影','梦','幻','仙'],
+  1:['锦鳞','琉尾','瑚鳍','珠光','宝气','翡翠','钻鳞','晶莹','碧波','澈影','明辉','亮星','耀斑','彩鳞','绚丽','华锦','美玉','秀颀','俊逸','俏丽','灵眸','巧鳍','珊瑚','玉鳞','金鳍','银尾','丹顶','墨斑','雪鳞'],
+  2:['幻鳞','玄尾','秘鳍','奇斑','仙鳞','神尾','龙鳞','凤鳍','麟斑','鲲尾','鹏鳍','鹤鳞','鸾尾','鲸影','鲨齿','豚跃','鳗舞','鳐翼','鲷纹','鲑霞'],
+  3:['天鳞','地尾','玄鳍','黄斑','宇鳞','宙尾','洪荒','太极','乾坤','混沌','鸿蒙','苍穹','星辰','日月','金乌','玉兔','青龙','白虎','朱雀','玄武'],
+  4:['圣鳞','尊尾','帝鳍','皇斑','霸鳞','王尾','神鳞','鬼鳍','魔斑','妖鳞'],
+  5:['幽鳞','冥尾','影鳍','暗斑','幻鳞','魅尾','灵鳍','魂斑','虚鳞','空尾'],
+  6:['绝鳞','独尾','特鳍','典斑','限鳞','藏尾','御鳍','赐斑','尊鳞','贵尾']
+};
+
+// 颜色方案
+const BODY_HUES = {
+  0:[0,15,25,30,35,40,45,50,55,60,180,200,210,340,350],
+  1:[160,170,190,220,240,260,280,300,320,10],
+  2:[250,270,290,310,330,130,150,80,100,120],
+  3:[35,45,55,280,300,320,20,140,160,200],
+  4:[25,40,50,60,300,320,340,10,200,220],
+  5:[270,290,310,330,350,130,150,170,190,210],
+  6:[0,15,30,45,55,180,270,300,340,20]
+};
+
+function genFishName(rarity, idx) {
+  const a = ADJ[rarity][idx % ADJ[rarity].length];
+  const n = NOUN[rarity][idx % NOUN[rarity].length];
+  if (rarity === 0) {
+    const a2 = ADJ[0][Math.floor(idx * 7 + 3) % ADJ[0].length];
+    return a !== a2 ? a + a2 + n : a + '小' + n;
+  }
+  return a + n;
+}
+
+function genFishHue(rarity, idx) {
+  const hues = BODY_HUES[rarity];
+  return hues[idx % hues.length];
+}
+
+function genAccessory(rarity, idx) {
+  const acc = {
+    0:['', '', '', '', '', '🌸', '🎀', '⭐', '', '', '', '', '💧', '', '', '', '', '🍀', '', '', ''],
+    1:['🌸','🎀','⭐','💎','🌺','💧','🍀','🌿','💫','✨'],
+    2:['👑','💎','🌟','✨','🌙','☀️','💫','🔮','🎪','💍'],
+    3:['👑','🌟','💎','🔮','⚡','🔥','🌈','💫','✨','🌙'],
+    4:['👑','⚡','🔥','🌈','🌟','💎','🔮','✨','💫','☀️'],
+    5:['👑','🔮','⚡','🌙','💀','🎭','👻','🖤','💫','✨'],
+    6:['👑','💎','🌟','⚡','🔥','🌈','🔮','✨','💫','🏆']
+  };
+  return acc[rarity][idx % acc[rarity].length];
+}
+
+let ALL_FISH = [];
+function buildAllFish() {
+  ALL_FISH = [];
+  for (let r = 0; r < 7; r++) {
+    for (let i = 0; i < R_COUNTS[r]; i++) {
+      ALL_FISH.push({
+        id: `r${r}-${i}`,
+        name: genFishName(r, i),
+        rarity: r,
+        hue: genFishHue(r, i),
+        accessory: genAccessory(r, i),
+        idx: i
+      });
+    }
+  }
+}
+buildAllFish();
+
+// ========== SVG渲染 ==========
+function renderFishSVG(fish, w, h) {
+  const hue = fish.hue || 10;
+  const body = `hsl(${hue},70%,72%)`;
+  const bodyD = `hsl(${hue},70%,58%)`;
+  const belly = `hsl(${hue},60%,88%)`;
+  const fin = `hsl(${hue},60%,65%)`;
+  const vw = w || 240, vh = h || 180;
+  const acc = fish.accessory || '';
+  return `<svg width="${vw}" height="${vh}" viewBox="0 0 240 180">
+    <defs><radialGradient id="fg_${fish.id}" cx="40%" cy="35%"><stop offset="0%" stop-color="${body}"/><stop offset="100%" stop-color="${bodyD}"/></radialGradient></defs>
+    <ellipse cx="120" cy="90" rx="85" ry="65" fill="rgba(255,255,255,.1)"/>
+    <g transform="translate(15,80)"><path d="M0,10 Q-25,-30 -12,-50 Q-5,-40 5,-30 Q10,-20 12,-5 Q18,-35 30,-55 Q35,-40 28,-20 Q30,-10 20,0 Q30,10 28,25 Q35,45 30,60 Q18,40 12,10 Q10,25 5,35 Q-5,45 -12,55 Q-25,35 0,15 Z" fill="${fin}"/></g>
+    <path d="M120,30 Q130,8 145,18 Q140,28 148,35 Q138,38 130,35" fill="${fin}" opacity=".65"/>
+    <path d="M90,130 Q100,152 115,148 Q110,140 118,135 Q108,133 100,130" fill="${fin}" opacity=".55"/>
+    <ellipse cx="120" cy="90" rx="75" ry="55" fill="url(#fg_${fish.id})"/>
+    <ellipse cx="130" cy="100" rx="45" ry="32" fill="${belly}" opacity=".75"/>
+    <ellipse cx="82" cy="75" rx="14" ry="10" fill="${bodyD}" opacity=".3"/>
+    <ellipse cx="82" cy="105" rx="12" ry="8" fill="${bodyD}" opacity=".25"/>
+    <circle cx="148" cy="68" r="19" fill="white" stroke="#e0e0e0" stroke-width="1.5"/><circle cx="152" cy="66" r="12" fill="#444"/><circle cx="156" cy="62" r="4.5" fill="white"/><circle cx="148" cy="70" r="1.8" fill="white"/>
+    <circle cx="148" cy="108" r="17" fill="white" stroke="#e0e0e0" stroke-width="1.5"/><circle cx="151" cy="106" r="11" fill="#444"/><circle cx="155" cy="102" r="4" fill="white"/><circle cx="146" cy="110" r="1.5" fill="white"/>
+    <ellipse cx="175" cy="90" rx="5" ry="3.5" fill="${bodyD}" opacity=".8"/>
+    ${acc ? `<text x="108" y="32" font-size="24" text-anchor="middle">${acc}</text>` : ''}
+  </svg>`;
+}
+
+function renderMainFish() {
+  const displayId = localStorage.getItem('displayFishId');
+  let fish = ALL_FISH[0];
+  if (displayId) {
+    const found = ALL_FISH.find(f => f.id === displayId);
+    if (found) fish = found;
+  }
+  document.getElementById('mainFishSvg').innerHTML = renderFishSVG(fish, 240, 180);
+}
+renderMainFish();
+
+// ========== 主页 ==========
+const fishWrapper = document.getElementById('fishWrapper');
+const speechText = document.getElementById('speechText');
+const counterEl = document.getElementById('counter');
+const clockEl = document.getElementById('clock');
+let clickCount = parseInt(localStorage.getItem('fishClickCount') || '0');
+let textTimer = null;
+if(clickCount>0) counterEl.textContent = `这条呆鱼一共说了 ${clickCount} 次 "我是傻鱼"～`;
+
+function updateClock(){
+  const n=new Date();
+  clockEl.textContent=n.toLocaleString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+}
+updateClock();setInterval(updateClock,1000);
+
+function playBubbleSound(){
+  const ctx=new(window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator();const g=ctx.createGain();
+  o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.setValueAtTime(600,ctx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(300,ctx.currentTime+.15);g.gain.setValueAtTime(.3,ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(.01,ctx.currentTime+.2);o.start(ctx.currentTime);o.stop(ctx.currentTime+.2);
+}
+
+function fishSay(msg){
+  speechText.textContent=msg;speechText.classList.remove('shake');void speechText.offsetWidth;
+  speechText.classList.add('shake');speechText.classList.add('show');clearTimeout(textTimer);
+  textTimer=setTimeout(()=>{speechText.classList.remove('show')},2000);
+}
+
+fishWrapper.addEventListener('click',()=>{
+  playBubbleSound();clickCount++;localStorage.setItem('fishClickCount',clickCount);
+  speechText.textContent='我是傻鱼 🐟';counterEl.textContent=`这条呆鱼一共说了 ${clickCount} 次 "我是傻鱼"～`;
+  speechText.classList.remove('shake');void speechText.offsetWidth;speechText.classList.add('shake');
+  speechText.classList.add('show');clearTimeout(textTimer);
+  textTimer=setTimeout(()=>{speechText.classList.remove('show')},1500);
+  fishWrapper.style.transform='scale(0.82)';setTimeout(()=>{fishWrapper.style.transform='scale(1.08)';
+    setTimeout(()=>{fishWrapper.style.transform=''},180)},100);
+});
+
+// ========== 游戏 ==========
+const gameOverlay=document.getElementById('gameOverlay'),gameBoard=document.getElementById('gameBoard'),
+      gameStatus=document.getElementById('gameStatus'),gameTitle=document.getElementById('gameTitle'),
+      fishJumpin=document.getElementById('fishJumpin'),resultBtns=document.getElementById('resultBtns'),
+      mainPage=document.getElementById('mainPage');
+let currentGame='tictactoe',gboard=[],gOver=false;
+
+function enterGame(game){
+  currentGame=game;mainPage.classList.add('hidden');gameOverlay.classList.add('active');
+  fishJumpin.classList.remove('show');resultBtns.style.display='none';resultBtns.classList.remove('show-btns');gOver=false;
+  if(game==='tictactoe')initTTT();else initGomoku();
+}
+function quitGame(){gameOverlay.classList.remove('active');mainPage.classList.remove('hidden')}
+function rematch(){fishJumpin.classList.remove('show');resultBtns.style.display='none';resultBtns.classList.remove('show-btns');gOver=false;if(currentGame==='tictactoe')initTTT();else initGomoku()}
+function admitLose(){gameOverlay.classList.remove('active');mainPage.classList.remove('hidden');setTimeout(()=>fishSay('我是傻鱼 🐟'),400)}
+
+function initTTT(){
+  gboard=Array(9).fill('');gOver=false;gameTitle.textContent='🎮 井字棋';gameStatus.textContent='轮到你了 ✨';
+  gameBoard.style.gridTemplateColumns='repeat(3,1fr)';gameBoard.innerHTML='';
+  for(let i=0;i<9;i++){const c=document.createElement('button');c.className='gcell';c.onclick=()=>tttClick(i);gameBoard.appendChild(c)}
+}
+function tttClick(i){
+  if(gboard[i]||gOver)return;gboard[i]='X';renderGBoard();
+  if(tttWin('X')){gOver=true;gameStatus.textContent='你赢了！🎉';return}
+  if(gboard.every(c=>c)){gOver=true;gameStatus.textContent='平局～';return}
+  setTimeout(()=>{gboard[tttAI()]='O';renderGBoard();if(tttWin('O')){gOver=true;onLose()}else if(gboard.every(c=>c)){gOver=true;gameStatus.textContent='平局～'}},300);
+}
+function tttWin(p){const w=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];for(const[a,b,c] of w)if(gboard[a]===p&&gboard[b]===p&&gboard[c]===p){hiCells(a,b,c);return true}return false}
+function tttAI(){let b=-Infinity,m=0;for(let i=0;i<9;i++)if(!gboard[i]){gboard[i]='O';let s=tttMM(false);gboard[i]='';if(s>b){b=s;m=i}}return m}
+function tttMM(isM){if(tttQ('O'))return 10;if(tttQ('X'))return-10;if(gboard.every(c=>c))return 0;let b=isM?-Infinity:Infinity;for(let i=0;i<9;i++)if(!gboard[i]){gboard[i]=isM?'O':'X';let s=tttMM(!isM);gboard[i]='';b=isM?Math.max(b,s):Math.min(b,s)}return b}
+function tttQ(p){const w=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];return w.some(([a,b,c])=>gboard[a]===p&&gboard[b]===p&&gboard[c]===p)}
+
+const GK=11;
+function initGomoku(){
+  gboard=Array(GK*GK).fill('');gOver=false;gameTitle.textContent='♟️ 五子棋';gameStatus.textContent='你执黑先手 ✨';
+  gameBoard.style.gridTemplateColumns=`repeat(${GK},1fr)`;gameBoard.innerHTML='';
+  for(let i=0;i<GK*GK;i++){const c=document.createElement('button');c.className='gcell';c.onclick=()=>gkClick(i);gameBoard.appendChild(c)}
+}
+function gkClick(i){if(gboard[i]||gOver)return;gboard[i]='X';renderGBoard();if(gkWin('X')){gOver=true;gameStatus.textContent='你赢了！🎉';return}if(gboard.every(c=>c)){gOver=true;gameStatus.textContent='平局～';return}setTimeout(()=>{gboard[gkAI()]='O';renderGBoard();if(gkWin('O')){gOver=true;onLose()}else if(gboard.every(c=>c)){gOver=true;gameStatus.textContent='平局～'}},200)}
+function gkWin(p){const dirs=[[1,0],[0,1],[1,1],[1,-1]];for(let r=0;r<GK;r++)for(let c=0;c<GK;c++){const idx=r*GK+c;if(gboard[idx]!==p)continue;for(const[dr,dc] of dirs){let cnt=1;const cells=[idx];for(let d=1;d<5;d++){const nr=r+dr*d,nc=c+dc*d;if(nr<0||nr>=GK||nc<0||nc>=GK)break;if(gboard[nr*GK+nc]===p){cnt++;cells.push(nr*GK+nc)}else break}for(let d=1;d<5;d++){const nr=r-dr*d,nc=c-dc*d;if(nr<0||nr>=GK||nc<0||nc>=GK)break;if(gboard[nr*GK+nc]===p){cnt++;cells.push(nr*GK+nc)}else break}if(cnt>=5){hiCells(...cells);return true}}}return false}
+function gkScore(idx,p){const r=Math.floor(idx/GK),c=idx%GK;const dirs=[[1,0],[0,1],[1,1],[1,-1]];let score=0;for(const[dr,dc] of dirs){let cnt=1,open=0;for(let d=1;d<5;d++){const nr=r+dr*d,nc=c+dc*d;if(nr<0||nr>=GK||nc<0||nc>=GK)break;const v=gboard[nr*GK+nc];if(v===p)cnt++;else{if(!v)open++;break}}for(let d=1;d<5;d++){const nr=r-dr*d,nc=c-dc*d;if(nr<0||nr>=GK||nc<0||nc>=GK)break;const v=gboard[nr*GK+nc];if(v===p)cnt++;else{if(!v)open++;break}}if(cnt>=5)score+=100000;else if(cnt===4)score+=open===2?10000:5000;else if(cnt===3)score+=open===2?1000:300;else if(cnt===2)score+=open===2?100:20;else if(cnt===1)score+=open===2?10:2}return score}
+function gkAI(){let best=-Infinity,move=Math.floor(GK*GK/2);const near=new Set();for(let i=0;i<GK*GK;i++){if(!gboard[i])continue;const r=Math.floor(i/GK),c=i%GK;for(let dr=-2;dr<=2;dr++)for(let dc=-2;dc<=2;dc++){const nr=r+dr,nc=c+dc;if(nr>=0&&nr<GK&&nc>=0&&nc<GK){const ni=nr*GK+nc;if(!gboard[ni])near.add(ni)}}}const candidates=near.size>0?[...near]:gboard.map((_,i)=>i).filter(i=>!gboard[i]);for(const i of candidates){gboard[i]='O';const atk=gkScore(i,'O');gboard[i]='X';const def=gkScore(i,'X');gboard[i]='';const s=Math.max(atk,def>9000?def*1.5:def);if(s>best){best=s;move=i}}return move}
+function renderGBoard(){const cells=gameBoard.children;for(let i=0;i<gboard.length;i++){cells[i].textContent=gboard[i];cells[i].className='gcell '+(gboard[i]||'')}}
+function hiCells(...indices){indices.forEach(i=>gameBoard.children[i].classList.add('win'))}
+function onLose(){
+  gameStatus.textContent='你输了 😢';
+  fishJumpin.innerHTML=renderFishSVG(ALL_FISH[0],140,100)+'<div class="speech-lose">你才是傻鱼！🐟</div>';
+  fishJumpin.classList.remove('show');resultBtns.classList.remove('show-btns');void fishJumpin.offsetWidth;
+  fishJumpin.classList.add('show');resultBtns.style.display='flex';void resultBtns.offsetWidth;resultBtns.classList.add('show-btns');
+}
+
+// ========== 抽卡系统 ==========
+function getUnlockedFish(){try{return JSON.parse(localStorage.getItem('unlockedFish')||'[]')}catch(e){return[]}}
+function saveUnlockedFish(arr){localStorage.setItem('unlockedFish',JSON.stringify(arr))}
+function getToday(){return new Date().toISOString().split('T')[0]}
+
+function drawFish(){
+  const r=Math.random();let cum=0;const total=R_PROB.reduce((a,b)=>a+b,0);
+  let tier=0;
+  for(let i=0;i<7;i++){cum+=R_PROB[i]/total;if(r<=cum){tier=i;break}}
+  const start=ALL_FISH.findIndex(f=>f.rarity===tier);
+  const pool=ALL_FISH.filter(f=>f.rarity===tier);
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+function showGacha(fish){
+  const overlay=document.getElementById('gachaOverlay');
+  const card=document.getElementById('gachaCard');
+  card.className='gacha-card r'+fish.rarity;
+  document.getElementById('gachaFishImg').innerHTML=renderFishSVG(fish,180,130);
+  document.getElementById('gachaRarity').textContent=RARITY[fish.rarity]+'款';
+  document.getElementById('gachaRarity').className='gacha-rarity rarity-'+fish.rarity;
+  document.getElementById('gachaFishName').textContent=fish.name;
+  overlay.classList.add('active');
+  // 特效
+  const img=document.getElementById('gachaFishImg');
+  img.style.animation='none';void img.offsetWidth;img.style.animation='gachaReveal .6s cubic-bezier(.175,.885,.32,1.275)';
+}
+
+let pendingFish=null;
+function collectGacha(){
+  document.getElementById('gachaOverlay').classList.remove('active');
+  if(pendingFish){
+    const unlocked=getUnlockedFish();
+    const existing=unlocked.find(f=>f.id===pendingFish.id);
+    if(existing){existing.count=(existing.count||1)+1}
+    else{unlocked.push({...pendingFish,count:1})}
+    saveUnlockedFish(unlocked);
+    localStorage.setItem('lastDrawDate',getToday());
+    localStorage.setItem('displayFishId',pendingFish.id);
+    renderMainFish();
+    pendingFish=null;
+  }
+}
+
+function checkDailyGacha(){
+  const last=localStorage.getItem('lastDrawDate');
+  if(last!==getToday()){
+    pendingFish=drawFish();
+    setTimeout(()=>showGacha(pendingFish),600);
+  }
+}
+
+// ========== 图鉴 ==========
+function openAlbum(){
+  const overlay=document.getElementById('albumOverlay');
+  overlay.classList.add('active');
+  renderAlbum();
+}
+function closeAlbum(){document.getElementById('albumOverlay').classList.remove('active')}
+
+function renderAlbum(tierFilter=null){
+  const unlocked=getUnlockedFish();
+  const unlockedMap={};unlocked.forEach(f=>{unlockedMap[f.id]=f.count||1});
+  let owned=0,total=165;
+  unlocked.forEach(f=>{owned++});
+
+  document.getElementById('albumStats').textContent=`已解锁 ${unlocked.length} / 165 种（含重复共 ${unlocked.reduce((s,f)=>s+(f.count||1),0)} 条）`;
+
+  // tabs
+  const tabs=document.getElementById('albumTabs');
+  tabs.innerHTML='<button class="album-tab" style="background:#999" onclick="renderAlbum(null)">全部</button>';
+  for(let r=0;r<7;r++){
+    const rc=R_COLORS[r];
+    tabs.innerHTML+=`<button class="album-tab" style="background:${rc}" onclick="renderAlbum(${r})">${RARITY[r]}</button>`;
   }
 
-  function updateClock() {
-    const now = new Date();
-    clockEl.textContent = now.toLocaleString('zh-CN', {
-      year:'numeric', month:'2-digit', day:'2-digit',
-      hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false
-    });
-  }
-  updateClock();
-  setInterval(updateClock, 1000);
+  // grid
+  const grid=document.getElementById('albumGrid');
+  let fishList=ALL_FISH;
+  if(tierFilter!==null) fishList=ALL_FISH.filter(f=>f.rarity===tierFilter);
+  grid.innerHTML=fishList.map(f=>{
+    const isOwned=!!unlockedMap[f.id];
+    const count=unlockedMap[f.id]||0;
+    return `<div class="album-item ${isOwned?'owned':'locked'}" ${isOwned?`onclick="selectDisplayFish('${f.id}')"`:''} title="${f.name}${isOwned?' ×'+count:''}">
+      <div class="fish-icon">${isOwned?renderFishSVG(f,50,38):'<svg width="50" height="38" viewBox="0 0 50 38"><ellipse cx="25" cy="19" rx="18" ry="12" fill="#ddd"/><text x="25" y="23" text-anchor="middle" font-size="14">❓</text></svg>'}</div>
+      <div class="fish-name">${isOwned?f.name:'???'}</div>
+      ${isOwned?`<span class="owned-tag">${count>1?'×'+count:''}</span>`:''}
+    </div>`;
+  }).join('');
+}
 
-  function playBubbleSound() {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(600, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.15);
-    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.2);
-  }
+function selectDisplayFish(id){
+  localStorage.setItem('displayFishId',id);
+  renderMainFish();
+  closeAlbum();
+  fishSay('换新皮肤啦～ 🐟');
+}
 
-  function fishSay(msg) {
-    speechText.textContent = msg;
-    speechText.classList.remove('shake');
-    void speechText.offsetWidth;
-    speechText.classList.add('shake');
-    speechText.classList.add('show');
-    clearTimeout(textTimer);
-    textTimer = setTimeout(() => { speechText.classList.remove('show'); }, 2000);
-  }
-
-  fishWrapper.addEventListener('click', () => {
-    playBubbleSound();
-    clickCount++;
-    localStorage.setItem('fishClickCount', clickCount);
-    speechText.textContent = '我是傻鱼 🐟';
-    counterEl.textContent = `这条呆鱼一共说了 ${clickCount} 次 "我是傻鱼"～`;
-    speechText.classList.remove('shake');
-    void speechText.offsetWidth;
-    speechText.classList.add('shake');
-    speechText.classList.add('show');
-    clearTimeout(textTimer);
-    textTimer = setTimeout(() => { speechText.classList.remove('show'); }, 1500);
-    fishWrapper.style.transform = 'scale(0.82)';
-    setTimeout(() => { fishWrapper.style.transform = 'scale(1.08)';
-      setTimeout(() => { fishWrapper.style.transform = ''; }, 180);
-    }, 100);
+// ========== 初始化场景和字母 ==========
+(function initScene(){
+  // 场景HTML太长，直接用JS生成简化版
+  const scene=document.getElementById('sceneBg');
+  let h='';
+  // clouds
+  h+=`<svg class="cloud" width="160" height="70" style="top:3%;left:100%;animation-duration:35s"><ellipse cx="50" cy="50" rx="50" ry="25" fill="white" opacity=".85"/><ellipse cx="90" cy="40" rx="45" ry="28" fill="white" opacity=".9"/><ellipse cx="120" cy="50" rx="40" ry="22" fill="white" opacity=".8"/></svg>`;
+  h+=`<svg class="cloud" width="130" height="55" style="top:10%;left:110%;animation-duration:42s;animation-delay:-15s"><ellipse cx="40" cy="40" rx="40" ry="20" fill="white" opacity=".75"/><ellipse cx="75" cy="30" rx="35" ry="22" fill="white" opacity=".8"/><ellipse cx="100" cy="40" rx="30" ry="18" fill="white" opacity=".75"/></svg>`;
+  h+=`<svg class="cloud" width="100" height="45" style="top:8%;left:105%;animation-duration:38s;animation-delay:-25s"><ellipse cx="35" cy="32" rx="35" ry="18" fill="white" opacity=".7"/><ellipse cx="65" cy="25" rx="30" ry="18" fill="white" opacity=".75"/></svg>`;
+  // sparkles
+  const stars=['✦','✧','⋆'];
+  for(let i=0;i<8;i++) h+=`<span class="sparkle" style="top:${5+Math.random()*18}%;left:${5+Math.random()*85}%;animation-delay:${Math.random()*1.5}s">${stars[i%3]}</span>`;
+  // seabed
+  h+=`<div class="seabed"></div>`;
+  // rocks
+  h+=`<svg class="rock" width="80" height="45" viewBox="0 0 80 45" style="left:20%"><ellipse cx="35" cy="35" rx="35" ry="18" fill="#bcaaa4"/><ellipse cx="25" cy="30" rx="20" ry="12" fill="#d7ccc8"/><ellipse cx="55" cy="38" rx="25" ry="14" fill="#a1887f"/></svg>`;
+  h+=`<svg class="rock" width="65" height="35" viewBox="0 0 65 35" style="right:18%"><ellipse cx="30" cy="28" rx="28" ry="15" fill="#c9b99a"/><ellipse cx="45" cy="32" rx="20" ry="12" fill="#b8a888"/></svg>`;
+  h+=`<svg class="rock" width="55" height="30" viewBox="0 0 55 30" style="left:50%"><ellipse cx="25" cy="24" rx="24" ry="13" fill="#d7ccc8"/><ellipse cx="15" cy="20" rx="15" ry="9" fill="#e8ddd8"/></svg>`;
+  // seaweed
+  for(let i=0;i<4;i++) h+=`<svg class="seaweed" width="${30+i*5}" height="${100+i*15}" viewBox="0 0 ${30+i*5} ${100+i*15}" style="left:${3+i*8}%;animation-delay:${-i}s;animation-duration:${3+i*.5}s"><path d="M${15+i*2},${100+i*15} Q${5+i},${70+i*10} ${15+i*2},${45+i*8} Q${4+i},${25+i*5} ${15+i*2},${10+i*3}" fill="none" stroke="#66bb6a" stroke-width="${7+i}" stroke-linecap="round" opacity="${.75-i*.05}"/></svg>`;
+  // corals
+  h+=`<svg class="coral" width="75" height="85" viewBox="0 0 75 85" style="left:17%"><circle cx="22" cy="72" r="13" fill="#ff8a80"/><circle cx="52" cy="70" r="11" fill="#ff8a80"/><circle cx="37" cy="75" r="12" fill="#ff5252"/></svg>`;
+  h+=`<svg class="coral" width="55" height="60" viewBox="0 0 55 60" style="right:8%"><circle cx="16" cy="52" r="10" fill="#ff80ab"/><circle cx="38" cy="50" r="9" fill="#ff80ab"/></svg>`;
+  // shells & starfish
+  h+=`<svg class="shell" width="38" height="24" viewBox="0 0 38 24" style="left:24%"><ellipse cx="19" cy="14" rx="17" ry="11" fill="#fff3e0"/></svg>`;
+  h+=`<svg class="shell" width="30" height="20" viewBox="0 0 30 20" style="right:22%"><ellipse cx="15" cy="12" rx="14" ry="9" fill="#fce4ec"/></svg>`;
+  h+=`<svg class="starfish" width="45" height="45" viewBox="0 0 45 45" style="left:30%"><polygon points="22,0 27,14 42,14 30,23 34,38 22,30 10,38 14,23 2,14 17,14" fill="#ffab91"/><circle cx="22" cy="22" r="3.5" fill="#ff8a65"/></svg>`;
+  h+=`<svg class="starfish" width="35" height="35" viewBox="0 0 35 35" style="right:28%;animation-delay:-2s;animation-duration:3.5s"><polygon points="18,0 22,11 33,11 24,18 27,30 18,24 9,30 12,18 3,11 14,11" fill="#ffcc80"/><circle cx="18" cy="17" r="2.5" fill="#ffb74d"/></svg>`;
+  // kitty dolls
+  const kittyColors=[['#f8bbd0','#f48fb1','#ec407a'],['#e1bee7','#ce93d8','#ab47bc'],['#fff9c4','#fff176','#fdd835'],['#bbdefb','#90caf9','#42a5f5'],['#c8e6c9','#a5d6a7','#66bb6a'],['#ffccbc','#ffab91','#ff7043']];
+  const kittyPos=[[18,102],[84,100],[35,85],[68,85],[48,95],[8,88]];
+  kittyPos.forEach((pos,i)=>{
+    const[c1,c2,c3]=kittyColors[i];
+    h+=`<svg class="kitty-doll" width="${60-i*3}" height="${70-i*3}" viewBox="0 0 120 140" style="left:${pos[0]}%;bottom:${pos[1]}px;animation-delay:${-i*.5}s;animation-duration:${3.5+i*.3}s"><ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="89,30 98,4 73,20" fill="${c1}"/><polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="31,30 22,4 47,20" fill="${c1}"/><ellipse cx="28" cy="22" rx="14" ry="9" fill="${c2}" transform="rotate(-15,28,22)"/><circle cx="28" cy="22" r="5" fill="${c3}"/><ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/><ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/><ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/></svg>`;
   });
+  // hearts
+  const hearts=['💕','💖','💗','💝','🫧'];
+  for(let i=0;i<13;i++) h+=`<span class="heart-float" style="left:${5+Math.random()*85}%;animation-duration:${6+Math.random()*6}s;animation-delay:${Math.random()*7}s;font-size:${18+Math.random()*10}px">${hearts[i%5]}</span>`;
+  scene.innerHTML=h;
 
-  // ========== 游戏逻辑 ==========
-  const gameOverlay = document.getElementById('gameOverlay');
-  const gameBoard = document.getElementById('gameBoard');
-  const gameStatus = document.getElementById('gameStatus');
-  const gameTitle = document.getElementById('gameTitle');
-  const fishJumpin = document.getElementById('fishJumpin');
-  const resultBtns = document.getElementById('resultBtns');
-  const mainPage = document.getElementById('mainPage');
+  // 滚动字幕
+  const marqueeText='必须好好夸夸咱们万能鱼姐！很难遇到像鱼姐这么宝藏的人，情商直接拉满，风趣幽默善于共情，和鱼姐交流完全不用小心翼翼，没有半点距离感，不管聊什么话题都顺畅舒服。遇到棘手事情从来不会慌慌张张，思路清晰眼界开阔，五花八门的难题交到鱼姐手中总能梳理明白，奇思妙招源源不断，妥妥团队里的定心骨干。为人格外仗义热忱，心地善良乐于助人，身边人遇到困境时总会主动伸出援手，默默帮忙不求回报，处事通透拎得清底线，温和包容却绝不任人敷衍。自带超强欢乐buff，只要鱼姐登场，压抑沉闷的气氛立刻一扫而空，枯燥的日常都会变得有意思，坏情绪见到鱼姐都主动绕道逃跑。可正经靠谱，可轻松玩闹，风格自由切换，既能冷静统筹处理繁杂事务，又懂得享受生活擅长制造乐趣。实力出众却十分低调，从不张扬炫耀自身能力，踏实稳重，做事细致周全，方方面面都让人无比放心。眼光独到看人通透，总能给出中肯实在的建议，不知不觉就能开导陷入内耗的人。有幸结识鱼姐真的是巨大收获，有鱼姐坐镇心里就格外踏实。祝愿全能鱼姐日日喜乐，烦心事全部退散，好运源源不断，财运节节攀升，生活多姿多彩，一路顺风顺水持续开挂，永远元气满满，自信耀眼，被所有美好紧紧包围！';
+  document.getElementById('marqueeInner').innerHTML=`<span class="marquee-text">${marqueeText}</span><span class="marquee-text">${marqueeText}</span>`;
+})();
 
-  let currentGame = 'tictactoe';
-  let gboard = [];
-  let gOver = false;
-
-  function enterGame(game) {
-    currentGame = game;
-    mainPage.classList.add('hidden');
-    gameOverlay.classList.add('active');
-    fishJumpin.classList.remove('show');
-    resultBtns.style.display = 'none';
-    gOver = false;
-    if (game === 'tictactoe') initTTT();
-    else initGomoku();
-  }
-
-  function quitGame() {
-    gameOverlay.classList.remove('active');
-    mainPage.classList.remove('hidden');
-  }
-
-  function rematch() {
-    fishJumpin.classList.remove('show');
-    resultBtns.style.display = 'none';
-    resultBtns.classList.remove('show-btns');
-    gOver = false;
-    if (currentGame === 'tictactoe') initTTT();
-    else initGomoku();
-  }
-
-  function admitLose() {
-    gameOverlay.classList.remove('active');
-    mainPage.classList.remove('hidden');
-    setTimeout(() => fishSay('我是傻鱼 🐟'), 400);
-  }
-
-  // ==== 井字棋 ====
-  function initTTT() {
-    gboard = Array(9).fill('');
-    gOver = false;
-    gameTitle.textContent = '🎮 井字棋';
-    gameStatus.textContent = '轮到你了 ✨';
-    gameBoard.style.gridTemplateColumns = 'repeat(3, 1fr)';
-    gameBoard.innerHTML = '';
-    for (let i = 0; i < 9; i++) {
-      const cell = document.createElement('button');
-      cell.className = 'gcell';
-      cell.onclick = () => tttClick(i);
-      gameBoard.appendChild(cell);
-    }
-  }
-
-  function tttClick(i) {
-    if (gboard[i] || gOver) return;
-    gboard[i] = 'X';
-    renderGBoard();
-    if (tttCheckWin('X')) { gOver=true; gameStatus.textContent='你赢了！🎉'; return; }
-    if (gboard.every(c=>c)) { gOver=true; gameStatus.textContent='平局～'; return; }
-    setTimeout(() => {
-      gboard[tttAI()] = 'O';
-      renderGBoard();
-      if (tttCheckWin('O')) { gOver=true; onLose(); return; }
-      if (gboard.every(c=>c)) { gOver=true; gameStatus.textContent='平局～'; }
-    }, 300);
-  }
-
-  function tttCheckWin(p) {
-    const w=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-    for(const [a,b,c] of w) if(gboard[a]===p&&gboard[b]===p&&gboard[c]===p){ hiCells(a,b,c); return true; }
-    return false;
-  }
-
-  function tttAI() {
-    let best=-Infinity,move=0;
-    for(let i=0;i<9;i++) if(!gboard[i]){ gboard[i]='O'; let s=tttMM(false); gboard[i]=''; if(s>best){best=s;move=i;} }
-    return move;
-  }
-  function tttMM(isMax) {
-    if(tttQuick('O')) return 10; if(tttQuick('X')) return -10; if(gboard.every(c=>c)) return 0;
-    let best=isMax?-Infinity:Infinity;
-    for(let i=0;i<9;i++) if(!gboard[i]){ gboard[i]=isMax?'O':'X'; let s=tttMM(!isMax); gboard[i]=''; best=isMax?Math.max(best,s):Math.min(best,s); }
-    return best;
-  }
-  function tttQuick(p) {
-    const w=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-    return w.some(([a,b,c])=>gboard[a]===p&&gboard[b]===p&&gboard[c]===p);
-  }
-
-  // ==== 五子棋 (11×11) ====
-  const GK=11;
-  function initGomoku() {
-    gboard=Array(GK*GK).fill('');
-    gOver=false;
-    gameTitle.textContent='♟️ 五子棋';
-    gameStatus.textContent='你执黑先手 ✨';
-    gameBoard.style.gridTemplateColumns=`repeat(${GK},1fr)`;
-    gameBoard.innerHTML='';
-    for(let i=0;i<GK*GK;i++){
-      const cell=document.createElement('button');
-      cell.className='gcell';
-      cell.onclick=()=>gkClick(i);
-      gameBoard.appendChild(cell);
-    }
-  }
-
-  function gkClick(i) {
-    if(gboard[i]||gOver) return;
-    gboard[i]='X';
-    renderGBoard();
-    if(gkCheckWin('X')){ gOver=true; gameStatus.textContent='你赢了！🎉'; return; }
-    if(gboard.every(c=>c)){ gOver=true; gameStatus.textContent='平局～'; return; }
-    setTimeout(()=>{
-      gboard[gkAI()]='O';
-      renderGBoard();
-      if(gkCheckWin('O')){ gOver=true; onLose(); return; }
-      if(gboard.every(c=>c)){ gOver=true; gameStatus.textContent='平局～'; }
-    },200);
-  }
-
-  function gkCheckWin(p){
-    const dirs=[[1,0],[0,1],[1,1],[1,-1]];
-    for(let r=0;r<GK;r++) for(let c=0;c<GK;c++){
-      const idx=r*GK+c;
-      if(gboard[idx]!==p) continue;
-      for(const [dr,dc] of dirs){
-        let cnt=1; const cells=[idx];
-        for(let d=1;d<5;d++){ const nr=r+dr*d,nc=c+dc*d; if(nr<0||nr>=GK||nc<0||nc>=GK) break; if(gboard[nr*GK+nc]===p){cnt++;cells.push(nr*GK+nc);} else break; }
-        for(let d=1;d<5;d++){ const nr=r-dr*d,nc=c-dc*d; if(nr<0||nr>=GK||nc<0||nc>=GK) break; if(gboard[nr*GK+nc]===p){cnt++;cells.push(nr*GK+nc);} else break; }
-        if(cnt>=5){ hiCells(...cells); return true; }
-      }
-    }
-    return false;
-  }
-
-  function gkScore(idx,p){
-    const r=Math.floor(idx/GK),c=idx%GK;
-    const dirs=[[1,0],[0,1],[1,1],[1,-1]]; let score=0;
-    for(const [dr,dc] of dirs){
-      let cnt=1,open=0;
-      for(let d=1;d<5;d++){ const nr=r+dr*d,nc=c+dc*d; if(nr<0||nr>=GK||nc<0||nc>=GK) break; const v=gboard[nr*GK+nc]; if(v===p)cnt++; else{if(!v)open++;break;} }
-      for(let d=1;d<5;d++){ const nr=r-dr*d,nc=c-dc*d; if(nr<0||nr>=GK||nc<0||nc>=GK) break; const v=gboard[nr*GK+nc]; if(v===p)cnt++; else{if(!v)open++;break;} }
-      if(cnt>=5) score+=100000;
-      else if(cnt===4) score+=open===2?10000:5000;
-      else if(cnt===3) score+=open===2?1000:300;
-      else if(cnt===2) score+=open===2?100:20;
-      else if(cnt===1) score+=open===2?10:2;
-    }
-    return score;
-  }
-
-  function gkAI(){
-    let best=-Infinity,move=Math.floor(GK*GK/2);
-    const near=new Set();
-    for(let i=0;i<GK*GK;i++){
-      if(!gboard[i]) continue;
-      const r=Math.floor(i/GK),c=i%GK;
-      for(let dr=-2;dr<=2;dr++) for(let dc=-2;dc<=2;dc++){
-        const nr=r+dr,nc=c+dc;
-        if(nr>=0&&nr<GK&&nc>=0&&nc<GK){ const ni=nr*GK+nc; if(!gboard[ni]) near.add(ni); }
-      }
-    }
-    const candidates=near.size>0?[...near]:gboard.map((_,i)=>i).filter(i=>!gboard[i]);
-    for(const i of candidates){
-      gboard[i]='O'; const atk=gkScore(i,'O'); gboard[i]='X'; const def=gkScore(i,'X'); gboard[i]='';
-      const s=Math.max(atk,def>9000?def*1.5:def);
-      if(s>best){ best=s; move=i; }
-    }
-    return move;
-  }
-
-  // ==== 公共 ====
-  function renderGBoard(){
-    const cells=gameBoard.children;
-    for(let i=0;i<gboard.length;i++){ cells[i].textContent=gboard[i]; cells[i].className='gcell '+(gboard[i]||''); }
-  }
-  function hiCells(...indices){ indices.forEach(i=>gameBoard.children[i].classList.add('win')); }
-
-  function onLose(){
-    gameStatus.textContent = '你输了 😢';
-    // 先移除再添加，强制重播动画
-    fishJumpin.classList.remove('show');
-    resultBtns.classList.remove('show-btns');
-    void fishJumpin.offsetWidth;
-    fishJumpin.classList.add('show');
-    resultBtns.style.display = 'flex';
-    void resultBtns.offsetWidth;
-    resultBtns.classList.add('show-btns');
-  }
+// ========== 启动 ==========
+checkDailyGacha();
 </script>
-
 </body>
 </html>
