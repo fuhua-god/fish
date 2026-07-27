@@ -419,6 +419,9 @@ window.addEventListener('resize', () => {
   fishY = Math.min(Math.max(fishY, 50), window.innerHeight - fishSize.h - 10);
 });
 
+// 立即设置初始位置
+fishWrapper.style.left = fishX + 'px';
+fishWrapper.style.top = fishY + 'px';
 updateFishPos();
 
 // ========== 拖尾 ==========
@@ -834,26 +837,29 @@ async function feedFish() {
 
 // ========== 启动 ==========
 (async function startup() {
-  await loadState();
-  await loadUnlocked();
+  try {
+    await loadState();
+    await loadUnlocked();
+  } catch(e) {
+    console.log('Supabase load failed, using defaults');
+  }
 
-  // 初始化显示
   renderMainFish();
   counterEl.textContent = (STATE.click_count || 0) > 0 ? `这条呆鱼一共说了 ${STATE.click_count} 次 "我是傻鱼"～` : '';
   updateAffectionBar();
 
-  // 每日抽卡
   checkDailyGacha();
 
-  // 节日检查
-  const todayHoliday = checkHoliday();
-  const holidayShown = STATE.holiday_shown_date || '';
-  if (todayHoliday && holidayShown !== getToday()) {
-    showHolidayPopup(todayHoliday);
-    await saveState({ holiday_shown_date: getToday() });
-    window._bonusDraw = true;
-    window._bonusMsg = `🎉 ${todayHoliday.name}额外抽卡机会`;
-  }
+  try {
+    const todayHoliday = checkHoliday();
+    const holidayShown = STATE.holiday_shown_date || '';
+    if (todayHoliday && holidayShown !== getToday()) {
+      showHolidayPopup(todayHoliday);
+      await saveState({ holiday_shown_date: getToday() });
+      window._bonusDraw = true;
+      window._bonusMsg = `🎉 ${todayHoliday.name}额外抽卡机会`;
+    }
+  } catch(e) { console.log('holiday check error:', e); }
 })();
 </script>
 </body>
