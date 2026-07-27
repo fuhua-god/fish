@@ -349,60 +349,62 @@ function renderMainFish() {
     const found = ALL_FISH.find(f => f.id === displayId);
     if (found) fish = found;
   }
-  document.getElementById('mainFishSvg').innerHTML = renderFishSVG(fish, 240, 180);
+  fishSize = getFishSize();
+  document.getElementById('mainFishSvg').innerHTML = renderFishSVG(fish, fishSize.w, fishSize.h);
 }
 renderMainFish();
 
 // ========== 鱼自由游动 ==========
 const fishWrapper = document.getElementById('fishWrapper');
-const FISH_W = 240, FISH_H = 180;
-let fishX = window.innerWidth / 2 - FISH_W / 2;
-let fishY = window.innerHeight / 2 - FISH_H / 2;
+function getFishSize() {
+  const w = window.innerWidth;
+  if (w <= 480) return { w: 140, h: 105 };       // 小手机
+  if (w <= 768) return { w: 180, h: 135 };       // 平板/大手机
+  return { w: 240, h: 180 };                       // 桌面
+}
+let fishSize = getFishSize();
+let fishX = window.innerWidth / 2 - fishSize.w / 2;
+let fishY = window.innerHeight / 2 - fishSize.h / 2;
 let fishVX = (Math.random() - 0.5) * 2.5;
 let fishVY = (Math.random() - 0.5) * 2.5;
-let fishDir = 1; // 1=right, -1=left
+let fishDir = 1;
 let fishAnimId = null;
 let fishPaused = false;
 let fishBouncing = false;
 
 function updateFishPos() {
   if (fishPaused) { fishAnimId = requestAnimationFrame(updateFishPos); return; }
-  // 随机微调方向
   if (Math.random() < 0.008) {
     fishVX += (Math.random() - 0.5) * 1.2;
     fishVY += (Math.random() - 0.5) * 1.2;
   }
-  // 限速
-  const maxSpd = 3.5, minSpd = 0.4;
+  const speedScale = fishSize.w / 240; // 小屏鱼慢一点
+  const maxSpd = 3.5 * speedScale, minSpd = 0.3 * speedScale;
   let spd = Math.sqrt(fishVX * fishVX + fishVY * fishVY);
   if (spd < minSpd) { fishVX = (fishVX / spd) * minSpd + (Math.random() - 0.5) * 0.5; fishVY = (fishVY / spd) * minSpd + (Math.random() - 0.5) * 0.5; }
   if (spd > maxSpd) { fishVX = (fishVX / spd) * maxSpd; fishVY = (fishVY / spd) * maxSpd; }
-  // 更新位置
   fishX += fishVX; fishY += fishVY;
-  // 边界反弹
-  const pad = 20;
+  const pad = 10;
+  const fw = fishSize.w, fh = fishSize.h;
   if (fishX < pad) { fishX = pad; fishVX = Math.abs(fishVX); }
-  if (fishX > window.innerWidth - FISH_W - pad) { fishX = window.innerWidth - FISH_W - pad; fishVX = -Math.abs(fishVX); }
+  if (fishX > window.innerWidth - fw - pad) { fishX = window.innerWidth - fw - pad; fishVX = -Math.abs(fishVX); }
   if (fishY < 50) { fishY = 50; fishVY = Math.abs(fishVY); }
-  if (fishY > window.innerHeight - FISH_H - pad) { fishY = window.innerHeight - FISH_H - pad; fishVY = -Math.abs(fishVY); }
-  // 翻转方向
+  if (fishY > window.innerHeight - fh - pad) { fishY = window.innerHeight - fh - pad; fishVY = -Math.abs(fishVY); }
   const newDir = fishVX >= 0 ? 1 : -1;
   if (newDir !== fishDir) { fishDir = newDir; }
-  // 应用位置
   fishWrapper.style.left = fishX + 'px';
   fishWrapper.style.top = fishY + 'px';
   if (!fishBouncing) {
     fishWrapper.style.transform = `scaleX(${fishDir})`;
   }
-  // 拖尾特效
   spawnTrail(fishX, fishY, fishDir);
   fishAnimId = requestAnimationFrame(updateFishPos);
 }
 
-// 窗口大小改变时调整
 window.addEventListener('resize', () => {
-  fishX = Math.min(Math.max(fishX, 20), window.innerWidth - FISH_W - 20);
-  fishY = Math.min(Math.max(fishY, 50), window.innerHeight - FISH_H - 20);
+  fishSize = getFishSize();
+  fishX = Math.min(Math.max(fishX, 10), window.innerWidth - fishSize.w - 10);
+  fishY = Math.min(Math.max(fishY, 50), window.innerHeight - fishSize.h - 10);
 });
 
 updateFishPos();
@@ -448,8 +450,8 @@ function spawnTrail(fx, fy, dir) {
   if (trailTick % Math.max(1, Math.floor(3 / cfg.perFrame)) !== 0) return;
 
   const container = document.getElementById('trailContainer');
-  const tailX = dir === 1 ? fx + 40 : fx + FISH_W - 40;
-  const tailY = fy + FISH_H / 2;
+  const tailX = dir === 1 ? fx + fishSize.w * 0.16 : fx + fishSize.w * 0.84;
+  const tailY = fy + fishSize.h / 2;
 
   for (let i = 0; i < cfg.perFrame; i++) {
     const p = document.createElement('div');
@@ -617,6 +619,7 @@ function collectGacha(){
     saveUnlockedFish(unlocked);
     localStorage.setItem('lastDrawDate',getToday());
     localStorage.setItem('displayFishId',pendingFish.id);
+    fishSize = getFishSize();
     renderMainFish();
     pendingFish=null;
   }
