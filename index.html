@@ -249,22 +249,38 @@ function markSynced() { lsSet(LS_SYNC_KEY, new Date().toISOString()); }
 function getLastSync() { const v = lsGet(LS_SYNC_KEY); return v ? new Date(v).toLocaleString('zh-CN') : '未知'; }
 
 async function loadState() {
-  let fromCloud = false;
+  // 先读本地缓存
+  const localState = lsGet(LS_STATE_KEY) || {};
   try {
     const r = await fetch(`${SB_URL}/shared_state?id=eq.1`, { headers: { ...SB_HEAD, 'Accept': 'application/json' } });
     if (r.ok) {
       const d = await r.json();
-      if (d && d[0] && Object.keys(d[0]).length > 1) {
-        STATE = d[0];
-        lsSet(LS_STATE_KEY, STATE);
-        fromCloud = true;
+      const cloud = (d && d[0]) ? d[0] : {};
+      // 合并：云端数据优先，云端没有的字段用本地补上
+      STATE = { ...localState, ...cloud };
+      // 如果有本地独有数据，推送到云端
+      if (Object.keys(localState).length > 0) {
+        const missing = {};
+        for (const k of Object.keys(localState)) {
+          if (!(k in cloud) || cloud[k] === null || cloud[k] === '') {
+            if (localState[k] !== null && localState[k] !== '' && k !== 'id') missing[k] = localState[k];
+          }
+        }
+        if (Object.keys(missing).length > 0) {
+          await fetch(`${SB_URL}/shared_state?id=eq.1`, {
+            method: 'PATCH', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' }, body: JSON.stringify(missing)
+          }).catch(() => {});
+        }
       }
+      lsSet(LS_STATE_KEY, STATE);
+      useSupabase = true;
+      console.log('☁️ 状态从云端加载成功');
+      return;
     }
-  } catch(e) { console.log('☁️ 云端加载失败，使用本地缓存'); }
-  if (!fromCloud) {
-    STATE = lsGet(LS_STATE_KEY) || {};
-    if (Object.keys(STATE).length > 0) useSupabase = false;
-  }
+  } catch(e) { console.log('☁️ 云端状态加载失败，使用本地缓存'); }
+  // 云端不可达才用纯本地
+  STATE = localState;
+  useSupabase = false;
 }
 
 async function saveState(updates) {
@@ -279,25 +295,38 @@ async function saveState(updates) {
 }
 
 async function loadUnlocked() {
-  let fromCloud = false;
+  const localList = lsGet(LS_UNLOCKED_KEY) || [];
   try {
     const r = await fetch(`${SB_URL}/unlocked_fish?select=*`, { headers: { ...SB_HEAD, 'Accept': 'application/json' } });
     if (r.ok) {
       const d = await r.json();
-      if (d && d.length > 0) {
-        UNLOCKED = d;
-        lsSet(LS_UNLOCKED_KEY, UNLOCKED);
-        fromCloud = true;
+      const cloudList = d || [];
+      // 合并：以 fish_id 去重，数量取较大值
+      const merged = {};
+      for (const f of localList) merged[f.fish_id] = f.count || 1;
+      for (const f of cloudList) {
+        merged[f.fish_id] = Math.max(merged[f.fish_id] || 0, f.count || 1);
       }
+      // 如果本地有云端没有的，上传
+      for (const f of localList) {
+        if (!cloudList.find(c => c.fish_id === f.fish_id)) {
+          await fetch(`${SB_URL}/unlocked_fish`, {
+            method: 'POST', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' },
+            body: JSON.stringify({ fish_id: f.fish_id, count: f.count || 1 })
+          }).catch(() => {});
+        }
+      }
+      UNLOCKED = Object.entries(merged).map(([fish_id, count]) => ({ fish_id, count }));
+      lsSet(LS_UNLOCKED_KEY, UNLOCKED);
+      console.log('☁️ 图鉴从云端加载成功，共' + UNLOCKED.length + '种');
+      return;
     }
-  } catch(e) { console.log('☁️ 图鉴加载失败，使用本地缓存'); }
-  if (!fromCloud) {
-    UNLOCKED = lsGet(LS_UNLOCKED_KEY) || [];
-  }
+  } catch(e) { console.log('☁️ 云端图鉴加载失败，使用本地缓存'); }
+  UNLOCKED = localList;
 }
 
 async function addUnlocked(fishId) {
-  // 先更新内存
+  // 更新内存
   const ex = UNLOCKED.find(f => f.fish_id === fishId);
   if (ex) {
     ex.count = (ex.count || 1) + 1;
@@ -308,21 +337,19 @@ async function addUnlocked(fishId) {
   lsSet(LS_UNLOCKED_KEY, UNLOCKED);
   markSynced();
   // 同步云端
-  if (useSupabase) {
-    try {
-      if (ex) {
-        await fetch(`${SB_URL}/unlocked_fish?fish_id=eq.${encodeURIComponent(fishId)}`, {
-          method: 'PATCH', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' },
-          body: JSON.stringify({ count: ex.count })
-        });
-      } else {
-        await fetch(`${SB_URL}/unlocked_fish`, {
-          method: 'POST', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' },
-          body: JSON.stringify({ fish_id: fishId, count: 1 })
-        });
-      }
-    } catch(e) {}
-  }
+  try {
+    if (ex) {
+      await fetch(`${SB_URL}/unlocked_fish?fish_id=eq.${encodeURIComponent(fishId)}`, {
+        method: 'PATCH', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ count: ex.count })
+      });
+    } else {
+      await fetch(`${SB_URL}/unlocked_fish`, {
+        method: 'POST', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ fish_id: fishId, count: 1 })
+      });
+    }
+  } catch(e) {}
 }
 
 async function switchDisplayFish(fishId) {
