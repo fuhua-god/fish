@@ -24,8 +24,10 @@ body{
 .shell{position:absolute;bottom:85px}
 .starfish{position:absolute;bottom:85px;animation:sw2 4s ease-in-out infinite}
 @keyframes sw2{0%,100%{transform:rotate(0)}25%{transform:rotate(10deg)}75%{transform:rotate(-10deg)}}
-.kitty-doll{position:absolute;animation:kb 3.5s ease-in-out infinite}
+.kitty-doll{position:absolute;animation:kb 3.5s ease-in-out infinite;pointer-events:auto;cursor:pointer}
 @keyframes kb{0%,100%{transform:translateY(0)rotate(0)}30%{transform:translateY(-6px)rotate(2deg)}70%{transform:translateY(-3px)rotate(-1deg)}}
+.meow-float{position:fixed;pointer-events:none;z-index:50;font-size:36px;font-weight:bold;animation:meowUp 1.2s ease-out forwards}
+@keyframes meowUp{0%{opacity:1;transform:translateY(0)scale(1)}100%{opacity:0;transform:translateY(-120px)scale(1.6)}}
 .heart-float{position:absolute;bottom:-40px;animation:hr linear infinite;font-size:24px}
 @keyframes hr{0%{transform:translateY(0)scale(.4)rotate(0);opacity:.7}100%{transform:translateY(-110vh)scale(1.1)rotate(360deg);opacity:0}}
 .sparkle{position:absolute;animation:tw 1.5s ease-in-out infinite;font-size:16px}
@@ -567,6 +569,34 @@ function playBubbleSound() {
   o.start(ctx.currentTime); o.stop(ctx.currentTime + .2);
 }
 
+function playMeowSound() {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const t = ctx.currentTime;
+  // 猫叫：短促的高频喵
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.connect(g); g.connect(ctx.destination); o.type = 'triangle';
+  o.frequency.setValueAtTime(600, t);
+  o.frequency.exponentialRampToValueAtTime(900, t + .05);
+  o.frequency.exponentialRampToValueAtTime(700, t + .12);
+  o.frequency.exponentialRampToValueAtTime(500, t + .2);
+  g.gain.setValueAtTime(.25, t);
+  g.gain.exponentialRampToValueAtTime(.01, t + .25);
+  o.start(t); o.stop(t + .25);
+}
+
+function spawnMeow(el) {
+  const rect = el.getBoundingClientRect();
+  const meow = document.createElement('span');
+  meow.className = 'meow-float';
+  meow.textContent = '喵';
+  meow.style.left = (rect.left + rect.width / 2 - 20) + 'px';
+  meow.style.top = (rect.top - 10) + 'px';
+  const colors = ['#f48fb1','#ce93d8','#ffb74d','#81d4fa','#ef9a9a','#a5d6a7','#ff80ab'];
+  meow.style.color = colors[Math.floor(Math.random() * colors.length)];
+  document.body.appendChild(meow);
+  meow.addEventListener('animationend', () => meow.remove());
+}
+
 let textTimer = null;
 function fishSay(msg) {
   speechText.textContent = msg;
@@ -905,6 +935,14 @@ async function feedFish() {
   const hearts = ['💕','💖','💗','💝','🫧'];
   for (let i = 0; i < 13; i++) h += `<span class="heart-float" style="left:${5 + Math.random() * 85}%;animation-duration:${6 + Math.random() * 6}s;animation-delay:${Math.random() * 7}s;font-size:${18 + Math.random() * 10}px">${hearts[i % 5]}</span>`;
   scene.innerHTML = h;
+
+  // 点击 Kitty 猫叫 + 喵字弹出
+  scene.addEventListener('click', (e) => {
+    const kitty = e.target.closest('.kitty-doll');
+    if (!kitty) return;
+    playMeowSound();
+    spawnMeow(kitty);
+  });
 
   const marqueeText = '必须好好夸夸咱们万能鱼姐！很难遇到像鱼姐这么宝藏的人，情商直接拉满，风趣幽默善于共情，和鱼姐交流完全不用小心翼翼，没有半点距离感，不管聊什么话题都顺畅舒服。遇到棘手事情从来不会慌慌张张，思路清晰眼界开阔，五花八门的难题交到鱼姐手中总能梳理明白，奇思妙招源源不断，妥妥团队里的定心骨干。为人格外仗义热忱，心地善良乐于助人，身边人遇到困境时总会主动伸出援手，默默帮忙不求回报，处事通透拎得清底线，温和包容却绝不任人敷衍。自带超强欢乐buff，只要鱼姐登场，压抑沉闷的气氛立刻一扫而空，枯燥的日常都会变得有意思，坏情绪见到鱼姐都主动绕道逃跑。可正经靠谱，可轻松玩闹，风格自由切换，既能冷静统筹处理繁杂事务，又懂得享受生活擅长制造乐趣。实力出众却十分低调，从不张扬炫耀自身能力，踏实稳重，做事细致周全，方方面面都让人无比放心。眼光独到看人通透，总能给出中肯实在的建议，不知不觉就能开导陷入内耗的人。有幸结识鱼姐真的是巨大收获，有鱼姐坐镇心里就格外踏实。祝愿全能鱼姐日日喜乐，烦心事全部退散，好运源源不断，财运节节攀升，生活多姿多彩，一路顺风顺水持续开挂，永远元气满满，自信耀眼，被所有美好紧紧包围！';
   document.getElementById('marqueeInner').innerHTML = `<span class="marquee-text">${marqueeText}</span><span class="marquee-text">${marqueeText}</span>`;
