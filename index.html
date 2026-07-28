@@ -1235,7 +1235,8 @@ async function feedFish() {
   const cMsg = choked ? '鱼吃太快呛到了！咳咳咳…' : '鱼吃得津津有味～';
   document.getElementById('feedEmoji').textContent = cEmoji;
   document.getElementById('feedMsg').innerHTML = cMsg + bonusMsg;
-  document.getElementById('feedDetail').textContent = `${emoji} ${label} +${points}好感度 | 剩余饲料:${remaining}`;
+  const afterFeed = STATE.feed_remaining;
+  document.getElementById('feedDetail').textContent = `${emoji} ${label} +${points}好感度 | 剩余饲料:${afterFeed}`;
   document.getElementById('feedOverlay').classList.add('active');
   updateAffectionBar();
 
