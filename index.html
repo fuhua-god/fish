@@ -468,14 +468,39 @@ let fishDir = 1;
 let fishAnimId = null;
 let fishPaused = false;
 let fishBouncing = false;
+// 时快时慢：心情系统
+let fishTargetSpd = 1.0;        // 目标速度倍率 (0.1~2.5)
+let fishCurSpd = 1.0;           // 当前平滑后的速度倍率
+let fishMoodTimer = 0;          // 计时器，到点换心情
+let fishMoodInterval = 3;       // 多少秒换一次心情
 
-function updateFishPos() {
+function updateFishPos(ts) {
   if (fishPaused) { fishAnimId = requestAnimationFrame(updateFishPos); return; }
-  if (Math.random() < 0.008) { fishVX += (Math.random() - 0.5) * 1.2; fishVY += (Math.random() - 0.5) * 1.2; }
+
+  // 时快时慢：定时切换目标速度
+  if (!updateFishPos._lastTs) updateFishPos._lastTs = ts;
+  const dt = Math.min((ts - updateFishPos._lastTs) / 1000, 0.1); // 秒
+  updateFishPos._lastTs = ts;
+  fishMoodTimer += dt;
+  if (fishMoodTimer >= fishMoodInterval) {
+    fishMoodTimer = 0;
+    fishMoodInterval = 2 + Math.random() * 6; // 2~8秒换一次
+    const r = Math.random();
+    if (r < 0.2) fishTargetSpd = 0.08 + Math.random() * 0.15;   // 发呆漂浮
+    else if (r < 0.5) fishTargetSpd = 0.4 + Math.random() * 0.5; // 悠闲游动
+    else if (r < 0.85) fishTargetSpd = 1.0 + Math.random() * 0.6; // 正常速度
+    else fishTargetSpd = 1.8 + Math.random() * 1.2;               // 冲刺
+  }
+  // 平滑过渡
+  fishCurSpd += (fishTargetSpd - fishCurSpd) * dt * 1.5;
+
+  if (Math.random() < 0.01) { fishVX += (Math.random() - 0.5) * 1.0; fishVY += (Math.random() - 0.5) * 1.0; }
   const speedScale = fishSize.w / 240;
-  const maxSpd = 3.5 * speedScale, minSpd = 0.3 * speedScale;
+  const baseMin = 0.3 * speedScale, baseMax = 3.5 * speedScale;
+  const minSpd = baseMin * fishCurSpd * 0.3;
+  const maxSpd = baseMax * fishCurSpd;
   let spd = Math.sqrt(fishVX * fishVX + fishVY * fishVY);
-  if (spd < minSpd) { fishVX = (fishVX / spd) * minSpd + (Math.random() - 0.5) * 0.5; fishVY = (fishVY / spd) * minSpd + (Math.random() - 0.5) * 0.5; }
+  if (spd < minSpd && fishCurSpd > 0.15) { fishVX = (fishVX / (spd || 0.01)) * minSpd + (Math.random() - 0.5) * 0.5; fishVY = (fishVY / (spd || 0.01)) * minSpd + (Math.random() - 0.5) * 0.5; }
   if (spd > maxSpd) { fishVX = (fishVX / spd) * maxSpd; fishVY = (fishVY / spd) * maxSpd; }
   fishX += fishVX; fishY += fishVY;
   const pad = 10, fw = fishSize.w, fh = fishSize.h;
