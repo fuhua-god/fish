@@ -732,9 +732,10 @@ async function pickDisplayFish(id) {
 
 // ========== 陪伴天数 ==========
 function getStartDate() {
-  let d = STATE.start_date;
-  if (!d) { d = getToday(); saveState({ start_date: d }); }
-  return d;
+  // 从昨天开始算起
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  return yesterday.toISOString().split('T')[0];
 }
 document.getElementById('sideImgLeft').addEventListener('click', () => {
   const start = new Date(getStartDate());
