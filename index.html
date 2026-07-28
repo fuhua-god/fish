@@ -154,6 +154,7 @@ body{
   <p class="counter" id="counter"></p>
   <p class="clock" id="clock"></p>
   <p class="counter" id="affectionBar" style="background:rgba(244,143,177,0.45)">💖 好感度 0</p>
+  <p class="counter" id="syncBadge" style="background:rgba(129,199,132,0.4);font-size:12px;padding:3px 12px">🔄 数据加载中...</p>
   <div class="main-btns">
     <button class="btn-album" onclick="openAlbum()">📖 图鉴</button>
     <button class="btn-album" id="feedBtn" onclick="feedFish()">🍥 喂食</button>
@@ -228,43 +229,102 @@ body{
 </div>
 
 <script>
-// ========== Supabase API ==========
+// ========== 数据存储（Supabase + localStorage 双写互通） ==========
 const SB_URL = 'https://xgdzfxwzqocbtlomcisp.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnZHpmeHd6cW9jYnRsb21jaXNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxNDUzMTcsImV4cCI6MjEwMDcyMTMxN30.IK6AExsyPMnZ2VYjmZNxcJj04BqTRdUVTBcMXbWRdNc';
 const SB_HEAD = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' };
+const LS_STATE_KEY = 'fish_state';
+const LS_UNLOCKED_KEY = 'fish_unlocked';
+const LS_SYNC_KEY = 'fish_last_sync';
 
 let STATE = {};
 let UNLOCKED = [];
+let useSupabase = true;
+
+// localStorage helpers
+function lsGet(key) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; } catch(e) { return null; } }
+function lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} }
+function lsMerge(key, updates) { try { const cur = lsGet(key) || {}; Object.assign(cur, updates); lsSet(key, cur); } catch(e) {} }
+function markSynced() { lsSet(LS_SYNC_KEY, new Date().toISOString()); }
+function getLastSync() { const v = lsGet(LS_SYNC_KEY); return v ? new Date(v).toLocaleString('zh-CN') : '未知'; }
 
 async function loadState() {
-  const r = await fetch(`${SB_URL}/shared_state?id=eq.1`, { headers: { ...SB_HEAD, 'Accept': 'application/json' } });
-  const d = await r.json();
-  STATE = d[0] || {};
-}
-async function saveState(updates) {
-  Object.assign(STATE, updates);
-  await fetch(`${SB_URL}/shared_state?id=eq.1`, { method: 'PATCH', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' }, body: JSON.stringify(updates) }).catch(() => {});
-}
-async function loadUnlocked() {
-  const r = await fetch(`${SB_URL}/unlocked_fish?select=*`, { headers: { ...SB_HEAD, 'Accept': 'application/json' } });
-  UNLOCKED = (await r.json()) || [];
-}
-async function addUnlocked(fishId) {
-  const ex = UNLOCKED.find(f => f.fish_id === fishId);
-  if (ex) {
-    await fetch(`${SB_URL}/unlocked_fish?fish_id=eq.${encodeURIComponent(fishId)}`, {
-      method: 'PATCH', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ count: (ex.count || 1) + 1 })
-    }).catch(() => {});
-    ex.count = (ex.count || 1) + 1;
-  } else {
-    await fetch(`${SB_URL}/unlocked_fish`, {
-      method: 'POST', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ fish_id: fishId, count: 1 })
-    }).catch(() => {});
-    UNLOCKED.push({ fish_id: fishId, count: 1 });
+  let fromCloud = false;
+  try {
+    const r = await fetch(`${SB_URL}/shared_state?id=eq.1`, { headers: { ...SB_HEAD, 'Accept': 'application/json' } });
+    if (r.ok) {
+      const d = await r.json();
+      if (d && d[0] && Object.keys(d[0]).length > 1) {
+        STATE = d[0];
+        lsSet(LS_STATE_KEY, STATE);
+        fromCloud = true;
+      }
+    }
+  } catch(e) { console.log('☁️ 云端加载失败，使用本地缓存'); }
+  if (!fromCloud) {
+    STATE = lsGet(LS_STATE_KEY) || {};
+    if (Object.keys(STATE).length > 0) useSupabase = false;
   }
 }
+
+async function saveState(updates) {
+  Object.assign(STATE, updates);
+  lsMerge(LS_STATE_KEY, updates);
+  if (useSupabase) {
+    await fetch(`${SB_URL}/shared_state?id=eq.1`, {
+      method: 'PATCH', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' }, body: JSON.stringify(updates)
+    }).catch(() => {});
+  }
+  markSynced();
+}
+
+async function loadUnlocked() {
+  let fromCloud = false;
+  try {
+    const r = await fetch(`${SB_URL}/unlocked_fish?select=*`, { headers: { ...SB_HEAD, 'Accept': 'application/json' } });
+    if (r.ok) {
+      const d = await r.json();
+      if (d && d.length > 0) {
+        UNLOCKED = d;
+        lsSet(LS_UNLOCKED_KEY, UNLOCKED);
+        fromCloud = true;
+      }
+    }
+  } catch(e) { console.log('☁️ 图鉴加载失败，使用本地缓存'); }
+  if (!fromCloud) {
+    UNLOCKED = lsGet(LS_UNLOCKED_KEY) || [];
+  }
+}
+
+async function addUnlocked(fishId) {
+  // 先更新内存
+  const ex = UNLOCKED.find(f => f.fish_id === fishId);
+  if (ex) {
+    ex.count = (ex.count || 1) + 1;
+  } else {
+    UNLOCKED.push({ fish_id: fishId, count: 1 });
+  }
+  // 写入本地
+  lsSet(LS_UNLOCKED_KEY, UNLOCKED);
+  markSynced();
+  // 同步云端
+  if (useSupabase) {
+    try {
+      if (ex) {
+        await fetch(`${SB_URL}/unlocked_fish?fish_id=eq.${encodeURIComponent(fishId)}`, {
+          method: 'PATCH', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ count: ex.count })
+        });
+      } else {
+        await fetch(`${SB_URL}/unlocked_fish`, {
+          method: 'POST', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ fish_id: fishId, count: 1 })
+        });
+      }
+    } catch(e) {}
+  }
+}
+
 async function switchDisplayFish(fishId) {
   await saveState({ display_fish_id: fishId });
 }
@@ -837,29 +897,58 @@ async function feedFish() {
 
 // ========== 启动 ==========
 (async function startup() {
+  // 1. 加载数据（云端优先，本地兜底）
   try {
     await loadState();
     await loadUnlocked();
+    console.log('✅ 数据加载完成 | 云端:' + (useSupabase ? '在线' : '离线') + ' | 同步时间:' + getLastSync());
   } catch(e) {
-    console.log('Supabase load failed, using defaults');
+    console.log('⚠️ 数据加载异常，使用本地缓存');
+    STATE = lsGet(LS_STATE_KEY) || {};
+    UNLOCKED = lsGet(LS_UNLOCKED_KEY) || [];
   }
 
+  // 2. 刷新渲染
   renderMainFish();
   counterEl.textContent = (STATE.click_count || 0) > 0 ? `这条呆鱼一共说了 ${STATE.click_count} 次 "我是傻鱼"～` : '';
   updateAffectionBar();
+  // 同步状态标识
+  const syncBadge = document.getElementById('syncBadge');
+  if (syncBadge) {
+    syncBadge.textContent = useSupabase ? '☁️ 数据已同步 · ' + getLastSync() : '💾 本地缓存 · ' + getLastSync();
+    syncBadge.style.background = useSupabase ? 'rgba(129,199,132,0.4)' : 'rgba(255,183,77,0.4)';
+    setTimeout(() => { syncBadge.style.opacity = '0'; syncBadge.style.transition = 'opacity 0.8s'; }, 5000);
+  }
 
+  // 3. 每页打开都检查每日抽卡、饲料重置
+  const today = getToday();
+
+  // 重置每日饲料
+  if (STATE.feed_date !== today) {
+    STATE.feed_remaining = 10;
+    STATE.feed_bonus_used = false;
+    STATE.feed_date = today;
+    lsSet(LS_STATE_KEY, STATE);
+  }
+
+  // 每日抽卡
   checkDailyGacha();
 
+  // 4. 节日检查
   try {
     const todayHoliday = checkHoliday();
     const holidayShown = STATE.holiday_shown_date || '';
-    if (todayHoliday && holidayShown !== getToday()) {
+    if (todayHoliday && holidayShown !== today) {
       showHolidayPopup(todayHoliday);
-      await saveState({ holiday_shown_date: getToday() });
+      await saveState({ holiday_shown_date: today });
       window._bonusDraw = true;
       window._bonusMsg = `🎉 ${todayHoliday.name}额外抽卡机会`;
     }
   } catch(e) { console.log('holiday check error:', e); }
+
+  // 5. 标记数据已刷新
+  markSynced();
+  console.log('🐟 傻鱼已就绪 | 点击:' + (STATE.click_count||0) + ' | 图鉴:' + UNLOCKED.length + '种 | 好感度:' + (STATE.affection||0));
 })();
 </script>
 </body>
