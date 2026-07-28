@@ -249,36 +249,34 @@ function markSynced() { lsSet(LS_SYNC_KEY, new Date().toISOString()); }
 function getLastSync() { const v = lsGet(LS_SYNC_KEY); return v ? new Date(v).toLocaleString('zh-CN') : '未知'; }
 
 async function loadState() {
-  // 先读本地缓存
   const localState = lsGet(LS_STATE_KEY) || {};
   try {
     const r = await fetch(`${SB_URL}/shared_state?id=eq.1`, { headers: { ...SB_HEAD, 'Accept': 'application/json' } });
     if (r.ok) {
       const d = await r.json();
       const cloud = (d && d[0]) ? d[0] : {};
-      // 合并：云端数据优先，云端没有的字段用本地补上
+      // 合并：云端为主，本地补充
       STATE = { ...localState, ...cloud };
-      // 如果有本地独有数据，推送到云端
-      if (Object.keys(localState).length > 0) {
-        const missing = {};
-        for (const k of Object.keys(localState)) {
-          if (!(k in cloud) || cloud[k] === null || cloud[k] === '') {
-            if (localState[k] !== null && localState[k] !== '' && k !== 'id') missing[k] = localState[k];
-          }
-        }
-        if (Object.keys(missing).length > 0) {
-          await fetch(`${SB_URL}/shared_state?id=eq.1`, {
-            method: 'PATCH', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' }, body: JSON.stringify(missing)
-          }).catch(() => {});
-        }
-      }
       lsSet(LS_STATE_KEY, STATE);
       useSupabase = true;
-      console.log('☁️ 状态从云端加载成功');
+      console.log('☁️ 状态从云端加载成功 | 点击:' + (STATE.click_count||0) + ' | 好感度:' + (STATE.affection||0));
+      // 将本地数据同步到云端
+      const allKeys = new Set([...Object.keys(localState), ...Object.keys(STATE)]);
+      allKeys.delete('id');
+      const upsert = { id: 1 };
+      for (const k of allKeys) {
+        const v = STATE[k];
+        if (v !== null && v !== undefined && v !== '') upsert[k] = v;
+      }
+      if (Object.keys(upsert).length > 1) {
+        await fetch(`${SB_URL}/shared_state`, {
+          method: 'POST', headers: { ...SB_HEAD, 'Prefer': 'resolution=merge-duplicates' },
+          body: JSON.stringify(upsert)
+        }).catch(() => {});
+      }
       return;
     }
   } catch(e) { console.log('☁️ 云端状态加载失败，使用本地缓存'); }
-  // 云端不可达才用纯本地
   STATE = localState;
   useSupabase = false;
 }
@@ -286,12 +284,14 @@ async function loadState() {
 async function saveState(updates) {
   Object.assign(STATE, updates);
   lsMerge(LS_STATE_KEY, updates);
-  if (useSupabase) {
-    await fetch(`${SB_URL}/shared_state?id=eq.1`, {
-      method: 'PATCH', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' }, body: JSON.stringify(updates)
-    }).catch(() => {});
-  }
-  markSynced();
+  // 使用 UPSERT：行存在则更新，不存在则创建
+  try {
+    await fetch(`${SB_URL}/shared_state`, {
+      method: 'POST', headers: { ...SB_HEAD, 'Prefer': 'resolution=merge-duplicates' },
+      body: JSON.stringify({ id: 1, ...updates })
+    });
+    markSynced();
+  } catch(e) {}
 }
 
 async function loadUnlocked() {
@@ -299,26 +299,24 @@ async function loadUnlocked() {
   try {
     const r = await fetch(`${SB_URL}/unlocked_fish?select=*`, { headers: { ...SB_HEAD, 'Accept': 'application/json' } });
     if (r.ok) {
-      const d = await r.json();
-      const cloudList = d || [];
-      // 合并：以 fish_id 去重，数量取较大值
+      const cloudList = (await r.json()) || [];
+      // 合并去重，数量取较大值
       const merged = {};
       for (const f of localList) merged[f.fish_id] = f.count || 1;
-      for (const f of cloudList) {
-        merged[f.fish_id] = Math.max(merged[f.fish_id] || 0, f.count || 1);
-      }
-      // 如果本地有云端没有的，上传
-      for (const f of localList) {
-        if (!cloudList.find(c => c.fish_id === f.fish_id)) {
+      for (const f of cloudList) merged[f.fish_id] = Math.max(merged[f.fish_id] || 0, f.count || 1);
+      UNLOCKED = Object.entries(merged).map(([fish_id, count]) => ({ fish_id, count }));
+      lsSet(LS_UNLOCKED_KEY, UNLOCKED);
+      // 将本地数据同步到云端
+      for (const [fish_id, count] of Object.entries(merged)) {
+        const inCloud = cloudList.find(c => c.fish_id === fish_id);
+        if (!inCloud || (inCloud.count || 1) < count) {
           await fetch(`${SB_URL}/unlocked_fish`, {
-            method: 'POST', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' },
-            body: JSON.stringify({ fish_id: f.fish_id, count: f.count || 1 })
+            method: 'POST', headers: { ...SB_HEAD, 'Prefer': 'resolution=merge-duplicates' },
+            body: JSON.stringify({ fish_id, count })
           }).catch(() => {});
         }
       }
-      UNLOCKED = Object.entries(merged).map(([fish_id, count]) => ({ fish_id, count }));
-      lsSet(LS_UNLOCKED_KEY, UNLOCKED);
-      console.log('☁️ 图鉴从云端加载成功，共' + UNLOCKED.length + '种');
+      console.log('☁️ 图鉴从云端加载成功 | 共' + UNLOCKED.length + '种');
       return;
     }
   } catch(e) { console.log('☁️ 云端图鉴加载失败，使用本地缓存'); }
@@ -326,29 +324,18 @@ async function loadUnlocked() {
 }
 
 async function addUnlocked(fishId) {
-  // 更新内存
   const ex = UNLOCKED.find(f => f.fish_id === fishId);
-  if (ex) {
-    ex.count = (ex.count || 1) + 1;
-  } else {
-    UNLOCKED.push({ fish_id: fishId, count: 1 });
-  }
-  // 写入本地
+  const newCount = ex ? (ex.count || 1) + 1 : 1;
+  if (ex) { ex.count = newCount; }
+  else { UNLOCKED.push({ fish_id: fishId, count: newCount }); }
   lsSet(LS_UNLOCKED_KEY, UNLOCKED);
   markSynced();
-  // 同步云端
+  // UPSERT 到云端
   try {
-    if (ex) {
-      await fetch(`${SB_URL}/unlocked_fish?fish_id=eq.${encodeURIComponent(fishId)}`, {
-        method: 'PATCH', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ count: ex.count })
-      });
-    } else {
-      await fetch(`${SB_URL}/unlocked_fish`, {
-        method: 'POST', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ fish_id: fishId, count: 1 })
-      });
-    }
+    await fetch(`${SB_URL}/unlocked_fish`, {
+      method: 'POST', headers: { ...SB_HEAD, 'Prefer': 'resolution=merge-duplicates' },
+      body: JSON.stringify({ fish_id: fishId, count: newCount })
+    });
   } catch(e) {}
 }
 
