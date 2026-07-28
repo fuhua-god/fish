@@ -230,7 +230,7 @@ body{
 
 <script>
 // ========== 数据存储（Supabase + localStorage 双写互通） ==========
-const SB_URL = 'https://xgdzfxwzqocbtlomcisp.supabase.co';
+const SB_URL = 'https://xgdzfxwzqocbtlomcisp.supabase.co/rest/v1';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnZHpmeHd6cW9jYnRsb21jaXNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxNDUzMTcsImV4cCI6MjEwMDcyMTMxN30.IK6AExsyPMnZ2VYjmZNxcJj04BqTRdUVTBcMXbWRdNc';
 const SB_HEAD = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' };
 const LS_STATE_KEY = 'fish_state';
