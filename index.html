@@ -5,692 +5,951 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🐟 我是傻鱼 ~ ♪</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,#fce4ec 0%,#f8bbd0 8%,#f48fb1 16%,#ce93d8 32%,#b39ddb 48%,#81d4fa 64%,#4fc3f7 80%,#b2dfdb 90%,#e8f5e9 100%);
+  overflow-x:hidden;font-family:"Comic Sans MS","KaiTi","STKaiti","Microsoft YaHei",cursive,sans-serif;user-select:none;cursor:default;padding-top:50px;
+}
+@media(max-width:768px){body{padding-top:38px}}
+.scene{position:fixed;inset:0;pointer-events:none;z-index:0}
+.cloud{position:absolute;animation:cd linear infinite}
+@keyframes cd{0%{transform:translateX(0)}100%{transform:translateX(-130vw)}}
+.seabed{position:absolute;bottom:0;left:0;right:0;height:110px;background:linear-gradient(180deg,#ffe0b2,#ffcc80 40%,#ffb74d 100%);border-radius:60% 70% 0 0/50px 50px 0 0}
+.seabed::before{content:'';position:absolute;top:-35px;left:0;right:0;height:60px;background:radial-gradient(ellipse 90px 45px at 8% 70%,#ffe0b2 60%,transparent 60%),radial-gradient(ellipse 70px 35px at 28% 65%,#ffecb3 60%,transparent 60%),radial-gradient(ellipse 100px 40px at 52% 72%,#ffe0b2 60%,transparent 60%),radial-gradient(ellipse 80px 35px at 78% 62%,#ffecb3 60%,transparent 60%),radial-gradient(ellipse 60px 30px at 92% 68%,#ffe0b2 60%,transparent 60%)}
+.rock{position:absolute;bottom:80px}
+.seaweed{position:absolute;bottom:90px;animation:sw 3s ease-in-out infinite;transform-origin:bottom center}
+@keyframes sw{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+.coral{position:absolute;bottom:80px}
+.shell{position:absolute;bottom:85px}
+.starfish{position:absolute;bottom:85px;animation:sw2 4s ease-in-out infinite}
+@keyframes sw2{0%,100%{transform:rotate(0)}25%{transform:rotate(10deg)}75%{transform:rotate(-10deg)}}
+.kitty-doll{position:absolute;animation:kb 3.5s ease-in-out infinite}
+@keyframes kb{0%,100%{transform:translateY(0)rotate(0)}30%{transform:translateY(-6px)rotate(2deg)}70%{transform:translateY(-3px)rotate(-1deg)}}
+.heart-float{position:absolute;bottom:-40px;animation:hr linear infinite;font-size:24px}
+@keyframes hr{0%{transform:translateY(0)scale(.4)rotate(0);opacity:.7}100%{transform:translateY(-110vh)scale(1.1)rotate(360deg);opacity:0}}
+.sparkle{position:absolute;animation:tw 1.5s ease-in-out infinite;font-size:16px}
+@keyframes tw{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1.3)}}
+.side-img{position:fixed;top:50%;transform:translateY(-50%);z-index:1;pointer-events:none;opacity:.9;width:280px;filter:drop-shadow(0 8px 25px rgba(0,0,0,.2))}
+.side-img.left{left:20px;pointer-events:auto;cursor:pointer}.side-img.left:hover{opacity:1;transform:translateY(-50%) scale(1.04)}
+.side-img.right{right:20px}
+@media(max-width:768px){.side-img{position:fixed;top:10px;transform:none;width:100px;opacity:.65;z-index:0}.side-img.left{left:2px;top:8px;pointer-events:auto}.side-img.left:hover{transform:scale(1.06)}.side-img.right{right:2px;top:8px}}
 
-  body {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(180deg,
-      #fce4ec 0%,
-      #f8bbd0 8%,
-      #f48fb1 16%,
-      #ce93d8 32%,
-      #b39ddb 48%,
-      #81d4fa 64%,
-      #4fc3f7 80%,
-      #b2dfdb 90%,
-      #e8f5e9 100%
-    );
-    overflow-x: hidden;
-    font-family: "Comic Sans MS", "KaiTi", "STKaiti", "Microsoft YaHei", cursive, sans-serif;
-    user-select: none;
-    cursor: default;
-  }
+.main-page{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:18px;transition:opacity .4s,transform .4s}
+.main-page.hidden{opacity:0;transform:scale(.9);pointer-events:none}
+.speech-text{font-size:34px;font-weight:bold;color:#ec407a;text-shadow:0 3px 8px rgba(236,64,122,.2);opacity:0;transform:translateY(15px);transition:all .35s cubic-bezier(.175,.885,.32,1.275);pointer-events:none;letter-spacing:3px;-webkit-tap-highlight-color:transparent;outline:none}
+.speech-text.show{opacity:1;transform:translateY(0)}
+.speech-text.shake{animation:jg .4s ease}
+@keyframes jg{0%{transform:translateY(0)rotate(0)scale(1)}15%{transform:translateY(-4px)rotate(-3deg)scale(1.06)}30%{transform:translateY(2px)rotate(3deg)scale(.96)}45%{transform:translateY(-3px)rotate(-2deg)scale(1.04)}60%{transform:translateY(1px)rotate(2deg)scale(.98)}75%{transform:translateY(-1px)rotate(-1deg)scale(1.02)}100%{transform:translateY(0)rotate(0)scale(1)}}
+.fish-wrapper{position:fixed;z-index:5;cursor:pointer;transition:transform .12s ease;filter:drop-shadow(0 10px 25px rgba(0,0,0,.2));-webkit-tap-highlight-color:transparent;outline:none;will-change:left,top,transform}
+.fish-wrapper:active{transform:scale(.9)}
+.fish-float{width:100%;height:100%}
+.hint{color:#fff;font-size:17px;letter-spacing:3px;animation:pl 2s ease-in-out infinite;text-shadow:0 2px 6px rgba(0,0,0,.3)}
+@keyframes pl{0%,100%{opacity:.5;transform:scale(.98)}50%{opacity:1;transform:scale(1.03)}}
+.counter,.clock{color:#fff;font-size:15px;background:rgba(0,0,0,.35);padding:6px 16px;border-radius:20px;text-shadow:0 1px 2px rgba(0,0,0,.2)}
+.clock{font-size:14px;background:rgba(0,0,0,.3);padding:5px 16px;letter-spacing:1px}
+.ribbon-tag{display:inline-block;background:#f48fb1;color:#fff;padding:4px 14px;border-radius:20px;font-size:13px;letter-spacing:1px;box-shadow:0 3px 10px rgba(244,143,177,.35)}
+.game-entry{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+.entry-btn{background:rgba(255,255,255,.85);border:2px solid #f8bbd0;color:#ec407a;padding:10px 24px;border-radius:25px;font-size:16px;font-weight:bold;cursor:pointer;letter-spacing:1px;font-family:inherit;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
+.entry-btn:hover{background:#fce4ec}
+.main-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.btn-album{background:#fff;border:2px solid #f8bbd0;color:#ec407a;padding:8px 18px;border-radius:25px;font-size:14px;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
+.btn-album:hover{background:#fce4ec}
+@media(max-width:768px){.speech-text{font-size:26px}.entry-btn{padding:8px 18px;font-size:14px}}
 
-  .scene {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-  }
+.game-overlay{position:fixed;inset:0;z-index:10;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+.game-overlay.active{opacity:1;pointer-events:auto}
+.game-panel{background:linear-gradient(160deg,#fff5f5,#fce4ec,#f3e5f5);border-radius:28px;padding:28px 24px 20px;box-shadow:0 20px 60px rgba(0,0,0,.35);display:flex;flex-direction:column;align-items:center;gap:16px;max-width:95vw;max-height:95vh;overflow-y:auto;position:relative}
+.game-title{font-size:24px;font-weight:bold;color:#ec407a;letter-spacing:2px}
+.game-board{display:inline-grid;gap:4px;background:rgba(236,64,122,.12);padding:8px;border-radius:14px}
+.gcell{width:46px;height:46px;background:rgba(255,255,255,.9);border-radius:8px;border:2px solid #f8bbd0;cursor:pointer;font-size:24px;font-weight:bold;display:flex;align-items:center;justify-content:center;transition:background .15s;color:#555;font-family:inherit;padding:0;-webkit-tap-highlight-color:transparent;outline:none}
+.gcell:hover{background:#fce4ec}.gcell.X{color:#e91e63;border-color:#f48fb1}.gcell.O{color:#42a5f5;border-color:#90caf9}.gcell.win{background:#fff9c4;border-color:#ffcc80}
+.game-status{font-size:18px;font-weight:bold;color:#555;letter-spacing:1px}
+.fish-jumpin{display:none;flex-direction:column;align-items:center;gap:10px}
+.fish-jumpin.show{display:flex}
+.fish-jumpin.show>svg{animation:popIn .4s cubic-bezier(.175,.885,.32,1.275) both}
+.fish-jumpin.show .speech-lose{animation:popIn .4s .15s cubic-bezier(.175,.885,.32,1.275) both}
+@keyframes popIn{0%{transform:scale(0)rotate(-10deg);opacity:0}100%{transform:scale(1)rotate(0);opacity:1}}
+.speech-lose{font-size:28px;font-weight:bold;color:#ec407a;background:#fff;padding:12px 28px;border-radius:24px;box-shadow:0 4px 20px rgba(236,64,122,.2)}
+.result-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.result-btns.show-btns .btn-retry{animation:popIn .4s .2s cubic-bezier(.175,.885,.32,1.275) both}
+.result-btns.show-btns .btn-quit{animation:popIn .4s .35s cubic-bezier(.175,.885,.32,1.275) both}
+.btn-retry,.btn-quit{padding:12px 30px;border-radius:30px;font-size:18px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;border:none;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
+.btn-retry{background:#f48fb1;color:#fff;box-shadow:0 4px 15px rgba(244,143,177,.5)}.btn-retry:hover{background:#ec407a;transform:scale(1.05)}
+.btn-quit{background:#fff;color:#999;border:2px solid #ddd}.btn-quit:hover{border-color:#999;color:#666}
+.btn-back{position:absolute;top:12px;left:18px;background:none;border:none;font-size:22px;cursor:pointer;color:#bbb;padding:4px 8px;-webkit-tap-highlight-color:transparent;outline:none}
+.btn-back:hover{color:#888}
+@media(max-width:768px){.game-panel{padding:22px 14px 16px;gap:12px}.game-title{font-size:20px}.gcell{width:34px;height:34px;font-size:18px}.game-status{font-size:15px}.speech-lose{font-size:22px;padding:10px 20px}.btn-retry,.btn-quit{padding:10px 20px;font-size:15px}}
 
-  /* --- 云朵 --- */
-  .cloud {
-    position: absolute;
-    animation: cloudDrift linear infinite;
-  }
-  @keyframes cloudDrift {
-    0%   { transform: translateX(0); }
-    100% { transform: translateX(-130vw); }
-  }
+.gacha-overlay{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .5s}
+.gacha-overlay.active{opacity:1;pointer-events:auto}
+.gacha-card{background:#fff;border-radius:28px;padding:30px 24px;box-shadow:0 20px 60px rgba(0,0,0,.4);display:flex;flex-direction:column;align-items:center;gap:18px;max-width:400px;width:90vw;position:relative;overflow:hidden}
+.gacha-card::before{content:'';position:absolute;top:0;left:0;right:0;height:6px}
+.gacha-card.r0::before{background:#bdbdbd}.gacha-card.r1::before{background:#81c784}
+.gacha-card.r2::before{background:#64b5f6}.gacha-card.r3::before{background:#ce93d8}
+.gacha-card.r4::before{background:#ffb74d}.gacha-card.r5::before{background:#ef5350}
+.gacha-card.r6::before{background:linear-gradient(90deg,#f48fb1,#ce93d8,#81d4fa,#f48fb1)}
+.gacha-card.r7::before{background:linear-gradient(90deg,#ff1744,#ff4081,#ff9100,#ffd600,#76ff03,#00e5ff,#d500f9);background-size:300% 100%;animation:barShine 2s ease-in-out infinite}
+.gacha-title{font-size:24px;font-weight:bold;letter-spacing:2px}
+.gacha-rarity{font-size:14px;padding:3px 14px;border-radius:12px;color:#fff;letter-spacing:1px}
+.rarity-0{background:#bdbdbd}.rarity-1{background:#81c784}.rarity-2{background:#64b5f6}
+.rarity-3{background:#ce93d8}.rarity-4{background:#ffb74d}.rarity-5{background:#ef5350}
+.rarity-6{background:linear-gradient(90deg,#f48fb1,#ce93d8,#81d4fa)}
+.rarity-7{background:linear-gradient(90deg,#ff1744,#ff4081,#ff9100,#ffd600,#76ff03,#00e5ff,#d500f9);background-size:300% 100%;animation:barShine 2s ease-in-out infinite}
+.gacha-fish-img{animation:gachaReveal .6s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes gachaReveal{0%{transform:scale(0)rotate(180deg);opacity:0}60%{transform:scale(1.1)rotate(-10deg);opacity:1}100%{transform:scale(1)rotate(0);opacity:1}}
+.gacha-fish-name{font-size:22px;font-weight:bold;color:#555;letter-spacing:2px}
+.gacha-close{padding:10px 36px;border-radius:25px;font-size:16px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;border:none;background:#f48fb1;color:#fff;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
+.gacha-close:hover{background:#ec407a;transform:scale(1.05)}
 
-  /* --- 海底沙子 --- */
-  .seabed {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 110px;
-    background: linear-gradient(180deg, #ffe0b2, #ffcc80 40%, #ffb74d 100%);
-    border-radius: 60% 70% 0 0 / 50px 50px 0 0;
-  }
-  .seabed::before {
-    content: '';
-    position: absolute;
-    top: -35px; left: 0; right: 0;
-    height: 60px;
-    background:
-      radial-gradient(ellipse 90px 45px at 8%  70%, #ffe0b2 60%, transparent 60%),
-      radial-gradient(ellipse 70px 35px at 28% 65%, #ffecb3 60%, transparent 60%),
-      radial-gradient(ellipse 100px 40px at 52% 72%, #ffe0b2 60%, transparent 60%),
-      radial-gradient(ellipse 80px 35px at 78% 62%, #ffecb3 60%, transparent 60%),
-      radial-gradient(ellipse 60px 30px at 92% 68%, #ffe0b2 60%, transparent 60%);
-  }
+.album-overlay{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+.album-overlay.active{opacity:1;pointer-events:auto}
+.album-panel{background:#fff;border-radius:28px;padding:24px 16px;box-shadow:0 20px 60px rgba(0,0,0,.35);max-width:95vw;max-height:90vh;width:700px;display:flex;flex-direction:column;gap:14px;position:relative}
+.album-title{font-size:22px;font-weight:bold;text-align:center;color:#ec407a;letter-spacing:2px}
+.album-tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.album-tab{padding:5px 12px;border-radius:15px;border:none;font-size:12px;cursor:pointer;font-family:inherit;font-weight:bold;color:#fff;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
+.album-tab:hover{opacity:.8}
+.album-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:8px;overflow-y:auto;max-height:55vh;padding:4px}
+.album-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:12px;background:#fafafa;transition:all .2s;position:relative}
+.album-item.owned{cursor:pointer}.album-item.owned:hover{background:#fce4ec;transform:scale(1.05)}
+.album-item.locked{opacity:.35}
+.album-item .fish-icon{width:50px;height:40px}
+.album-item .fish-name{font-size:10px;text-align:center;color:#666;line-height:1.2}
+.album-item .owned-tag{position:absolute;top:2px;right:4px;font-size:10px}
+.album-stats{text-align:center;font-size:14px;color:#999;letter-spacing:1px}
+@media(max-width:768px){.album-grid{grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:5px}.album-panel{padding:16px 10px}.album-title{font-size:18px}.album-tab{font-size:10px;padding:4px 8px}}
 
-  /* --- 海底岩石 --- */
-  .rock {
-    position: absolute;
-    bottom: 80px;
-  }
+.marquee-bar{position:fixed;top:0;left:0;right:0;z-index:20;background:linear-gradient(90deg,#f48fb1,#ce93d8,#81d4fa,#f48fb1);background-size:300% 100%;animation:barShine 4s ease-in-out infinite;padding:10px 0;overflow:hidden;box-shadow:0 2px 15px rgba(244,143,177,.35)}
+@keyframes barShine{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.marquee-inner{display:flex;width:max-content;animation:marqueeScroll 80s linear infinite}
+@keyframes marqueeScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.marquee-text{color:#fff;font-size:16px;font-weight:bold;letter-spacing:2px;white-space:nowrap;text-shadow:0 1px 4px rgba(0,0,0,.15);padding-right:60px}
+@media(max-width:768px){.marquee-bar{padding:8px 0}.marquee-text{font-size:13px;letter-spacing:1px;padding-right:30px}}
 
-  /* --- 海草 --- */
-  .seaweed {
-    position: absolute;
-    bottom: 90px;
-    animation: sway 3s ease-in-out infinite;
-    transform-origin: bottom center;
-  }
-  @keyframes sway {
-    0%, 100% { transform: rotate(-4deg); }
-    50%      { transform: rotate(4deg); }
-  }
-
-  /* --- 珊瑚 --- */
-  .coral {
-    position: absolute;
-    bottom: 80px;
-  }
-
-  /* --- 贝壳 --- */
-  .shell {
-    position: absolute;
-    bottom: 85px;
-  }
-
-  /* --- 海星 --- */
-  .starfish {
-    position: absolute;
-    bottom: 85px;
-    animation: starWiggle 4s ease-in-out infinite;
-  }
-  @keyframes starWiggle {
-    0%, 100% { transform: rotate(0deg); }
-    25%      { transform: rotate(10deg); }
-    75%      { transform: rotate(-10deg); }
-  }
-
-  /* --- Hello Kitty 玩偶 --- */
-  .kitty-doll {
-    position: absolute;
-    animation: kittyBob 3.5s ease-in-out infinite;
-  }
-  @keyframes kittyBob {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    30%      { transform: translateY(-6px) rotate(2deg); }
-    70%      { transform: translateY(-3px) rotate(-1deg); }
-  }
-
-  /* --- 爱心 --- */
-  .heart-float {
-    position: absolute;
-    bottom: -40px;
-    animation: heartRise linear infinite;
-    font-size: 24px;
-  }
-  @keyframes heartRise {
-    0%   { transform: translateY(0) scale(0.4) rotate(0deg); opacity: 0.7; }
-    100% { transform: translateY(-110vh) scale(1.1) rotate(360deg); opacity: 0; }
-  }
-
-  /* --- 闪光星 --- */
-  .sparkle {
-    position: absolute;
-    animation: twinkle 1.5s ease-in-out infinite;
-    font-size: 16px;
-  }
-  @keyframes twinkle {
-    0%, 100% { opacity: 0.2; transform: scale(0.8); }
-    50%      { opacity: 1; transform: scale(1.3); }
-  }
-
-  /* --- 两侧图片 --- */
-  .side-img {
-    position: fixed;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 1;
-    pointer-events: none;
-    opacity: 0.9;
-    width: 280px;
-    filter: drop-shadow(0 8px 25px rgba(0,0,0,0.2));
-  }
-  .side-img.left  { left: 20px; }
-  .side-img.right { right: 20px; }
-
-  /* 手机端：缩小并放到上下 */
-  @media (max-width: 768px) {
-    .side-img {
-      position: fixed;
-      top: auto;
-      transform: none;
-      width: 120px;
-      opacity: 0.7;
-      z-index: 0;
-    }
-    .side-img.left {
-      left: 5px;
-      bottom: 60px;
-    }
-    .side-img.right {
-      right: 5px;
-      bottom: 60px;
-    }
-  }
-
-  /* ===== 主内容 ===== */
-  .container {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-  }
-
-  /* --- 对话文字 --- */
-  .speech-text {
-    font-size: 34px;
-    font-weight: bold;
-    color: #ec407a;
-    text-shadow: 0 3px 8px rgba(236, 64, 122, 0.2);
-    opacity: 0;
-    transform: translateY(15px);
-    transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    pointer-events: none;
-    letter-spacing: 3px;
-  }
-  .speech-text.show {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .speech-text.shake {
-    animation: jiggle 0.4s ease;
-  }
-  @keyframes jiggle {
-    0%   { transform: translateY(0) rotate(0deg) scale(1); }
-    15%  { transform: translateY(-4px) rotate(-3deg) scale(1.06); }
-    30%  { transform: translateY(2px) rotate(3deg) scale(0.96); }
-    45%  { transform: translateY(-3px) rotate(-2deg) scale(1.04); }
-    60%  { transform: translateY(1px) rotate(2deg) scale(0.98); }
-    75%  { transform: translateY(-1px) rotate(-1deg) scale(1.02); }
-    100% { transform: translateY(0) rotate(0deg) scale(1); }
-  }
-
-  /* --- 鱼 --- */
-  .fish-wrapper {
-    cursor: pointer;
-    transition: transform 0.15s ease;
-    filter: drop-shadow(0 10px 25px rgba(0,0,0,0.2));
-  }
-  .fish-wrapper:hover { transform: scale(1.06); }
-  .fish-wrapper:active { transform: scale(0.9); }
-
-  .fish-float {
-    animation: bob 3s ease-in-out infinite;
-  }
-  @keyframes bob {
-    0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(-12px); }
-  }
-
-  .hint {
-    color: rgba(255,255,255,0.85);
-    font-size: 17px;
-    letter-spacing: 3px;
-    animation: pulse 2s ease-in-out infinite;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 0.5; transform: scale(0.98); }
-    50%      { opacity: 1; transform: scale(1.03); }
-  }
-
-  .counter {
-    color: rgba(255,255,255,0.75);
-    font-size: 15px;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  }
-
-  .ribbon-tag {
-    display: inline-block;
-    background: #f48fb1;
-    color: #fff;
-    padding: 4px 14px;
-    border-radius: 20px;
-    font-size: 13px;
-    letter-spacing: 1px;
-    box-shadow: 0 3px 10px rgba(244,143,177,0.35);
-  }
+.days-overlay{position:fixed;inset:0;z-index:35;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+.days-overlay.active{opacity:1;pointer-events:auto}
+.days-card{background:#fff;border-radius:24px;padding:30px 28px;box-shadow:0 16px 50px rgba(0,0,0,.3);text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px;max-width:360px;width:85vw}
+.days-card .days-emoji{font-size:50px;animation:popIn .5s cubic-bezier(.175,.885,.32,1.275)}
+.days-card .days-text{font-size:18px;color:#666;letter-spacing:2px;line-height:1.8}
+.days-card .days-num{font-size:48px;font-weight:bold;color:#ec407a;text-shadow:0 3px 10px rgba(236,64,122,.2)}
+.days-card .days-close{padding:10px 30px;border-radius:25px;font-size:15px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;border:none;background:#f48fb1;color:#fff;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
+.days-card .days-close:hover{background:#ec407a;transform:scale(1.05)}
+.trail-container{position:fixed;inset:0;z-index:4;pointer-events:none;overflow:hidden}
 </style>
 </head>
 <body>
 
-<!-- ====== 场景层 ====== -->
-<div class="scene">
-
-  <!-- ========== 云朵 ========== -->
-  <svg class="cloud" width="160" height="70" style="top:3%; left:100%; animation-duration:35s;">
-    <ellipse cx="50" cy="50" rx="50" ry="25" fill="white" opacity="0.85"/>
-    <ellipse cx="90" cy="40" rx="45" ry="28" fill="white" opacity="0.9"/>
-    <ellipse cx="120" cy="50" rx="40" ry="22" fill="white" opacity="0.8"/>
-  </svg>
-  <svg class="cloud" width="130" height="55" style="top:10%; left:110%; animation-duration:42s; animation-delay:-15s;">
-    <ellipse cx="40" cy="40" rx="40" ry="20" fill="white" opacity="0.75"/>
-    <ellipse cx="75" cy="30" rx="35" ry="22" fill="white" opacity="0.8"/>
-    <ellipse cx="100" cy="40" rx="30" ry="18" fill="white" opacity="0.75"/>
-  </svg>
-  <svg class="cloud" width="100" height="45" style="top:8%; left:105%; animation-duration:38s; animation-delay:-25s;">
-    <ellipse cx="35" cy="32" rx="35" ry="18" fill="white" opacity="0.7"/>
-    <ellipse cx="65" cy="25" rx="30" ry="18" fill="white" opacity="0.75"/>
-  </svg>
-
-  <!-- ========== 闪光星 ========== -->
-  <span class="sparkle" style="top:12%; left:8%;  animation-delay:0s;">✦</span>
-  <span class="sparkle" style="top:18%; left:85%; animation-delay:0.5s;">✧</span>
-  <span class="sparkle" style="top:7%;  left:45%; animation-delay:0.8s;">✦</span>
-  <span class="sparkle" style="top:22%; left:15%; animation-delay:1.1s;">⋆</span>
-  <span class="sparkle" style="top:5%;  left:68%; animation-delay:0.3s;">✧</span>
-  <span class="sparkle" style="top:15%; left:32%; animation-delay:1.4s;">✦</span>
-  <span class="sparkle" style="top:20%; left:92%; animation-delay:0.7s;">⋆</span>
-  <span class="sparkle" style="top:9%;  left:55%; animation-delay:1.0s;">✧</span>
-
-  <!-- ========== 海底 ========== -->
-  <div class="seabed"></div>
-
-  <!-- 岩石 -->
-  <svg class="rock" width="80" height="45" viewBox="0 0 80 45" style="left:20%;">
-    <ellipse cx="35" cy="35" rx="35" ry="18" fill="#bcaaa4"/>
-    <ellipse cx="25" cy="30" rx="20" ry="12" fill="#d7ccc8"/>
-    <ellipse cx="55" cy="38" rx="25" ry="14" fill="#a1887f"/>
-  </svg>
-  <svg class="rock" width="65" height="35" viewBox="0 0 65 35" style="right:18%;">
-    <ellipse cx="30" cy="28" rx="28" ry="15" fill="#c9b99a"/>
-    <ellipse cx="45" cy="32" rx="20" ry="12" fill="#b8a888"/>
-  </svg>
-  <svg class="rock" width="55" height="30" viewBox="0 0 55 30" style="left:50%;">
-    <ellipse cx="25" cy="24" rx="24" ry="13" fill="#d7ccc8"/>
-    <ellipse cx="15" cy="20" rx="15" ry="9" fill="#e8ddd8"/>
-  </svg>
-
-  <!-- 海草 -->
-  <svg class="seaweed" width="40" height="140" viewBox="0 0 40 140" style="left:3%; animation-delay:0s;">
-    <path d="M20,140 Q6,100 20,70  Q5,45  20,25  Q8,10  17,0" fill="none" stroke="#66bb6a" stroke-width="9" stroke-linecap="round" opacity="0.75"/>
-    <path d="M20,140 Q32,95 20,60  Q34,38 20,18  Q28,6  24,0" fill="none" stroke="#81c784" stroke-width="6" stroke-linecap="round" opacity="0.65"/>
-  </svg>
-  <svg class="seaweed" width="35" height="120" viewBox="0 0 35 120" style="left:11%; animation-delay:-1s; animation-duration:3.5s;">
-    <path d="M17,120 Q5,80  17,55  Q6,35  17,15  Q10,4  15,0" fill="none" stroke="#4caf50" stroke-width="8" stroke-linecap="round" opacity="0.65"/>
-    <path d="M17,120 Q28,78 17,50  Q29,30 17,10  Q25,3  22,0" fill="none" stroke="#81c784" stroke-width="5" stroke-linecap="round" opacity="0.6"/>
-  </svg>
-  <svg class="seaweed" width="45" height="150" viewBox="0 0 45 150" style="right:4%; animation-delay:-2s; animation-duration:4s;">
-    <path d="M22,150 Q6,108 22,75  Q5,48  22,28  Q8,12  20,0" fill="none" stroke="#66bb6a" stroke-width="10" stroke-linecap="round" opacity="0.7"/>
-    <path d="M22,150 Q36,100 22,68  Q37,42 22,20  Q32,6  28,0" fill="none" stroke="#a5d6a7" stroke-width="6" stroke-linecap="round" opacity="0.65"/>
-  </svg>
-  <svg class="seaweed" width="30" height="105" viewBox="0 0 30 105" style="right:15%; animation-delay:-1.5s; animation-duration:3.2s;">
-    <path d="M15,105 Q4,73 15,48  Q5,28 15,10  Q10,3  13,0" fill="none" stroke="#43a047" stroke-width="7" stroke-linecap="round" opacity="0.6"/>
-  </svg>
-
-  <!-- 珊瑚 -->
-  <svg class="coral" width="75" height="85" viewBox="0 0 75 85" style="left:17%;">
-    <circle cx="22" cy="72" r="13" fill="#ff8a80"/>
-    <circle cx="52" cy="70" r="11" fill="#ff8a80"/>
-    <circle cx="37" cy="75" r="12" fill="#ff5252"/>
-    <path d="M22,59 Q20,30 15,10" fill="none" stroke="#ff8a80" stroke-width="8" stroke-linecap="round"/>
-    <path d="M15,10 Q7,2 9,-2" fill="none" stroke="#ff8a80" stroke-width="7" stroke-linecap="round"/>
-    <path d="M15,10 Q19,0 21,-2" fill="none" stroke="#ff8a80" stroke-width="6" stroke-linecap="round"/>
-    <path d="M37,63 Q32,32 30,8" fill="none" stroke="#ff5252" stroke-width="8" stroke-linecap="round"/>
-    <path d="M30,8 Q22,-1 24,-5" fill="none" stroke="#ff5252" stroke-width="6" stroke-linecap="round"/>
-    <path d="M30,8 Q35,-1 37,-3" fill="none" stroke="#ff5252" stroke-width="6" stroke-linecap="round"/>
-    <path d="M52,59 Q55,30 57,6" fill="none" stroke="#ff8a80" stroke-width="8" stroke-linecap="round"/>
-    <path d="M57,6 Q50,-2 52,-4" fill="none" stroke="#ff8a80" stroke-width="6" stroke-linecap="round"/>
-  </svg>
-  <svg class="coral" width="55" height="60" viewBox="0 0 55 60" style="right:8%;">
-    <circle cx="16" cy="52" r="10" fill="#ff80ab"/>
-    <circle cx="38" cy="50" r="9" fill="#ff80ab"/>
-    <path d="M16,42 Q13,22 11,4" fill="none" stroke="#ff80ab" stroke-width="7" stroke-linecap="round"/>
-    <path d="M11,4 Q5,-3 7,-5" fill="none" stroke="#ff80ab" stroke-width="5" stroke-linecap="round"/>
-    <path d="M11,4 Q15,-2 17,-4" fill="none" stroke="#ff80ab" stroke-width="5" stroke-linecap="round"/>
-    <path d="M38,41 Q41,20 39,2" fill="none" stroke="#ff80ab" stroke-width="7" stroke-linecap="round"/>
-    <path d="M39,2 Q33,-4 35,-6" fill="none" stroke="#ff80ab" stroke-width="5" stroke-linecap="round"/>
-  </svg>
-
-  <!-- 贝壳 -->
-  <svg class="shell" width="38" height="24" viewBox="0 0 38 24" style="left:24%;">
-    <ellipse cx="19" cy="14" rx="17" ry="11" fill="#fff3e0"/>
-    <path d="M2,14 Q10,5 19,9 Q28,5 36,14" fill="none" stroke="#ffcc80" stroke-width="2"/>
-    <path d="M5,16 Q12,8 19,11 Q26,8 33,16" fill="none" stroke="#ffb74d" stroke-width="1.5"/>
-    <path d="M8,18 Q14,11 19,13 Q24,11 30,18" fill="none" stroke="#ffa726" stroke-width="1" opacity="0.5"/>
-  </svg>
-  <svg class="shell" width="30" height="20" viewBox="0 0 30 20" style="right:22%;">
-    <ellipse cx="15" cy="12" rx="14" ry="9" fill="#fce4ec"/>
-    <path d="M1,12 Q8,4 15,7 Q22,4 29,12" fill="none" stroke="#f8bbd0" stroke-width="1.5"/>
-    <path d="M3,14 Q9,7 15,9 Q21,7 27,14" fill="none" stroke="#f48fb1" stroke-width="1.5"/>
-  </svg>
-  <svg class="shell" width="30" height="20" viewBox="0 0 30 20" style="left:40%;">
-    <ellipse cx="15" cy="12" rx="14" ry="9" fill="#ede7f6"/>
-    <path d="M1,12 Q8,4 15,7 Q22,4 29,12" fill="none" stroke="#b39ddb" stroke-width="1.5"/>
-    <path d="M3,14 Q9,7 15,9 Q21,7 27,14" fill="none" stroke="#ce93d8" stroke-width="1.5"/>
-  </svg>
-
-  <!-- 海星 -->
-  <svg class="starfish" width="45" height="45" viewBox="0 0 45 45" style="left:30%;">
-    <polygon points="22,0 27,14 42,14 30,23 34,38 22,30 10,38 14,23 2,14 17,14" fill="#ffab91"/>
-    <circle cx="22" cy="22" r="3.5" fill="#ff8a65"/>
-    <!-- 海星上的小斑点 -->
-    <circle cx="18" cy="12" r="1.2" fill="#ffccbc" opacity="0.6"/>
-    <circle cx="28" cy="20" r="1" fill="#ffccbc" opacity="0.6"/>
-    <circle cx="16" cy="26" r="1" fill="#ffccbc" opacity="0.6"/>
-  </svg>
-  <svg class="starfish" width="35" height="35" viewBox="0 0 35 35" style="right:28%; animation-delay:-2s; animation-duration:3.5s;">
-    <polygon points="18,0 22,11 33,11 24,18 27,30 18,24 9,30 12,18 3,11 14,11" fill="#ffcc80"/>
-    <circle cx="18" cy="17" r="2.5" fill="#ffb74d"/>
-  </svg>
-
-  <!-- ========== Hello Kitty 玩偶 × 6 ========== -->
-
-  <!--
-    Hello Kitty 标准特征:
-    - 椭圆头 (上窄下宽)
-    - 三角尖耳朵 + 粉色内耳
-    - 小椭圆黑眼睛 (分得很开)
-    - 黄色横椭圆鼻子
-    - 没有嘴巴!
-    - 每边 3 根胡须
-    - 蝴蝶结在右耳上 (画面左侧)
-    - 简单身体 + 小裙子
-  -->
-
-  <!-- Kitty #1: 坐在左边岩石上 (经典粉色) -->
-  <svg class="kitty-doll" width="60" height="70" viewBox="0 0 120 140" style="left:18%; bottom:102px;">
-    <!-- 头 -->
-    <ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/>
-    <!-- 左耳 (画面右侧) -->
-    <polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
-    <polygon points="89,30 98,4 73,20" fill="#f8bbd0"/>
-    <!-- 右耳 (画面左侧 - 蝴蝶结这边) -->
-    <polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
-    <polygon points="31,30 22,4 47,20" fill="#f8bbd0"/>
-    <!-- 蝴蝶结 (在右耳/画面左侧) -->
-    <ellipse cx="28" cy="22" rx="14" ry="9" fill="#f48fb1" transform="rotate(-15,28,22)"/>
-    <circle cx="28" cy="22" r="5" fill="#ec407a"/>
-    <!-- 眼睛 -->
-    <ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/>
-    <ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/>
-    <!-- 鼻子 -->
-    <ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/>
-    <!-- 胡须 -->
-    <line x1="30" y1="58" x2="45" y2="60" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="30" y1="64" x2="45" y2="63" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="30" y1="70" x2="45" y2="66" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="90" y1="58" x2="75" y2="60" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="90" y1="64" x2="75" y2="63" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="90" y1="70" x2="75" y2="66" stroke="#aaa" stroke-width="1.2"/>
-    <!-- 身体 -->
-    <ellipse cx="60" cy="110" rx="22" ry="18" fill="#fce4ec"/>
-    <!-- 裙子 -->
-    <path d="M38,110 Q40,130 60,132 Q80,130 82,110 Z" fill="#f48fb1"/>
-    <!-- 小脚 -->
-    <ellipse cx="50" cy="132" rx="6" ry="4" fill="#fff"/>
-    <ellipse cx="70" cy="132" rx="6" ry="4" fill="#fff"/>
-  </svg>
-
-  <!-- Kitty #2: 坐在右边岩石上 (紫色) -->
-  <svg class="kitty-doll" width="55" height="65" viewBox="0 0 120 140" style="right:16%; bottom:100px; animation-delay:-1s; animation-duration:4s;">
-    <ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/>
-    <polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
-    <polygon points="89,30 98,4 73,20" fill="#e1bee7"/>
-    <polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
-    <polygon points="31,30 22,4 47,20" fill="#e1bee7"/>
-    <ellipse cx="28" cy="22" rx="14" ry="9" fill="#ce93d8" transform="rotate(-15,28,22)"/>
-    <circle cx="28" cy="22" r="5" fill="#ab47bc"/>
-    <ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/>
-    <ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/>
-    <ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/>
-    <line x1="30" y1="58" x2="45" y2="60" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="30" y1="64" x2="45" y2="63" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="30" y1="70" x2="45" y2="66" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="90" y1="58" x2="75" y2="60" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="90" y1="64" x2="75" y2="63" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="90" y1="70" x2="75" y2="66" stroke="#aaa" stroke-width="1.2"/>
-    <ellipse cx="60" cy="110" rx="22" ry="18" fill="#ede7f6"/>
-    <path d="M38,110 Q40,130 60,132 Q80,130 82,110 Z" fill="#ce93d8"/>
-    <ellipse cx="50" cy="132" rx="6" ry="4" fill="#fff"/>
-    <ellipse cx="70" cy="132" rx="6" ry="4" fill="#fff"/>
-  </svg>
-
-  <!-- Kitty #3: 中间偏左沙地上 (黄色) -->
-  <svg class="kitty-doll" width="50" height="60" viewBox="0 0 120 140" style="left:35%; bottom:85px; animation-delay:-2.2s; animation-duration:3.8s;">
-    <ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/>
-    <polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
-    <polygon points="89,30 98,4 73,20" fill="#fff9c4"/>
-    <polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
-    <polygon points="31,30 22,4 47,20" fill="#fff9c4"/>
-    <ellipse cx="28" cy="22" rx="14" ry="9" fill="#fff176" transform="rotate(-15,28,22)"/>
-    <circle cx="28" cy="22" r="5" fill="#fdd835"/>
-    <ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/>
-    <ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/>
-    <ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/>
-    <line x1="30" y1="58" x2="45" y2="60" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="30" y1="64" x2="45" y2="63" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="30" y1="70" x2="45" y2="66" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="90" y1="58" x2="75" y2="60" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="90" y1="64" x2="75" y2="63" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="90" y1="70" x2="75" y2="66" stroke="#aaa" stroke-width="1.2"/>
-    <ellipse cx="60" cy="110" rx="22" ry="18" fill="#fffde7"/>
-    <path d="M38,110 Q40,130 60,132 Q80,130 82,110 Z" fill="#fff176"/>
-    <ellipse cx="50" cy="132" rx="6" ry="4" fill="#fff"/>
-    <ellipse cx="70" cy="132" rx="6" ry="4" fill="#fff"/>
-  </svg>
-
-  <!-- Kitty #4: 右边沙地上 (浅蓝) -->
-  <svg class="kitty-doll" width="48" height="58" viewBox="0 0 120 140" style="right:32%; bottom:85px; animation-delay:-0.8s; animation-duration:4.2s;">
-    <ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/>
-    <polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
-    <polygon points="89,30 98,4 73,20" fill="#bbdefb"/>
-    <polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
-    <polygon points="31,30 22,4 47,20" fill="#bbdefb"/>
-    <ellipse cx="28" cy="22" rx="14" ry="9" fill="#90caf9" transform="rotate(-15,28,22)"/>
-    <circle cx="28" cy="22" r="5" fill="#42a5f5"/>
-    <ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/>
-    <ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/>
-    <ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/>
-    <line x1="30" y1="58" x2="45" y2="60" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="30" y1="64" x2="45" y2="63" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="30" y1="70" x2="45" y2="66" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="90" y1="58" x2="75" y2="60" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="90" y1="64" x2="75" y2="63" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="90" y1="70" x2="75" y2="66" stroke="#aaa" stroke-width="1.2"/>
-    <ellipse cx="60" cy="110" rx="22" ry="18" fill="#e3f2fd"/>
-    <path d="M38,110 Q40,130 60,132 Q80,130 82,110 Z" fill="#90caf9"/>
-    <ellipse cx="50" cy="132" rx="6" ry="4" fill="#fff"/>
-    <ellipse cx="70" cy="132" rx="6" ry="4" fill="#fff"/>
-  </svg>
-
-  <!-- Kitty #5: 站在中间岩石上 (薄荷绿) -->
-  <svg class="kitty-doll" width="45" height="55" viewBox="0 0 120 140" style="left:48%; bottom:95px; animation-delay:-3s; animation-duration:3.3s;">
-    <ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/>
-    <polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
-    <polygon points="89,30 98,4 73,20" fill="#c8e6c9"/>
-    <polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
-    <polygon points="31,30 22,4 47,20" fill="#c8e6c9"/>
-    <ellipse cx="28" cy="22" rx="14" ry="9" fill="#a5d6a7" transform="rotate(-15,28,22)"/>
-    <circle cx="28" cy="22" r="5" fill="#66bb6a"/>
-    <ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/>
-    <ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/>
-    <ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/>
-    <line x1="30" y1="58" x2="45" y2="60" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="30" y1="64" x2="45" y2="63" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="30" y1="70" x2="45" y2="66" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="90" y1="58" x2="75" y2="60" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="90" y1="64" x2="75" y2="63" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="90" y1="70" x2="75" y2="66" stroke="#aaa" stroke-width="1.2"/>
-    <ellipse cx="60" cy="110" rx="22" ry="18" fill="#e8f5e9"/>
-    <path d="M38,110 Q40,130 60,132 Q80,130 82,110 Z" fill="#a5d6a7"/>
-    <ellipse cx="50" cy="132" rx="6" ry="4" fill="#fff"/>
-    <ellipse cx="70" cy="132" rx="6" ry="4" fill="#fff"/>
-  </svg>
-
-  <!-- Kitty #6: 躲在左边海草后面 (水蜜桃色) -->
-  <svg class="kitty-doll" width="42" height="52" viewBox="0 0 120 140" style="left:8%; bottom:88px; animation-delay:-1.8s; animation-duration:4.5s;">
-    <ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/>
-    <polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
-    <polygon points="89,30 98,4 73,20" fill="#ffccbc"/>
-    <polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/>
-    <polygon points="31,30 22,4 47,20" fill="#ffccbc"/>
-    <ellipse cx="28" cy="22" rx="14" ry="9" fill="#ffab91" transform="rotate(-15,28,22)"/>
-    <circle cx="28" cy="22" r="5" fill="#ff7043"/>
-    <ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/>
-    <ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/>
-    <ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/>
-    <line x1="30" y1="58" x2="45" y2="60" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="30" y1="64" x2="45" y2="63" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="30" y1="70" x2="45" y2="66" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="90" y1="58" x2="75" y2="60" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="90" y1="64" x2="75" y2="63" stroke="#aaa" stroke-width="1.2"/>
-    <line x1="90" y1="70" x2="75" y2="66" stroke="#aaa" stroke-width="1.2"/>
-    <ellipse cx="60" cy="110" rx="22" ry="18" fill="#fbe9e7"/>
-    <path d="M38,110 Q40,130 60,132 Q80,130 82,110 Z" fill="#ffab91"/>
-    <ellipse cx="50" cy="132" rx="6" ry="4" fill="#fff"/>
-    <ellipse cx="70" cy="132" rx="6" ry="4" fill="#fff"/>
-  </svg>
-
-  <!-- ========== 爱心 & 泡泡 ========== -->
-  <span class="heart-float" style="left:5%;  animation-duration:8s;  animation-delay:0s;">💕</span>
-  <span class="heart-float" style="left:18%; animation-duration:9s;  animation-delay:2s;">💖</span>
-  <span class="heart-float" style="left:35%; animation-duration:7s;  animation-delay:4s;">💗</span>
-  <span class="heart-float" style="left:55%; animation-duration:10s; animation-delay:1s;">💕</span>
-  <span class="heart-float" style="left:72%; animation-duration:8.5s;animation-delay:3s;">💖</span>
-  <span class="heart-float" style="left:85%; animation-duration:9.5s;animation-delay:5s;">💗</span>
-  <span class="heart-float" style="left:90%; animation-duration:7.5s;animation-delay:0.5s;">💝</span>
-  <span class="heart-float" style="left:12%; animation-duration:11s; animation-delay:6s;">💕</span>
-
-  <span class="heart-float" style="left:25%; animation-duration:6s;  animation-delay:1.5s;">🫧</span>
-  <span class="heart-float" style="left:48%; animation-duration:7s;  animation-delay:3.5s; font-size:18px;">🫧</span>
-  <span class="heart-float" style="left:65%; animation-duration:8s;  animation-delay:2.5s; font-size:20px;">🫧</span>
-  <span class="heart-float" style="left:80%; animation-duration:6.5s;animation-delay:4.5s;">🫧</span>
-  <span class="heart-float" style="left:40%; animation-duration:9s;  animation-delay:5.5s; font-size:22px;">🫧</span>
-</div>
-
-<!-- ====== 两侧图片 ====== -->
-<img class="side-img left"  src="fish-img.jpg" alt="">
+<div class="marquee-bar"><div class="marquee-inner" id="marqueeInner"></div></div>
+<div class="scene" id="sceneBg"></div>
+<img class="side-img left" src="fish-img.jpg" alt="" id="sideImgLeft" title="点我">
 <img class="side-img right" src="fish-img.jpg" alt="">
 
-<!-- ====== 主内容 ====== -->
-<div class="container">
+<div class="trail-container" id="trailContainer"></div>
+<div class="fish-wrapper" id="fishWrapper" title="点我！"><div class="fish-float" id="mainFishSvg"></div></div>
 
-  <!-- 对话框 -->
+<div class="main-page" id="mainPage">
   <div class="speech-text" id="speechText">我是傻鱼 🐟</div>
-
-  <!-- 鱼 -->
-  <div class="fish-wrapper" id="fishWrapper" title="点我！">
-    <div class="fish-float">
-      <svg width="240" height="180" viewBox="0 0 240 180">
-        <defs>
-          <radialGradient id="fishGrad" cx="40%" cy="35%">
-            <stop offset="0%" stop-color="#ffccd5"/>
-            <stop offset="50%" stop-color="#ffb3ba"/>
-            <stop offset="100%" stop-color="#ff8a80"/>
-          </radialGradient>
-          <radialGradient id="bellyGrad" cx="50%" cy="40%">
-            <stop offset="0%" stop-color="#fff5f5"/>
-            <stop offset="100%" stop-color="#ffe0e0"/>
-          </radialGradient>
-        </defs>
-
-        <!-- 水光 -->
-        <ellipse cx="120" cy="90" rx="85" ry="65" fill="rgba(255,255,255,0.12)"/>
-
-        <!-- 尾巴 -->
-        <g transform="translate(15, 80)">
-          <path d="M0,10 Q-25,-30 -12,-50 Q-5,-40 5,-30 Q10,-20 12,-5 Q18,-35 30,-55 Q35,-40 28,-20 Q30,-10 20,0 Q30,10 28,25 Q35,45 30,60 Q18,40 12,10 Q10,25 5,35 Q-5,45 -12,55 Q-25,35 0,15 Z" fill="#ffb3ba"/>
-          <path d="M0,10 Q-18,-20 -8,-40 Q-2,-30 3,-20 Q8,-10 10,0 Q10,-25 20,-40 Q24,-28 20,-12 Q22,-5 15,2 Q24,8 22,20 Q28,35 24,45 Q14,30 10,10 Q6,20 2,28 Q-2,38 -8,45 Q-18,28 0,15 Z" fill="#ff8a80" opacity="0.45"/>
-        </g>
-
-        <!-- 背鳍 -->
-        <path d="M120,30 Q130,8 145,18 Q140,28 148,35 Q138,38 130,35" fill="#ffb3ba" opacity="0.65"/>
-
-        <!-- 腹鳍 -->
-        <path d="M90,130 Q100,152 115,148 Q110,140 118,135 Q108,133 100,130" fill="#ffb3ba" opacity="0.55"/>
-
-        <!-- 鱼身 -->
-        <ellipse cx="120" cy="90" rx="75" ry="55" fill="url(#fishGrad)"/>
-
-        <!-- 鱼肚 -->
-        <ellipse cx="130" cy="100" rx="45" ry="32" fill="url(#bellyGrad)" opacity="0.75"/>
-
-        <!-- 腮红 -->
-        <ellipse cx="82" cy="75" rx="14" ry="10" fill="#ff8a80" opacity="0.32"/>
-        <ellipse cx="82" cy="105" rx="12" ry="8" fill="#ff8a80" opacity="0.28"/>
-
-        <!-- 大呆萌眼睛 -->
-        <!-- 左眼 -->
-        <circle cx="148" cy="68" r="19" fill="white" stroke="#e0e0e0" stroke-width="1.5"/>
-        <circle cx="152" cy="66" r="12" fill="#444"/>
-        <circle cx="156" cy="62" r="4.5" fill="white"/>
-        <circle cx="148" cy="70" r="1.8" fill="white"/>
-
-        <!-- 右眼 -->
-        <circle cx="148" cy="108" r="17" fill="white" stroke="#e0e0e0" stroke-width="1.5"/>
-        <circle cx="151" cy="106" r="11" fill="#444"/>
-        <circle cx="155" cy="102" r="4" fill="white"/>
-        <circle cx="146" cy="110" r="1.5" fill="white"/>
-
-        <!-- 小嘴 -->
-        <ellipse cx="175" cy="90" rx="5" ry="3.5" fill="#e57373" opacity="0.8"/>
-        <path d="M178,92 Q180,95 177,96" fill="none" stroke="#e57373" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
-
-        <!-- 头上的小花 -->
-        <g transform="translate(115, 28)">
-          <circle cx="0" cy="0" r="8" fill="#fff176"/>
-          <circle cx="-7" cy="-5" r="7" fill="#ffeb3b"/>
-          <circle cx="7" cy="-5" r="7" fill="#fff176"/>
-          <circle cx="-7" cy="5" r="7" fill="#fff176"/>
-          <circle cx="7" cy="5" r="7" fill="#ffeb3b"/>
-          <circle cx="0" cy="0" r="5" fill="#fff9c4"/>
-          <circle cx="0" cy="0" r="3" fill="#ffcc80"/>
-        </g>
-      </svg>
-    </div>
-  </div>
-
   <p class="hint">✧ 点一下这条呆鱼 ✧</p>
   <span class="ribbon-tag">🐟 小鱼</span>
   <p class="counter" id="counter"></p>
+  <p class="clock" id="clock"></p>
+  <p class="counter" id="affectionBar" style="background:rgba(244,143,177,0.45)">💖 好感度 0</p>
+  <p class="counter" id="syncBadge" style="background:rgba(129,199,132,0.4);font-size:12px;padding:3px 12px">🔄 数据加载中...</p>
+  <div class="main-btns">
+    <button class="btn-album" onclick="openAlbum()">📖 图鉴</button>
+    <button class="btn-album" id="feedBtn" onclick="feedFish()">🍥 喂食</button>
+  </div>
+  <div class="game-entry">
+    <button class="entry-btn" onclick="enterGame('tictactoe')">🎮 井字棋</button>
+    <button class="entry-btn" onclick="enterGame('gomoku')">♟️ 五子棋</button>
+  </div>
+</div>
+
+<div class="game-overlay" id="gameOverlay">
+  <div class="game-panel" id="gamePanel">
+    <button class="btn-back" onclick="quitGame()">✕</button>
+    <div class="game-title" id="gameTitle"></div>
+    <div class="game-board" id="gameBoard"></div>
+    <div class="game-status" id="gameStatus"></div>
+    <div class="fish-jumpin" id="fishJumpin"></div>
+    <div class="result-btns" id="resultBtns" style="display:none">
+      <button class="btn-retry" onclick="rematch()">💪 我不服！</button>
+      <button class="btn-quit" onclick="admitLose()">🥺 我承认我是傻鱼</button>
+    </div>
+  </div>
+</div>
+
+<div class="gacha-overlay" id="gachaOverlay">
+  <div class="gacha-card" id="gachaCard">
+    <div class="gacha-title" id="gachaTitle">🎣 今日抽鱼</div>
+    <div class="gacha-fish-img" id="gachaFishImg"></div>
+    <div class="gacha-rarity" id="gachaRarity"></div>
+    <div class="gacha-fish-name" id="gachaFishName"></div>
+    <button class="gacha-close" onclick="collectGacha()">🎒 收下！</button>
+  </div>
+</div>
+
+<div class="album-overlay" id="albumOverlay">
+  <div class="album-panel">
+    <button class="btn-back" onclick="closeAlbum()">✕</button>
+    <div class="album-title">📖 鱼鱼图鉴</div>
+    <div class="album-stats" id="albumStats"></div>
+    <div class="album-tabs" id="albumTabs"></div>
+    <div class="album-grid" id="albumGrid"></div>
+  </div>
+</div>
+
+<div class="days-overlay" id="daysOverlay">
+  <div class="days-card">
+    <div class="days-emoji">💕</div>
+    <div class="days-text">这个网站已经陪伴鱼姐</div>
+    <div class="days-num" id="daysNum"></div>
+    <div class="days-text">天</div>
+    <button class="days-close" onclick="closeDays()">💖 一直陪伴</button>
+  </div>
+</div>
+
+<div class="days-overlay" id="easterOverlay">
+  <div class="days-card">
+    <div class="days-emoji" id="easterEmoji">😌</div>
+    <div class="days-text" id="easterMsg"></div>
+    <div class="days-num" id="easterNum" style="font-size:36px"></div>
+    <div class="days-text" id="easterHint">🌿 休息一下眼睛，活动活动肩膀～</div>
+    <button class="days-close" id="easterCloseBtn" onclick="closeEaster()">☕ 好的，休息一下</button>
+  </div>
+</div>
+
+<div class="days-overlay" id="feedOverlay">
+  <div class="days-card" id="feedCard">
+    <div class="days-emoji" id="feedEmoji"></div>
+    <div class="days-text" id="feedMsg"></div>
+    <div class="days-num" style="font-size:28px" id="feedDetail"></div>
+    <button class="days-close" onclick="closeFeed()">🐟 好的～</button>
+  </div>
 </div>
 
 <script>
-  const fishWrapper = document.getElementById('fishWrapper');
-  const speechText = document.getElementById('speechText');
-  const counterEl = document.getElementById('counter');
-  let clickCount = 0;
-  let textTimer = null;
+// ========== 数据存储（Supabase + localStorage 双写互通） ==========
+const SB_URL = 'https://xgdzfxwzqocbtlomcisp.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnZHpmeHd6cW9jYnRsb21jaXNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxNDUzMTcsImV4cCI6MjEwMDcyMTMxN30.IK6AExsyPMnZ2VYjmZNxcJj04BqTRdUVTBcMXbWRdNc';
+const SB_HEAD = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' };
+const LS_STATE_KEY = 'fish_state';
+const LS_UNLOCKED_KEY = 'fish_unlocked';
+const LS_SYNC_KEY = 'fish_last_sync';
 
-  fishWrapper.addEventListener('click', () => {
-    clickCount++;
+let STATE = {};
+let UNLOCKED = [];
+let useSupabase = true;
 
-    speechText.textContent = '我是傻鱼 🐟';
-    counterEl.textContent = `这条呆鱼已经说了 ${clickCount} 次 "我是傻鱼"～`;
+// localStorage helpers
+function lsGet(key) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : null; } catch(e) { return null; } }
+function lsSet(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {} }
+function lsMerge(key, updates) { try { const cur = lsGet(key) || {}; Object.assign(cur, updates); lsSet(key, cur); } catch(e) {} }
+function markSynced() { lsSet(LS_SYNC_KEY, new Date().toISOString()); }
+function getLastSync() { const v = lsGet(LS_SYNC_KEY); return v ? new Date(v).toLocaleString('zh-CN') : '未知'; }
 
-    // 每次点击都触发抖动（先移除再添加以重播动画）
-    speechText.classList.remove('shake');
-    void speechText.offsetWidth; // 强制回流重播动画
-    speechText.classList.add('shake');
+async function loadState() {
+  let fromCloud = false;
+  try {
+    const r = await fetch(`${SB_URL}/shared_state?id=eq.1`, { headers: { ...SB_HEAD, 'Accept': 'application/json' } });
+    if (r.ok) {
+      const d = await r.json();
+      if (d && d[0] && Object.keys(d[0]).length > 1) {
+        STATE = d[0];
+        lsSet(LS_STATE_KEY, STATE);
+        fromCloud = true;
+      }
+    }
+  } catch(e) { console.log('☁️ 云端加载失败，使用本地缓存'); }
+  if (!fromCloud) {
+    STATE = lsGet(LS_STATE_KEY) || {};
+    if (Object.keys(STATE).length > 0) useSupabase = false;
+  }
+}
 
-    speechText.classList.add('show');
-    clearTimeout(textTimer);
-    textTimer = setTimeout(() => {
-      speechText.classList.remove('show');
-    }, 1500);
+async function saveState(updates) {
+  Object.assign(STATE, updates);
+  lsMerge(LS_STATE_KEY, updates);
+  if (useSupabase) {
+    await fetch(`${SB_URL}/shared_state?id=eq.1`, {
+      method: 'PATCH', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' }, body: JSON.stringify(updates)
+    }).catch(() => {});
+  }
+  markSynced();
+}
 
-    // 鱼弹跳
-    fishWrapper.style.transform = 'scale(0.82)';
+async function loadUnlocked() {
+  let fromCloud = false;
+  try {
+    const r = await fetch(`${SB_URL}/unlocked_fish?select=*`, { headers: { ...SB_HEAD, 'Accept': 'application/json' } });
+    if (r.ok) {
+      const d = await r.json();
+      if (d && d.length > 0) {
+        UNLOCKED = d;
+        lsSet(LS_UNLOCKED_KEY, UNLOCKED);
+        fromCloud = true;
+      }
+    }
+  } catch(e) { console.log('☁️ 图鉴加载失败，使用本地缓存'); }
+  if (!fromCloud) {
+    UNLOCKED = lsGet(LS_UNLOCKED_KEY) || [];
+  }
+}
+
+async function addUnlocked(fishId) {
+  // 先更新内存
+  const ex = UNLOCKED.find(f => f.fish_id === fishId);
+  if (ex) {
+    ex.count = (ex.count || 1) + 1;
+  } else {
+    UNLOCKED.push({ fish_id: fishId, count: 1 });
+  }
+  // 写入本地
+  lsSet(LS_UNLOCKED_KEY, UNLOCKED);
+  markSynced();
+  // 同步云端
+  if (useSupabase) {
+    try {
+      if (ex) {
+        await fetch(`${SB_URL}/unlocked_fish?fish_id=eq.${encodeURIComponent(fishId)}`, {
+          method: 'PATCH', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ count: ex.count })
+        });
+      } else {
+        await fetch(`${SB_URL}/unlocked_fish`, {
+          method: 'POST', headers: { ...SB_HEAD, 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ fish_id: fishId, count: 1 })
+        });
+      }
+    } catch(e) {}
+  }
+}
+
+async function switchDisplayFish(fishId) {
+  await saveState({ display_fish_id: fishId });
+}
+
+function getToday() { return new Date().toISOString().split('T')[0]; }
+
+// ========== 鱼数据 ==========
+const RARITY = ['普通','优良','稀有','史诗','传说','隐藏','限量','终极'];
+const R_COLORS = ['#bdbdbd','#81c784','#64b5f6','#ce93d8','#ffb74d','#ef5350','#f48fb1','#e91e63'];
+const R_PROB = [0.5, 0.45, 0.4, 0.33, 0.2, 0.1, 0.06, 0.03];
+const R_COUNTS = [75, 30, 20, 15, 10, 10, 5, 1];
+const ADJ = {
+  0:['小','胖','圆','红','粉','橙','黄','绿','青','蓝','紫','白','灰','花','软','呆','萌','乖','笨','懒','馋','乐','跳','游','睡','甜','香','热','温','凉','快','慢','轻','重','长','短','厚','薄','光','暗','闪','水','火','泥','沙','石','草','树','花','云','雨','雪','风','日','月','星','海','河','湖','溪','泉','泡','波','浪','潮','涌','飘','浮','沉'],
+  1:['锦','琉','珊','瑚','珍','珠','宝','翡','翠','钻','晶','莹','碧','澈','清','明','亮','耀','辉','灿','绚','丽','华','美','雅','秀','俊','俏','灵','巧'],
+  2:['幻','玄','秘','奇','仙','神','龙','凤','麟','鲲','鹏','鹤','鸾','鲸','鲨','豚','鳗','鳐','鲷','鲑'],
+  3:['天','地','玄','黄','宇','宙','洪','荒','太','极','乾','坤','混','沌','鸿','蒙','苍','穹','星','辰'],
+  4:['圣','尊','帝','皇','霸','王','神','鬼','魔','妖'],
+  5:['幽','冥','影','暗','幻','魅','灵','魂','虚','空'],
+  6:['绝','独','特','典','限','藏','御','赐','尊','贵']
+};
+const NOUN = {
+  0:['鱼','鲤','鲫','鲢','鳅','鲶','鳊','鲈','鳜','鳕','鳗','鲷','鲑','鳟','鲀','豚','鲸','鲨','鳐','鲲','泡','珠','玉','宝','贝','晶','钻','石','星','月','日','云','花','草','叶','果','糖','饼','包','丸','球','点','斑','纹','条','线','圈','环','波','浪','涛','潮','汐','流','溪','泉','露','霜','雪','霓','虹','彩','霞','曦','辉','光','影','梦','幻','仙'],
+  1:['锦鳞','琉尾','瑚鳍','珠光','宝气','翡翠','钻鳞','晶莹','碧波','澈影','明辉','亮星','耀斑','彩鳞','绚丽','华锦','美玉','秀颀','俊逸','俏丽','灵眸','巧鳍','珊瑚','玉鳞','金鳍','银尾','丹顶','墨斑','雪鳞'],
+  2:['幻鳞','玄尾','秘鳍','奇斑','仙鳞','神尾','龙鳞','凤鳍','麟斑','鲲尾','鹏鳍','鹤鳞','鸾尾','鲸影','鲨齿','豚跃','鳗舞','鳐翼','鲷纹','鲑霞'],
+  3:['天鳞','地尾','玄鳍','黄斑','宇鳞','宙尾','洪荒','太极','乾坤','混沌','鸿蒙','苍穹','星辰','日月','金乌','玉兔','青龙','白虎','朱雀','玄武'],
+  4:['圣鳞','尊尾','帝鳍','皇斑','霸鳞','王尾','神鳞','鬼鳍','魔斑','妖鳞'],
+  5:['幽鳞','冥尾','影鳍','暗斑','幻鳞','魅尾','灵鳍','魂斑','虚鳞','空尾'],
+  6:['绝鳞','独尾','特鳍','典斑','限鳞','藏尾','御鳍','赐斑','尊鳞','贵尾']
+};
+const BODY_HUES = {
+  0:[0,15,25,30,35,40,45,50,55,60,180,200,210,340,350],
+  1:[160,170,190,220,240,260,280,300,320,10],
+  2:[250,270,290,310,330,130,150,80,100,120],
+  3:[35,45,55,280,300,320,20,140,160,200],
+  4:[25,40,50,60,300,320,340,10,200,220],
+  5:[270,290,310,330,350,130,150,170,190,210],
+  6:[0,15,30,45,55,180,270,300,340,20],
+  7:[330]
+};
+
+function genFishName(rarity, idx) {
+  if (rarity === 7) return '小雯大王';
+  const a = ADJ[rarity][idx % ADJ[rarity].length];
+  const n = NOUN[rarity][idx % NOUN[rarity].length];
+  if (rarity === 0) {
+    const a2 = ADJ[0][Math.floor(idx * 7 + 3) % ADJ[0].length];
+    return a !== a2 ? a + a2 + n : a + '小' + n;
+  }
+  return a + n;
+}
+function genFishHue(rarity, idx) { return BODY_HUES[rarity][idx % BODY_HUES[rarity].length]; }
+function genAccessory(rarity, idx) {
+  const acc = {
+    0:['','','','','','🌸','🎀','⭐','','','','','💧','','','','','🍀','','',''],
+    1:['🌸','🎀','⭐','💎','🌺','💧','🍀','🌿','💫','✨'],
+    2:['👑','💎','🌟','✨','🌙','☀️','💫','🔮','🎪','💍'],
+    3:['👑','🌟','💎','🔮','⚡','🔥','🌈','💫','✨','🌙'],
+    4:['👑','⚡','🔥','🌈','🌟','💎','🔮','✨','💫','☀️'],
+    5:['👑','🔮','⚡','🌙','💀','🎭','👻','🖤','💫','✨'],
+    6:['👑','💎','🌟','⚡','🔥','🌈','🔮','✨','💫','🏆'],
+    7:['👑']
+  };
+  return acc[rarity][idx % acc[rarity].length];
+}
+
+let ALL_FISH = [];
+function buildAllFish() {
+  ALL_FISH = [];
+  for (let r = 0; r < R_COUNTS.length; r++) {
+    for (let i = 0; i < R_COUNTS[r]; i++) {
+      ALL_FISH.push({ id: `r${r}-${i}`, name: genFishName(r, i), rarity: r, hue: genFishHue(r, i), accessory: genAccessory(r, i), idx: i });
+    }
+  }
+}
+buildAllFish();
+
+function renderFishSVG(fish, w, h) {
+  const hue = fish.hue || 10;
+  const body = `hsl(${hue},70%,72%)`, bodyD = `hsl(${hue},70%,58%)`, belly = `hsl(${hue},60%,88%)`, fin = `hsl(${hue},60%,65%)`;
+  const vw = w || 240, vh = h || 180;
+  const acc = fish.accessory || '';
+  return `<svg width="${vw}" height="${vh}" viewBox="0 0 240 180">
+    <defs><radialGradient id="fg_${fish.id}" cx="40%" cy="35%"><stop offset="0%" stop-color="${body}"/><stop offset="100%" stop-color="${bodyD}"/></radialGradient></defs>
+    <ellipse cx="120" cy="90" rx="85" ry="65" fill="rgba(255,255,255,.1)"/>
+    <g transform="translate(15,80)"><path d="M0,10 Q-25,-30 -12,-50 Q-5,-40 5,-30 Q10,-20 12,-5 Q18,-35 30,-55 Q35,-40 28,-20 Q30,-10 20,0 Q30,10 28,25 Q35,45 30,60 Q18,40 12,10 Q10,25 5,35 Q-5,45 -12,55 Q-25,35 0,15 Z" fill="${fin}"/></g>
+    <path d="M120,30 Q130,8 145,18 Q140,28 148,35 Q138,38 130,35" fill="${fin}" opacity=".65"/>
+    <path d="M90,130 Q100,152 115,148 Q110,140 118,135 Q108,133 100,130" fill="${fin}" opacity=".55"/>
+    <ellipse cx="120" cy="90" rx="75" ry="55" fill="url(#fg_${fish.id})"/>
+    <ellipse cx="130" cy="100" rx="45" ry="32" fill="${belly}" opacity=".75"/>
+    <ellipse cx="82" cy="75" rx="14" ry="10" fill="${bodyD}" opacity=".3"/>
+    <ellipse cx="82" cy="105" rx="12" ry="8" fill="${bodyD}" opacity=".25"/>
+    <circle cx="148" cy="68" r="19" fill="white" stroke="#e0e0e0" stroke-width="1.5"/><circle cx="152" cy="66" r="12" fill="#444"/><circle cx="156" cy="62" r="4.5" fill="white"/><circle cx="148" cy="70" r="1.8" fill="white"/>
+    <circle cx="148" cy="108" r="17" fill="white" stroke="#e0e0e0" stroke-width="1.5"/><circle cx="151" cy="106" r="11" fill="#444"/><circle cx="155" cy="102" r="4" fill="white"/><circle cx="146" cy="110" r="1.5" fill="white"/>
+    <ellipse cx="175" cy="90" rx="5" ry="3.5" fill="${bodyD}" opacity=".8"/>
+    ${acc ? `<text x="108" y="32" font-size="24" text-anchor="middle">${acc}</text>` : ''}
+  </svg>`;
+}
+
+// ========== 鱼自由游动 ==========
+const fishWrapper = document.getElementById('fishWrapper');
+function getFishSize() {
+  const w = window.innerWidth;
+  if (w <= 480) return { w: 140, h: 105 };
+  if (w <= 768) return { w: 180, h: 135 };
+  return { w: 240, h: 180 };
+}
+let fishSize = getFishSize();
+
+function renderMainFish() {
+  const displayId = STATE.display_fish_id || '';
+  let fish = ALL_FISH[0];
+  if (displayId) { const found = ALL_FISH.find(f => f.id === displayId); if (found) fish = found; }
+  fishSize = getFishSize();
+  document.getElementById('mainFishSvg').innerHTML = renderFishSVG(fish, fishSize.w, fishSize.h);
+}
+
+let fishX = window.innerWidth / 2 - fishSize.w / 2;
+let fishY = window.innerHeight / 2 - fishSize.h / 2;
+let fishVX = (Math.random() - 0.5) * 2.5;
+let fishVY = (Math.random() - 0.5) * 2.5;
+let fishDir = 1;
+let fishAnimId = null;
+let fishPaused = false;
+let fishBouncing = false;
+
+function updateFishPos() {
+  if (fishPaused) { fishAnimId = requestAnimationFrame(updateFishPos); return; }
+  if (Math.random() < 0.008) { fishVX += (Math.random() - 0.5) * 1.2; fishVY += (Math.random() - 0.5) * 1.2; }
+  const speedScale = fishSize.w / 240;
+  const maxSpd = 3.5 * speedScale, minSpd = 0.3 * speedScale;
+  let spd = Math.sqrt(fishVX * fishVX + fishVY * fishVY);
+  if (spd < minSpd) { fishVX = (fishVX / spd) * minSpd + (Math.random() - 0.5) * 0.5; fishVY = (fishVY / spd) * minSpd + (Math.random() - 0.5) * 0.5; }
+  if (spd > maxSpd) { fishVX = (fishVX / spd) * maxSpd; fishVY = (fishVY / spd) * maxSpd; }
+  fishX += fishVX; fishY += fishVY;
+  const pad = 10, fw = fishSize.w, fh = fishSize.h;
+  if (fishX < pad) { fishX = pad; fishVX = Math.abs(fishVX); }
+  if (fishX > window.innerWidth - fw - pad) { fishX = window.innerWidth - fw - pad; fishVX = -Math.abs(fishVX); }
+  if (fishY < 50) { fishY = 50; fishVY = Math.abs(fishVY); }
+  if (fishY > window.innerHeight - fh - pad) { fishY = window.innerHeight - fh - pad; fishVY = -Math.abs(fishVY); }
+  const newDir = fishVX >= 0 ? 1 : -1;
+  if (newDir !== fishDir) { fishDir = newDir; }
+  fishWrapper.style.left = fishX + 'px';
+  fishWrapper.style.top = fishY + 'px';
+  if (!fishBouncing) { fishWrapper.style.transform = `scaleX(${fishDir})`; }
+  spawnTrail(fishX, fishY, fishDir);
+  fishAnimId = requestAnimationFrame(updateFishPos);
+}
+
+window.addEventListener('resize', () => {
+  fishSize = getFishSize();
+  fishX = Math.min(Math.max(fishX, 10), window.innerWidth - fishSize.w - 10);
+  fishY = Math.min(Math.max(fishY, 50), window.innerHeight - fishSize.h - 10);
+});
+
+// 立即设置初始位置
+fishWrapper.style.left = fishX + 'px';
+fishWrapper.style.top = fishY + 'px';
+updateFishPos();
+
+// ========== 拖尾 ==========
+const TRAIL_CONFIG = {
+  3: { perFrame: 2, life: 700, size: [3, 6], colors: ['#ce93d8', '#e1bee7', '#f3e5f5', '#ba68c8', '#fff'], shapes: ['circle'] },
+  4: { perFrame: 3, life: 850, size: [4, 8], colors: ['#ffb74d', '#ffe0b2', '#ffcc80', '#fff8e1', '#fff', '#ff9800'], shapes: ['circle', 'star'] },
+  5: { perFrame: 3, life: 950, size: [3, 7], colors: ['#ef5350', '#b71c1c', '#7b1fa2', '#4a148c', '#ffcdd2', '#fff'], shapes: ['circle', 'circle', 'star'] },
+  6: { perFrame: 5, life: 1100, size: [5, 10], colors: ['#f48fb1', '#ce93d8', '#81d4fa', '#fff176', '#ff8a80', '#a5d6a7', '#ffe082', '#ef9a9a'], shapes: ['circle', 'star', 'star', 'diamond'] },
+  7: { perFrame: 8, life: 1400, size: [6, 14], colors: ['#ff1744','#ff4081','#ff9100','#ffd600','#76ff03','#00e5ff','#d500f9','#fff','#ff80ab','#ffe57f','#b9f6ca','#80d8ff','#ea80fc'], shapes: ['circle', 'star', 'star', 'diamond', 'diamond', 'star'] }
+};
+
+function getDisplayFishRarity() {
+  const displayId = STATE.display_fish_id || '';
+  if (!displayId) return 0;
+  const found = ALL_FISH.find(f => f.id === displayId);
+  return found ? found.rarity : 0;
+}
+
+let trailTick = 0;
+function spawnTrail(fx, fy, dir) {
+  const rarity = getDisplayFishRarity();
+  if (rarity < 3) return;
+  const cfg = TRAIL_CONFIG[rarity];
+  if (!cfg) return;
+  trailTick++;
+  if (trailTick % Math.max(1, Math.floor(3 / cfg.perFrame)) !== 0) return;
+  const container = document.getElementById('trailContainer');
+  const tailX = dir === 1 ? fx + fishSize.w * 0.16 : fx + fishSize.w * 0.84;
+  const tailY = fy + fishSize.h / 2;
+  for (let i = 0; i < cfg.perFrame; i++) {
+    const p = document.createElement('div');
+    const size = cfg.size[0] + Math.random() * (cfg.size[1] - cfg.size[0]);
+    const color = cfg.colors[Math.floor(Math.random() * cfg.colors.length)];
+    const shape = cfg.shapes[Math.floor(Math.random() * cfg.shapes.length)];
+    const ox = (Math.random() - 0.5) * 40, oy = (Math.random() - 0.5) * 40;
+    p.style.cssText = `position:fixed;pointer-events:none;left:${tailX+ox}px;top:${tailY+oy}px;width:${size}px;height:${size}px;background:${color};z-index:4;`;
+    if (shape === 'circle') { p.style.borderRadius = '50%'; }
+    else if (shape === 'star') { p.style.borderRadius = '50%'; p.style.boxShadow = `0 0 ${size*2}px ${color}`; }
+    else if (shape === 'diamond') { p.style.borderRadius = '2px'; p.style.transform = 'rotate(45deg)'; p.style.boxShadow = `0 0 ${size*3}px ${color}`; }
+    const anim = p.animate([
+      { opacity: 0.9, transform: p.style.transform + ' translate(0,0) scale(1)' },
+      { opacity: 0, transform: p.style.transform + ` translate(${ox*2}px,${oy*2-20}px) scale(0)` }
+    ], { duration: cfg.life, easing: 'ease-out' });
+    container.appendChild(p);
+    anim.onfinish = () => p.remove();
+    setTimeout(() => { if (p.parentNode) p.remove(); }, cfg.life + 100);
+  }
+}
+
+// ========== 主页逻辑 ==========
+const speechText = document.getElementById('speechText');
+const counterEl = document.getElementById('counter');
+const clockEl = document.getElementById('clock');
+
+function updateClock() {
+  const n = new Date();
+  clockEl.textContent = n.toLocaleString('zh-CN', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false });
+}
+updateClock(); setInterval(updateClock, 1000);
+
+function playBubbleSound() {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const o = ctx.createOscillator(), g = ctx.createGain();
+  o.connect(g); g.connect(ctx.destination); o.type = 'sine';
+  o.frequency.setValueAtTime(600, ctx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + .15);
+  g.gain.setValueAtTime(.3, ctx.currentTime);
+  g.gain.exponentialRampToValueAtTime(.01, ctx.currentTime + .2);
+  o.start(ctx.currentTime); o.stop(ctx.currentTime + .2);
+}
+
+let textTimer = null;
+function fishSay(msg) {
+  speechText.textContent = msg;
+  speechText.classList.remove('shake'); void speechText.offsetWidth;
+  speechText.classList.add('shake'); speechText.classList.add('show');
+  clearTimeout(textTimer);
+  textTimer = setTimeout(() => { speechText.classList.remove('show'); }, 2000);
+}
+
+fishWrapper.addEventListener('click', async (e) => {
+  e.stopPropagation();
+  playBubbleSound();
+  STATE.click_count = (STATE.click_count || 0) + 1;
+  counterEl.textContent = `这条呆鱼一共说了 ${STATE.click_count} 次 "我是傻鱼"～`;
+  await saveState({ click_count: STATE.click_count });
+
+  speechText.textContent = '我是傻鱼 🐟';
+  speechText.classList.remove('shake'); void speechText.offsetWidth; speechText.classList.add('shake');
+  speechText.classList.add('show');
+  clearTimeout(textTimer);
+  textTimer = setTimeout(() => { speechText.classList.remove('show'); }, 1500);
+
+  fishBouncing = true;
+  const curScale = `scaleX(${fishDir})`;
+  fishWrapper.style.transform = curScale + ' scale(0.82)';
+  setTimeout(() => { fishWrapper.style.transform = curScale + ' scale(1.08)';
+    setTimeout(() => { fishWrapper.style.transform = curScale; fishBouncing = false; }, 180);
+  }, 100);
+
+  // 彩蛋：50倍数
+  if (STATE.click_count % 50 === 0) {
     setTimeout(() => {
-      fishWrapper.style.transform = 'scale(1.08)';
-      setTimeout(() => {
-        fishWrapper.style.transform = '';
-      }, 180);
-    }, 100);
-  });
-</script>
+      window._bonusDraw = false;
+      document.getElementById('easterEmoji').textContent = '😌';
+      document.getElementById('easterNum').textContent = `你或别人已经点了 ${STATE.click_count} 次鱼！`;
+      document.getElementById('easterMsg').innerHTML = '🐟 鱼鱼提醒你：<br>已经戳了好多下啦～';
+      document.getElementById('easterHint').textContent = '🌿 休息一下眼睛，活动活动肩膀～';
+      document.getElementById('easterCloseBtn').textContent = '☕ 好的，休息一下';
+      document.getElementById('easterOverlay').classList.add('active');
+    }, 600);
+  }
+});
 
+// ========== 游戏 ==========
+const gameOverlay = document.getElementById('gameOverlay'), gameBoard = document.getElementById('gameBoard');
+const gameStatus = document.getElementById('gameStatus'), gameTitle = document.getElementById('gameTitle');
+const fishJumpin = document.getElementById('fishJumpin'), resultBtns = document.getElementById('resultBtns');
+const mainPage = document.getElementById('mainPage');
+let currentGame = 'tictactoe', gboard = [], gOver = false;
+
+function enterGame(game) {
+  currentGame = game; mainPage.classList.add('hidden'); gameOverlay.classList.add('active');
+  fishJumpin.classList.remove('show'); resultBtns.style.display = 'none'; resultBtns.classList.remove('show-btns'); gOver = false;
+  fishPaused = true; fishWrapper.style.opacity = '0';
+  if (game === 'tictactoe') initTTT(); else initGomoku();
+}
+function quitGame() { gameOverlay.classList.remove('active'); mainPage.classList.remove('hidden'); fishPaused = false; fishWrapper.style.opacity = '1'; }
+function rematch() { fishJumpin.classList.remove('show'); resultBtns.style.display = 'none'; resultBtns.classList.remove('show-btns'); gOver = false; if (currentGame === 'tictactoe') initTTT(); else initGomoku(); }
+function admitLose() { gameOverlay.classList.remove('active'); mainPage.classList.remove('hidden'); fishPaused = false; fishWrapper.style.opacity = '1'; setTimeout(() => fishSay('我是傻鱼 🐟'), 400); }
+
+function initTTT() {
+  gboard = Array(9).fill(''); gOver = false; gameTitle.textContent = '🎮 井字棋'; gameStatus.textContent = '轮到你了 ✨';
+  gameBoard.style.gridTemplateColumns = 'repeat(3, 1fr)'; gameBoard.innerHTML = '';
+  for (let i = 0; i < 9; i++) { const c = document.createElement('button'); c.className = 'gcell'; c.onclick = () => tttClick(i); gameBoard.appendChild(c); }
+}
+function tttClick(i) {
+  if (gboard[i] || gOver) return; gboard[i] = 'X'; renderGBoard();
+  if (tttWin('X')) { gOver = true; gameStatus.textContent = '你赢了！🎉'; return; }
+  if (gboard.every(c => c)) { gOver = true; gameStatus.textContent = '平局～'; return; }
+  setTimeout(() => { gboard[tttAI()] = 'O'; renderGBoard(); if (tttWin('O')) { gOver = true; onLose(); } else if (gboard.every(c => c)) { gOver = true; gameStatus.textContent = '平局～'; } }, 300);
+}
+function tttWin(p) { const w = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; for (const [a,b,c] of w) if (gboard[a] === p && gboard[b] === p && gboard[c] === p) { hiCells(a,b,c); return true; } return false; }
+function tttAI() { let b = -Infinity, m = 0; for (let i = 0; i < 9; i++) if (!gboard[i]) { gboard[i] = 'O'; let s = tttMM(false); gboard[i] = ''; if (s > b) { b = s; m = i; } } return m; }
+function tttMM(isM) { if (tttQ('O')) return 10; if (tttQ('X')) return -10; if (gboard.every(c => c)) return 0; let b = isM ? -Infinity : Infinity; for (let i = 0; i < 9; i++) if (!gboard[i]) { gboard[i] = isM ? 'O' : 'X'; let s = tttMM(!isM); gboard[i] = ''; b = isM ? Math.max(b, s) : Math.min(b, s); } return b; }
+function tttQ(p) { const w = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; return w.some(([a,b,c]) => gboard[a] === p && gboard[b] === p && gboard[c] === p); }
+
+const GK = 11;
+function initGomoku() {
+  gboard = Array(GK * GK).fill(''); gOver = false; gameTitle.textContent = '♟️ 五子棋'; gameStatus.textContent = '你执黑先手 ✨';
+  gameBoard.style.gridTemplateColumns = `repeat(${GK}, 1fr)`; gameBoard.innerHTML = '';
+  for (let i = 0; i < GK * GK; i++) { const c = document.createElement('button'); c.className = 'gcell'; c.onclick = () => gkClick(i); gameBoard.appendChild(c); }
+}
+function gkClick(i) { if (gboard[i] || gOver) return; gboard[i] = 'X'; renderGBoard(); if (gkWin('X')) { gOver = true; gameStatus.textContent = '你赢了！🎉'; return; } if (gboard.every(c => c)) { gOver = true; gameStatus.textContent = '平局～'; return; } setTimeout(() => { gboard[gkAI()] = 'O'; renderGBoard(); if (gkWin('O')) { gOver = true; onLose(); } else if (gboard.every(c => c)) { gOver = true; gameStatus.textContent = '平局～'; } }, 200); }
+function gkWin(p) { const dirs = [[1,0],[0,1],[1,1],[1,-1]]; for (let r = 0; r < GK; r++) for (let c = 0; c < GK; c++) { const idx = r * GK + c; if (gboard[idx] !== p) continue; for (const [dr,dc] of dirs) { let cnt = 1; const cells = [idx]; for (let d = 1; d < 5; d++) { const nr = r + dr * d, nc = c + dc * d; if (nr < 0 || nr >= GK || nc < 0 || nc >= GK) break; if (gboard[nr * GK + nc] === p) { cnt++; cells.push(nr * GK + nc); } else break; } for (let d = 1; d < 5; d++) { const nr = r - dr * d, nc = c - dc * d; if (nr < 0 || nr >= GK || nc < 0 || nc >= GK) break; if (gboard[nr * GK + nc] === p) { cnt++; cells.push(nr * GK + nc); } else break; } if (cnt >= 5) { hiCells(...cells); return true; } } } return false; }
+function gkScore(idx, p) { const r = Math.floor(idx / GK), c = idx % GK; const dirs = [[1,0],[0,1],[1,1],[1,-1]]; let score = 0; for (const [dr,dc] of dirs) { let cnt = 1, open = 0; for (let d = 1; d < 5; d++) { const nr = r + dr * d, nc = c + dc * d; if (nr < 0 || nr >= GK || nc < 0 || nc >= GK) break; const v = gboard[nr * GK + nc]; if (v === p) cnt++; else { if (!v) open++; break; } } for (let d = 1; d < 5; d++) { const nr = r - dr * d, nc = c - dc * d; if (nr < 0 || nr >= GK || nc < 0 || nc >= GK) break; const v = gboard[nr * GK + nc]; if (v === p) cnt++; else { if (!v) open++; break; } } if (cnt >= 5) score += 100000; else if (cnt === 4) score += open === 2 ? 10000 : 5000; else if (cnt === 3) score += open === 2 ? 1000 : 300; else if (cnt === 2) score += open === 2 ? 100 : 20; else if (cnt === 1) score += open === 2 ? 10 : 2; } return score; }
+function gkAI() { let best = -Infinity, move = Math.floor(GK * GK / 2); const near = new Set(); for (let i = 0; i < GK * GK; i++) { if (!gboard[i]) continue; const r = Math.floor(i / GK), c = i % GK; for (let dr = -2; dr <= 2; dr++) for (let dc = -2; dc <= 2; dc++) { const nr = r + dr, nc = c + dc; if (nr >= 0 && nr < GK && nc >= 0 && nc < GK) { const ni = nr * GK + nc; if (!gboard[ni]) near.add(ni); } } } const candidates = near.size > 0 ? [...near] : gboard.map((_, i) => i).filter(i => !gboard[i]); for (const i of candidates) { gboard[i] = 'O'; const atk = gkScore(i, 'O'); gboard[i] = 'X'; const def = gkScore(i, 'X'); gboard[i] = ''; const s = Math.max(atk, def > 9000 ? def * 1.5 : def); if (s > best) { best = s; move = i; } } return move; }
+function renderGBoard() { const cells = gameBoard.children; for (let i = 0; i < gboard.length; i++) { cells[i].textContent = gboard[i]; cells[i].className = 'gcell ' + (gboard[i] || ''); } }
+function hiCells(...indices) { indices.forEach(i => gameBoard.children[i].classList.add('win')); }
+function onLose() {
+  gameStatus.textContent = '你输了 😢';
+  fishJumpin.innerHTML = renderFishSVG(ALL_FISH[0], 140, 100) + '<div class="speech-lose">你才是傻鱼！🐟</div>';
+  fishJumpin.classList.remove('show'); resultBtns.classList.remove('show-btns'); void fishJumpin.offsetWidth;
+  fishJumpin.classList.add('show'); resultBtns.style.display = 'flex'; void resultBtns.offsetWidth; resultBtns.classList.add('show-btns');
+}
+
+// ========== 抽卡 ==========
+function drawFish() {
+  const r = Math.random(); let cum = 0; const total = R_PROB.reduce((a, b) => a + b, 0);
+  let tier = 0;
+  for (let i = 0; i < R_PROB.length; i++) { cum += R_PROB[i] / total; if (r <= cum) { tier = i; break; } }
+  const pool = ALL_FISH.filter(f => f.rarity === tier);
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function showGacha(fish, customTitle) {
+  const overlay = document.getElementById('gachaOverlay');
+  const card = document.getElementById('gachaCard');
+  card.className = 'gacha-card r' + fish.rarity;
+  document.getElementById('gachaTitle').textContent = customTitle || '🎣 今日抽鱼';
+  document.getElementById('gachaFishImg').innerHTML = renderFishSVG(fish, 180, 130);
+  document.getElementById('gachaRarity').textContent = RARITY[fish.rarity] + '款';
+  document.getElementById('gachaRarity').className = 'gacha-rarity rarity-' + fish.rarity;
+  document.getElementById('gachaFishName').textContent = fish.name;
+  overlay.classList.add('active');
+  const img = document.getElementById('gachaFishImg');
+  img.style.animation = 'none'; void img.offsetWidth;
+  img.style.animation = 'gachaReveal .6s cubic-bezier(.175,.885,.32,1.275)';
+}
+
+let pendingFish = null;
+async function collectGacha() {
+  document.getElementById('gachaOverlay').classList.remove('active');
+  if (pendingFish) {
+    await addUnlocked(pendingFish.id);
+    await saveState({ last_draw_date: getToday(), display_fish_id: pendingFish.id });
+    renderMainFish();
+    pendingFish = null;
+  }
+}
+
+function checkDailyGacha() {
+  const last = STATE.last_draw_date || '';
+  if (last !== getToday()) {
+    pendingFish = drawFish();
+    setTimeout(() => showGacha(pendingFish), 600);
+  }
+}
+
+// ========== 图鉴 ==========
+function openAlbum() { document.getElementById('albumOverlay').classList.add('active'); renderAlbum(); }
+function closeAlbum() { document.getElementById('albumOverlay').classList.remove('active'); }
+
+function renderAlbum(tierFilter = null) {
+  const unlockedMap = {}; UNLOCKED.forEach(f => { unlockedMap[f.fish_id] = f.count || 1; });
+  const total = R_COUNTS.reduce((a, b) => a + b, 0);
+  const totalOwned = UNLOCKED.reduce((s, f) => s + (f.count || 1), 0);
+  document.getElementById('albumStats').textContent = `已解锁 ${UNLOCKED.length} / ${total} 种（含重复共 ${totalOwned} 条）`;
+
+  const tabs = document.getElementById('albumTabs');
+  tabs.innerHTML = '<button class="album-tab" style="background:#999" onclick="renderAlbum(null)">全部</button>';
+  for (let r = 0; r < RARITY.length; r++) {
+    tabs.innerHTML += `<button class="album-tab" style="background:${R_COLORS[r]}" onclick="renderAlbum(${r})">${RARITY[r]}</button>`;
+  }
+
+  const grid = document.getElementById('albumGrid');
+  let fishList = ALL_FISH;
+  if (tierFilter !== null) fishList = ALL_FISH.filter(f => f.rarity === tierFilter);
+  const trailIcons = ['', '✨', '🌟', '💫', '⚡', '🔥', '👑'];
+  grid.innerHTML = fishList.map(f => {
+    const isOwned = !!unlockedMap[f.fish_id] || !!unlockedMap[f.id];
+    const count = unlockedMap[f.fish_id] || unlockedMap[f.id] || 0;
+    const trailHint = isOwned && f.rarity >= 3 ? trailIcons[Math.min(f.rarity - 2, 5)] : '';
+    return `<div class="album-item ${isOwned ? 'owned' : 'locked'}" ${isOwned ? `onclick="pickDisplayFish('${f.id}')"` : ''} title="${f.name}${isOwned ? ' ×' + count : ''}${trailHint ? ' 🔥拖尾特效' : ''}">
+      <div class="fish-icon">${isOwned ? renderFishSVG(f, 50, 38) : '<svg width="50" height="38" viewBox="0 0 50 38"><ellipse cx="25" cy="19" rx="18" ry="12" fill="#ddd"/><text x="25" y="23" text-anchor="middle" font-size="14">❓</text></svg>'}</div>
+      <div class="fish-name">${isOwned ? f.name : '???'}</div>
+      ${isOwned ? `<span class="owned-tag">${count > 1 ? '×' + count : ''}${trailHint}</span>` : ''}
+    </div>`;
+  }).join('');
+}
+
+async function pickDisplayFish(id) {
+  await switchDisplayFish(id);
+  renderMainFish();
+  closeAlbum();
+  fishSay('换新皮肤啦～ 🐟');
+}
+
+// ========== 陪伴天数 ==========
+function getStartDate() {
+  let d = STATE.start_date;
+  if (!d) { d = getToday(); saveState({ start_date: d }); }
+  return d;
+}
+document.getElementById('sideImgLeft').addEventListener('click', () => {
+  const start = new Date(getStartDate());
+  const today = new Date(getToday());
+  const days = Math.max(1, Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1);
+  document.getElementById('daysNum').textContent = days;
+  document.getElementById('daysOverlay').classList.add('active');
+});
+function closeDays() { document.getElementById('daysOverlay').classList.remove('active'); }
+
+// ========== 彩蛋 & 节日 ==========
+function closeEaster() {
+  const bonusDraw = window._bonusDraw;
+  const bonusMsg = window._bonusMsg || '';
+  document.getElementById('easterOverlay').classList.remove('active');
+  if (bonusDraw) {
+    window._bonusDraw = false; window._bonusMsg = '';
+    setTimeout(() => { pendingFish = drawFish(); showGacha(pendingFish, bonusMsg); }, 400);
+  }
+}
+
+const HOLIDAYS = {
+  '2026-02-16': { name: '除夕', emoji: '🧧', msg: '辞旧迎新，鱼姐新年快乐！' },
+  '2026-03-03': { name: '元宵节', emoji: '🏮', msg: '团团圆圆，甜甜蜜蜜～' },
+  '2026-04-05': { name: '清明节', emoji: '🌿', msg: '踏青赏春，万物清明～' },
+  '2026-09-25': { name: '中秋节', emoji: '🥮', msg: '月圆人圆，鱼姐中秋快乐！' },
+  '2027-02-05': { name: '除夕', emoji: '🧧', msg: '辞旧迎新，鱼姐新年快乐！' },
+  '2027-02-20': { name: '元宵节', emoji: '🏮', msg: '团团圆圆，甜甜蜜蜜～' },
+  '2027-04-05': { name: '清明节', emoji: '🌿', msg: '踏青赏春，万物清明～' },
+  '2027-09-14': { name: '中秋节', emoji: '🥮', msg: '月圆人圆，鱼姐中秋快乐！' },
+  '2028-01-25': { name: '除夕', emoji: '🧧', msg: '辞旧迎新，鱼姐新年快乐！' },
+  '2028-02-08': { name: '元宵节', emoji: '🏮', msg: '团团圆圆，甜甜蜜蜜～' },
+  '2028-04-04': { name: '清明节', emoji: '🌿', msg: '踏青赏春，万物清明～' },
+  '2028-10-03': { name: '中秋节', emoji: '🥮', msg: '月圆人圆，鱼姐中秋快乐！' },
+};
+const SOLAR_HOLIDAYS = [
+  { mmdd: '05-01', name: '劳动节', emoji: '💪', msg: '劳动最光荣，鱼姐辛苦啦！' },
+  { mmdd: '06-01', name: '儿童节', emoji: '🎈', msg: '不管几岁，开心万岁！' },
+  { mmdd: '10-01', name: '国庆节', emoji: '🇨🇳', msg: '祖国繁荣昌盛，假期快乐！' },
+];
+
+function checkHoliday() {
+  const today = getToday();
+  const lunar = HOLIDAYS[today];
+  if (lunar) return lunar;
+  const mmdd = today.slice(5);
+  return SOLAR_HOLIDAYS.find(h => h.mmdd === mmdd) || null;
+}
+
+function showHolidayPopup(holiday) {
+  document.getElementById('easterEmoji').textContent = holiday.emoji;
+  document.getElementById('easterNum').textContent = holiday.name;
+  document.getElementById('easterMsg').innerHTML = holiday.msg;
+  document.getElementById('easterHint').textContent = '🎁 今天额外赠送一次抽卡机会！';
+  document.getElementById('easterCloseBtn').textContent = '🎣 收下礼物！';
+  document.getElementById('easterOverlay').classList.add('active');
+}
+
+// ========== 喂食 ==========
+function closeFeed() {
+  const bonusDraw = window._bonusDraw;
+  const bonusMsg = window._bonusMsg || '';
+  document.getElementById('feedOverlay').classList.remove('active');
+  if (bonusDraw) {
+    window._bonusDraw = false; window._bonusMsg = '';
+    setTimeout(() => { pendingFish = drawFish(); showGacha(pendingFish, bonusMsg); }, 400);
+  }
+}
+
+function updateAffectionBar() {
+  const a = STATE.affection || 0;
+  document.getElementById('affectionBar').textContent = `💖 好感度 ${a}`;
+  const d = { date: STATE.feed_date, remaining: STATE.feed_remaining || 10, bonusUsed: STATE.feed_bonus_used || false };
+  const today = getToday();
+  if (d.date !== today) { d.remaining = 10; d.bonusUsed = false; }
+  document.getElementById('feedBtn').textContent = d.remaining > 0 ? `🍥 喂食(${d.remaining})` : '🍥 喂食(0)';
+}
+
+async function feedFish() {
+  let remaining = STATE.feed_remaining || 10;
+  let feedDate = STATE.feed_date || '';
+  const today = getToday();
+  if (feedDate !== today) { remaining = 10; feedDate = today; }
+  if (remaining <= 0) {
+    document.getElementById('feedEmoji').textContent = '😿';
+    document.getElementById('feedMsg').textContent = '今天的鱼饲料已经喂完啦～';
+    document.getElementById('feedDetail').textContent = '明天再来吧！';
+    document.getElementById('feedOverlay').classList.add('active');
+    return;
+  }
+  remaining--;
+  await saveState({ feed_remaining: remaining, feed_date: feedDate });
+
+  const rnd = Math.random();
+  let points, emoji, label;
+  if (rnd < 0.5) { points = 10; emoji = '🍞'; label = '普通饲料'; }
+  else if (rnd < 0.8) { points = 20; emoji = '🍰'; label = '优质饲料'; }
+  else { points = 50; emoji = '🍣'; label = '上等饲料'; }
+
+  const oldAff = STATE.affection || 0;
+  const newAff = oldAff + points;
+  await saveState({ affection: newAff });
+
+  const choked = Math.random() < 0.33;
+  const oldMilestone = Math.floor(oldAff / 200);
+  const newMilestone = Math.floor(newAff / 200);
+  let bonusMsg = '';
+
+  if (newMilestone > oldMilestone && !(STATE.feed_bonus_used)) {
+    await saveState({ feed_bonus_used: true });
+    window._bonusDraw = true;
+    window._bonusMsg = '💖 好感度 ' + (newMilestone * 200) + ' 奖励抽卡';
+    bonusMsg = '<br>🎉 好感度突破 ' + (newMilestone * 200) + '！<br>今天鱼吃爽了，让你再抽一次卡！';
+  }
+
+  const cEmoji = choked ? '😤' : '😋';
+  const cMsg = choked ? '鱼吃太快呛到了！咳咳咳…' : '鱼吃得津津有味～';
+  document.getElementById('feedEmoji').textContent = cEmoji;
+  document.getElementById('feedMsg').innerHTML = cMsg + bonusMsg;
+  document.getElementById('feedDetail').textContent = `${emoji} ${label} +${points}好感度 | 剩余饲料:${remaining}`;
+  document.getElementById('feedOverlay').classList.add('active');
+  updateAffectionBar();
+
+  if (choked) { setTimeout(() => fishSay('咳咳咳…呛到了！😤'), 400); }
+}
+
+// ========== 场景初始化 ==========
+(function initScene() {
+  const scene = document.getElementById('sceneBg');
+  let h = '';
+  h += `<svg class="cloud" width="160" height="70" style="top:3%;left:100%;animation-duration:35s"><ellipse cx="50" cy="50" rx="50" ry="25" fill="white" opacity=".85"/><ellipse cx="90" cy="40" rx="45" ry="28" fill="white" opacity=".9"/><ellipse cx="120" cy="50" rx="40" ry="22" fill="white" opacity=".8"/></svg>`;
+  h += `<svg class="cloud" width="130" height="55" style="top:10%;left:110%;animation-duration:42s;animation-delay:-15s"><ellipse cx="40" cy="40" rx="40" ry="20" fill="white" opacity=".75"/><ellipse cx="75" cy="30" rx="35" ry="22" fill="white" opacity=".8"/><ellipse cx="100" cy="40" rx="30" ry="18" fill="white" opacity=".75"/></svg>`;
+  h += `<svg class="cloud" width="100" height="45" style="top:8%;left:105%;animation-duration:38s;animation-delay:-25s"><ellipse cx="35" cy="32" rx="35" ry="18" fill="white" opacity=".7"/><ellipse cx="65" cy="25" rx="30" ry="18" fill="white" opacity=".75"/></svg>`;
+  const stars = ['✦', '✧', '⋆'];
+  for (let i = 0; i < 8; i++) h += `<span class="sparkle" style="top:${5 + Math.random() * 18}%;left:${5 + Math.random() * 85}%;animation-delay:${Math.random() * 1.5}s">${stars[i % 3]}</span>`;
+  h += '<div class="seabed"></div>';
+  h += '<svg class="rock" width="80" height="45" viewBox="0 0 80 45" style="left:20%"><ellipse cx="35" cy="35" rx="35" ry="18" fill="#bcaaa4"/><ellipse cx="25" cy="30" rx="20" ry="12" fill="#d7ccc8"/><ellipse cx="55" cy="38" rx="25" ry="14" fill="#a1887f"/></svg>';
+  h += '<svg class="rock" width="65" height="35" viewBox="0 0 65 35" style="right:18%"><ellipse cx="30" cy="28" rx="28" ry="15" fill="#c9b99a"/><ellipse cx="45" cy="32" rx="20" ry="12" fill="#b8a888"/></svg>';
+  h += '<svg class="rock" width="55" height="30" viewBox="0 0 55 30" style="left:50%"><ellipse cx="25" cy="24" rx="24" ry="13" fill="#d7ccc8"/><ellipse cx="15" cy="20" rx="15" ry="9" fill="#e8ddd8"/></svg>';
+  for (let i = 0; i < 4; i++) h += `<svg class="seaweed" width="${30 + i * 5}" height="${100 + i * 15}" viewBox="0 0 ${30 + i * 5} ${100 + i * 15}" style="left:${3 + i * 8}%;animation-delay:${-i}s;animation-duration:${3 + i * .5}s"><path d="M${15 + i * 2},${100 + i * 15} Q${5 + i},${70 + i * 10} ${15 + i * 2},${45 + i * 8} Q${4 + i},${25 + i * 5} ${15 + i * 2},${10 + i * 3}" fill="none" stroke="#66bb6a" stroke-width="${7 + i}" stroke-linecap="round" opacity="${.75 - i * .05}"/></svg>`;
+  h += '<svg class="coral" width="75" height="85" viewBox="0 0 75 85" style="left:17%"><circle cx="22" cy="72" r="13" fill="#ff8a80"/><circle cx="52" cy="70" r="11" fill="#ff8a80"/><circle cx="37" cy="75" r="12" fill="#ff5252"/></svg>';
+  h += '<svg class="coral" width="55" height="60" viewBox="0 0 55 60" style="right:8%"><circle cx="16" cy="52" r="10" fill="#ff80ab"/><circle cx="38" cy="50" r="9" fill="#ff80ab"/></svg>';
+  h += '<svg class="shell" width="38" height="24" viewBox="0 0 38 24" style="left:24%"><ellipse cx="19" cy="14" rx="17" ry="11" fill="#fff3e0"/></svg>';
+  h += '<svg class="shell" width="30" height="20" viewBox="0 0 30 20" style="right:22%"><ellipse cx="15" cy="12" rx="14" ry="9" fill="#fce4ec"/></svg>';
+  h += '<svg class="starfish" width="45" height="45" viewBox="0 0 45 45" style="left:30%"><polygon points="22,0 27,14 42,14 30,23 34,38 22,30 10,38 14,23 2,14 17,14" fill="#ffab91"/><circle cx="22" cy="22" r="3.5" fill="#ff8a65"/></svg>';
+  h += '<svg class="starfish" width="35" height="35" viewBox="0 0 35 35" style="right:28%;animation-delay:-2s;animation-duration:3.5s"><polygon points="18,0 22,11 33,11 24,18 27,30 18,24 9,30 12,18 3,11 14,11" fill="#ffcc80"/><circle cx="18" cy="17" r="2.5" fill="#ffb74d"/></svg>';
+  const kittyColors = [['#f8bbd0','#f48fb1','#ec407a'],['#e1bee7','#ce93d8','#ab47bc'],['#fff9c4','#fff176','#fdd835'],['#bbdefb','#90caf9','#42a5f5'],['#c8e6c9','#a5d6a7','#66bb6a'],['#ffccbc','#ffab91','#ff7043']];
+  const kittyPos = [[18,102],[84,100],[35,85],[68,85],[48,95],[8,88]];
+  kittyPos.forEach((pos, i) => {
+    const [c1, c2, c3] = kittyColors[i];
+    h += `<svg class="kitty-doll" width="${60 - i * 3}" height="${70 - i * 3}" viewBox="0 0 120 140" style="left:${pos[0]}%;bottom:${pos[1]}px;animation-delay:${-i * .5}s;animation-duration:${3.5 + i * .3}s"><ellipse cx="60" cy="55" rx="42" ry="40" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="90,32 102,-2 70,18" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="89,30 98,4 73,20" fill="${c1}"/><polygon points="30,32 18,-2 50,18" fill="white" stroke="#e0e0e0" stroke-width="1"/><polygon points="31,30 22,4 47,20" fill="${c1}"/><ellipse cx="28" cy="22" rx="14" ry="9" fill="${c2}" transform="rotate(-15,28,22)"/><circle cx="28" cy="22" r="5" fill="${c3}"/><ellipse cx="42" cy="52" rx="3.5" ry="5" fill="#333"/><ellipse cx="66" cy="52" rx="3.5" ry="5" fill="#333"/><ellipse cx="54" cy="63" rx="3.5" ry="2.5" fill="#ffcc02"/></svg>`;
+  });
+  const hearts = ['💕','💖','💗','💝','🫧'];
+  for (let i = 0; i < 13; i++) h += `<span class="heart-float" style="left:${5 + Math.random() * 85}%;animation-duration:${6 + Math.random() * 6}s;animation-delay:${Math.random() * 7}s;font-size:${18 + Math.random() * 10}px">${hearts[i % 5]}</span>`;
+  scene.innerHTML = h;
+
+  const marqueeText = '必须好好夸夸咱们万能鱼姐！很难遇到像鱼姐这么宝藏的人，情商直接拉满，风趣幽默善于共情，和鱼姐交流完全不用小心翼翼，没有半点距离感，不管聊什么话题都顺畅舒服。遇到棘手事情从来不会慌慌张张，思路清晰眼界开阔，五花八门的难题交到鱼姐手中总能梳理明白，奇思妙招源源不断，妥妥团队里的定心骨干。为人格外仗义热忱，心地善良乐于助人，身边人遇到困境时总会主动伸出援手，默默帮忙不求回报，处事通透拎得清底线，温和包容却绝不任人敷衍。自带超强欢乐buff，只要鱼姐登场，压抑沉闷的气氛立刻一扫而空，枯燥的日常都会变得有意思，坏情绪见到鱼姐都主动绕道逃跑。可正经靠谱，可轻松玩闹，风格自由切换，既能冷静统筹处理繁杂事务，又懂得享受生活擅长制造乐趣。实力出众却十分低调，从不张扬炫耀自身能力，踏实稳重，做事细致周全，方方面面都让人无比放心。眼光独到看人通透，总能给出中肯实在的建议，不知不觉就能开导陷入内耗的人。有幸结识鱼姐真的是巨大收获，有鱼姐坐镇心里就格外踏实。祝愿全能鱼姐日日喜乐，烦心事全部退散，好运源源不断，财运节节攀升，生活多姿多彩，一路顺风顺水持续开挂，永远元气满满，自信耀眼，被所有美好紧紧包围！';
+  document.getElementById('marqueeInner').innerHTML = `<span class="marquee-text">${marqueeText}</span><span class="marquee-text">${marqueeText}</span>`;
+})();
+
+// ========== 启动 ==========
+(async function startup() {
+  // 1. 加载数据（云端优先，本地兜底）
+  try {
+    await loadState();
+    await loadUnlocked();
+    console.log('✅ 数据加载完成 | 云端:' + (useSupabase ? '在线' : '离线') + ' | 同步时间:' + getLastSync());
+  } catch(e) {
+    console.log('⚠️ 数据加载异常，使用本地缓存');
+    STATE = lsGet(LS_STATE_KEY) || {};
+    UNLOCKED = lsGet(LS_UNLOCKED_KEY) || [];
+  }
+
+  // 2. 刷新渲染
+  renderMainFish();
+  counterEl.textContent = (STATE.click_count || 0) > 0 ? `这条呆鱼一共说了 ${STATE.click_count} 次 "我是傻鱼"～` : '';
+  updateAffectionBar();
+  // 同步状态标识
+  const syncBadge = document.getElementById('syncBadge');
+  if (syncBadge) {
+    syncBadge.textContent = useSupabase ? '☁️ 数据已同步 · ' + getLastSync() : '💾 本地缓存 · ' + getLastSync();
+    syncBadge.style.background = useSupabase ? 'rgba(129,199,132,0.4)' : 'rgba(255,183,77,0.4)';
+    setTimeout(() => { syncBadge.style.opacity = '0'; syncBadge.style.transition = 'opacity 0.8s'; }, 5000);
+  }
+
+  // 3. 每页打开都检查每日抽卡、饲料重置
+  const today = getToday();
+
+  // 重置每日饲料
+  if (STATE.feed_date !== today) {
+    STATE.feed_remaining = 10;
+    STATE.feed_bonus_used = false;
+    STATE.feed_date = today;
+    lsSet(LS_STATE_KEY, STATE);
+  }
+
+  // 每日抽卡
+  checkDailyGacha();
+
+  // 4. 节日检查
+  try {
+    const todayHoliday = checkHoliday();
+    const holidayShown = STATE.holiday_shown_date || '';
+    if (todayHoliday && holidayShown !== today) {
+      showHolidayPopup(todayHoliday);
+      await saveState({ holiday_shown_date: today });
+      window._bonusDraw = true;
+      window._bonusMsg = `🎉 ${todayHoliday.name}额外抽卡机会`;
+    }
+  } catch(e) { console.log('holiday check error:', e); }
+
+  // 5. 标记数据已刷新
+  markSynced();
+  console.log('🐟 傻鱼已就绪 | 点击:' + (STATE.click_count||0) + ' | 图鉴:' + UNLOCKED.length + '种 | 好感度:' + (STATE.affection||0));
+})();
+</script>
 </body>
 </html>
