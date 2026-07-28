@@ -146,8 +146,14 @@ body{
 <img class="side-img left" src="fish-img.jpg" alt="" id="sideImgLeft" title="点我">
 <img class="side-img right" src="fish-img.jpg" alt="">
 
-<audio id="bgMusic" loop preload="auto" style="display:none"><source src="Music-Overworld_Day.mp3" type="audio/mpeg"></audio>
-<div id="musicBar" style="display:none;position:fixed;bottom:12px;left:50%;transform:translateX(-50%);z-index:25;background:rgba(0,0,0,.5);color:#fff;padding:6px 18px;border-radius:20px;font-size:13px;letter-spacing:1px;display:flex;align-items:center;gap:8px;pointer-events:none">🔊 <span id="musicName">Overworld Day</span></div>
+<div id="musicBar" style="display:none;position:fixed;bottom:12px;left:50%;transform:translateX(-50%);z-index:25;background:rgba(0,0,0,.5);color:#fff;padding:6px 16px;border-radius:20px;font-size:13px;letter-spacing:1px;align-items:center;gap:6px;pointer-events:auto;cursor:pointer;white-space:nowrap">
+  <span onclick="event.stopPropagation();prevTrack()" style="cursor:pointer;font-size:16px">⏮</span>
+  <span>🔊</span>
+  <span id="musicName" onclick="showPlaylist()" style="cursor:pointer;border-bottom:1px dashed rgba(255,255,255,.4)">Overworld Day</span>
+  <span onclick="event.stopPropagation();nextTrack()" style="cursor:pointer;font-size:16px">⏭</span>
+</div>
+<div id="playlistPopup" style="display:none;position:fixed;bottom:55px;left:50%;transform:translateX(-50%);z-index:26;background:rgba(0,0,0,.85);color:#fff;padding:10px 6px;border-radius:16px;font-size:13px;min-width:180px;max-height:260px;overflow-y:auto">
+</div>
 <div class="trail-container" id="trailContainer"></div>
 <div class="fish-wrapper" id="fishWrapper" title="点我！"><div class="fish-float" id="mainFishSvg"></div></div>
 
@@ -597,23 +603,104 @@ function playBubbleSound() {
   o.start(ctx.currentTime); o.stop(ctx.currentTime + .2);
 }
 
+// ========== 音乐播放器 ==========
+const PLAYLIST = [
+  { name: 'Overworld Day', file: 'Music-Overworld_Day.mp3' },
+  { name: 'Overworld Night', file: 'Music-Overworld_Night.mp3' },
+  { name: 'Ocean Day', file: 'Music-Ocean_Day.mp3' },
+  { name: 'Rain', file: 'Music-Rain.mp3' },
+  { name: 'Underground', file: 'Music-Underground.mp3' },
+];
+
+let curTrackIdx = 0;
 let bgMusicPlaying = false;
-function toggleMusic() {
-  const music = document.getElementById('bgMusic');
+let bgMusic = null;
+
+function getMusicAudio() {
+  if (!bgMusic) {
+    bgMusic = new Audio();
+    bgMusic.volume = 0.4;
+    bgMusic.addEventListener('ended', () => {
+      curTrackIdx = (curTrackIdx + 1) % PLAYLIST.length;
+      loadAndPlay();
+    });
+  }
+  return bgMusic;
+}
+
+function loadAndPlay() {
+  const music = getMusicAudio();
+  music.src = PLAYLIST[curTrackIdx].file;
+  music.load();
+  music.play().catch(() => {});
+  updateMusicUI();
+}
+
+function updateMusicUI() {
   const btn = document.getElementById('musicBtn');
   const bar = document.getElementById('musicBar');
+  const name = document.getElementById('musicName');
+  const t = PLAYLIST[curTrackIdx];
+  name.textContent = t.name;
+  document.title = '🐟 ' + t.name + ' ~ ♪';
   if (bgMusicPlaying) {
-    music.pause();
+    btn.textContent = '🎵 暂停';
+    bar.style.display = 'flex';
+  } else {
     btn.textContent = '🔇 音乐关';
     bar.style.display = 'none';
+    document.title = '🐟 我是傻鱼 ~ ♪';
+  }
+}
+
+function toggleMusic() {
+  const music = getMusicAudio();
+  if (bgMusicPlaying) {
+    music.pause();
     bgMusicPlaying = false;
   } else {
-    music.volume = 0.4;
+    music.src = music.src || PLAYLIST[curTrackIdx].file;
     music.play().catch(() => {});
-    btn.textContent = '🎵 音乐开';
-    bar.style.display = 'flex';
     bgMusicPlaying = true;
   }
+  updateMusicUI();
+}
+
+function nextTrack() {
+  curTrackIdx = (curTrackIdx + 1) % PLAYLIST.length;
+  if (bgMusicPlaying) loadAndPlay(); else updateMusicUI();
+  closePlaylist();
+}
+
+function prevTrack() {
+  curTrackIdx = (curTrackIdx - 1 + PLAYLIST.length) % PLAYLIST.length;
+  if (bgMusicPlaying) loadAndPlay(); else updateMusicUI();
+  closePlaylist();
+}
+
+function selectTrack(idx) {
+  curTrackIdx = idx;
+  if (bgMusicPlaying) loadAndPlay(); else { updateMusicUI(); toggleMusic(); }
+  closePlaylist();
+}
+
+function showPlaylist() {
+  const popup = document.getElementById('playlistPopup');
+  popup.innerHTML = PLAYLIST.map((t, i) =>
+    `<div style="padding:7px 14px;cursor:pointer;border-radius:8px;${i === curTrackIdx ? 'background:rgba(244,143,177,.5)' : ''}"
+         onclick="event.stopPropagation();selectTrack(${i})">
+       ${i === curTrackIdx && bgMusicPlaying ? '🎵 ' : '   '}${t.name}
+    </div>`
+  ).join('');
+  popup.style.display = 'block';
+  // 点其他地方关闭
+  setTimeout(() => {
+    document.addEventListener('click', closePlaylist, { once: true });
+  }, 50);
+}
+
+function closePlaylist() {
+  document.getElementById('playlistPopup').style.display = 'none';
 }
 
 function playMeowSound() {
