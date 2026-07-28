@@ -570,18 +570,9 @@ function playBubbleSound() {
 }
 
 function playMeowSound() {
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  const t = ctx.currentTime;
-  // 猫叫：短促的高频喵
-  const o = ctx.createOscillator(), g = ctx.createGain();
-  o.connect(g); g.connect(ctx.destination); o.type = 'triangle';
-  o.frequency.setValueAtTime(600, t);
-  o.frequency.exponentialRampToValueAtTime(900, t + .05);
-  o.frequency.exponentialRampToValueAtTime(700, t + .12);
-  o.frequency.exponentialRampToValueAtTime(500, t + .2);
-  g.gain.setValueAtTime(.25, t);
-  g.gain.exponentialRampToValueAtTime(.01, t + .25);
-  o.start(t); o.stop(t + .25);
+  const audio = new Audio('Item_1.wav');
+  audio.volume = 0.6;
+  audio.play().catch(() => {});
 }
 
 function spawnMeow(el) {
