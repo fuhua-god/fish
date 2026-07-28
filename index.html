@@ -137,6 +137,20 @@ body{
 .days-card .days-close{padding:10px 30px;border-radius:25px;font-size:15px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;border:none;background:#f48fb1;color:#fff;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
 .days-card .days-close:hover{background:#ec407a;transform:scale(1.05)}
 .trail-container{position:fixed;inset:0;z-index:4;pointer-events:none;overflow:hidden}
+/* 美食转盘 */
+.wheel-overlay{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+.wheel-overlay.active{opacity:1;pointer-events:auto}
+.wheel-card{background:#fff;border-radius:28px;padding:24px 20px 20px;box-shadow:0 20px 60px rgba(0,0,0,.4);display:flex;flex-direction:column;align-items:center;gap:16px;max-width:420px;width:92vw;position:relative}
+.wheel-title{font-size:26px;font-weight:bold;color:#ec407a;letter-spacing:3px}
+.wheel-pointer{position:absolute;top:58px;right:8px;font-size:32px;z-index:5;filter:drop-shadow(0 2px 6px rgba(0,0,0,.3));transform:rotate(-30deg)}
+.wheel-result{font-size:22px;font-weight:bold;color:#555;min-height:32px;letter-spacing:2px;transition:all .3s}
+.wheel-result.win{color:#ec407a;animation:popIn .4s cubic-bezier(.175,.885,.32,1.275)}
+.wheel-btn{padding:12px 36px;border-radius:30px;font-size:18px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;border:none;background:#f48fb1;color:#fff;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none;box-shadow:0 4px 15px rgba(244,143,177,.5)}
+.wheel-btn:hover{background:#ec407a;transform:scale(1.05)}
+.wheel-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.wheel-close{position:absolute;top:12px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:#bbb;-webkit-tap-highlight-color:transparent;outline:none}
+.wheel-close:hover{color:#888}
+
 </style>
 </head>
 <body>
@@ -144,7 +158,7 @@ body{
 <div class="marquee-bar"><div class="marquee-inner" id="marqueeInner"></div></div>
 <div class="scene" id="sceneBg"></div>
 <img class="side-img left" src="fish-img.jpg" alt="" id="sideImgLeft" title="点我">
-<img class="side-img right" src="fish-img.jpg" alt="">
+<img class="side-img right" src="fish-img.jpg" alt="" id="sideImgRight" title="今天吃什么？">
 
 <div id="musicBar" style="display:none;position:fixed;bottom:12px;left:50%;transform:translateX(-50%);z-index:25;background:rgba(0,0,0,.5);color:#fff;padding:6px 16px;border-radius:20px;font-size:13px;letter-spacing:1px;align-items:center;gap:6px;pointer-events:auto;cursor:pointer;white-space:nowrap">
   <span onclick="event.stopPropagation();prevTrack()" style="cursor:pointer;font-size:16px">⏮</span>
@@ -236,6 +250,21 @@ body{
     <div class="days-text" id="feedMsg"></div>
     <div class="days-num" style="font-size:28px" id="feedDetail"></div>
     <button class="days-close" onclick="closeFeed()">🐟 好的～</button>
+  </div>
+</div>
+
+<!-- 美食转盘 -->
+<div class="wheel-overlay" id="wheelOverlay">
+  <div class="wheel-card">
+    <button class="wheel-close" onclick="closeWheel()">✕</button>
+    <div class="wheel-title">🍽️ 今天吃什么</div>
+    <canvas id="wheelCanvas" width="400" height="400" style="max-width:300px;max-height:300px"></canvas>
+    <div class="wheel-result" id="wheelResult"></div>
+    <button class="wheel-btn" id="wheelSpinBtn" onclick="spinWheel()">🎯 开转！</button>
+    <div id="wheelChoices" style="display:none;gap:12px;flex-wrap:wrap;justify-content:center">
+      <button class="wheel-btn" style="background:#66bb6a;box-shadow:0 4px 15px rgba(102,187,106,.5)" onclick="confirmEat()">😋 就吃这个了</button>
+      <button class="wheel-btn" style="background:#ffb74d;box-shadow:0 4px 15px rgba(255,183,77,.5)" onclick="swapWheel()">🔄 换个口味吧</button>
+    </div>
   </div>
 </div>
 
@@ -914,6 +943,155 @@ document.getElementById('sideImgLeft').addEventListener('click', () => {
   document.getElementById('daysOverlay').classList.add('active');
 });
 function closeDays() { document.getElementById('daysOverlay').classList.remove('active'); }
+
+// ========== 美食转盘 ==========
+const FOODS = [
+  '🦆 北京烤鸭','🍜 炸酱面','🥘 涮羊肉',
+  '🌶️ 担担面','🐟 水煮鱼','🥩 回锅肉','🫘 麻婆豆腐','🐔 口水鸡','🥟 钟水饺','🥘 毛血旺','🐂 夫妻肺片',
+  '🦐 虾饺','🍗 烧鹅','🥟 肠粉',
+  '🥟 小笼包','🥘 生煎包','🍲 腌笃鲜',
+  '🥙 肉夹馍','🍜 凉皮','🍲 羊肉泡馍',
+  '🐟 剁椒鱼头','🧈 臭豆腐','🌶️ 小炒肉',
+  '🍜 过桥米线','🍗 汽锅鸡','🍄 菌子火锅','🐟 大理砂锅鱼','🥩 宣威火腿','🍲 野生菌汤','🧀 烤乳扇','🌿 傣味柠檬撒',
+  '🍗 大盘鸡','🍢 烤羊肉串','🥘 手抓饭',
+  '🥩 锅包肉','🍲 酸菜白肉','🍖 酱骨架',
+  '🍲 佛跳墙','🍜 沙茶面','🦀 姜母鸭',
+  '🦆 盐水鸭','🐟 松鼠桂鱼','🥟 蟹黄汤包',
+  '🥩 东坡肉','🐟 西湖醋鱼','🍲 龙井虾仁',
+  '🍜 热干面','🫘 豆皮','🦞 油焖大虾',
+  '🍜 螺蛳粉','🍜 桂林米粉','🥘 柠檬鸭',
+  '🍛 卤肉饭','🦪 蚵仔煎','🍗 盐酥鸡',
+  '🍜 云吞面','🥘 煲仔饭','🍞 菠萝包',
+  '🥘 麻辣香锅','🍲 酸菜鱼','🍖 烤鱼'
+];
+const WHEEL_COLORS = [
+  '#ff8a80','#ff80ab','#ea80fc','#b388ff','#8c9eff','#80d8ff','#84ffff','#b9f6ca','#ccff90',
+  '#f4ff81','#ffe57f','#ffd740','#ffab40','#ff6e40','#a7ffeb','#ff9e80','#ffcc80','#ef9a9a',
+  '#90caf9','#a5d6a7','#fff176','#ce93d8','#f48fb1','#81c784','#ffb74d','#e1bee7','#80cbc4',
+  '#ffe082','#bcaaa4','#ef5350','#42a5f5','#66bb6a','#ffa726','#ab47bc','#26c6da','#7e57c2',
+  '#ffca28','#8d6e63','#ec407a','#29b6f6','#9ccc65','#ff7043','#5c6bc0','#00acc1','#d4e157',
+  '#fdd835','#c0ca33','#43a047','#00b8d4','#ff5252','#448aff','#69f0ae','#ffd740','#e040fb'
+];
+
+let wheelAngle = 0;
+let wheelSpinning = false;
+
+document.getElementById('sideImgRight').addEventListener('click', () => {
+  document.getElementById('wheelOverlay').classList.add('active');
+  drawWheel(0);
+  document.getElementById('wheelResult').textContent = '';
+  document.getElementById('wheelResult').classList.remove('win');
+  document.getElementById('wheelSpinBtn').style.display = 'block';
+  document.getElementById('wheelSpinBtn').disabled = false;
+  document.getElementById('wheelChoices').style.display = 'none';
+});
+
+function closeWheel() { document.getElementById('wheelOverlay').classList.remove('active'); }
+
+function drawWheel(rotateDeg) {
+  const canvas = document.getElementById('wheelCanvas');
+  const ctx = canvas.getContext('2d');
+  const cx = canvas.width / 2, cy = canvas.height / 2, r = Math.min(cx, cy) - 4;
+  const segAngle = (2 * Math.PI) / FOODS.length;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // 外圈
+  ctx.beginPath(); ctx.arc(cx, cy, r + 2, 0, 2 * Math.PI); ctx.fillStyle = '#f48fb1'; ctx.fill();
+
+  for (let i = 0; i < FOODS.length; i++) {
+    const start = segAngle * i + rotateDeg * Math.PI / 180;
+    const end = start + segAngle;
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, start, end);
+    ctx.fillStyle = WHEEL_COLORS[i]; ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+
+    // 文字
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(start + segAngle / 2);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#fff';
+    const fontSize = FOODS.length > 30 ? 9 : 11;
+    ctx.font = `bold ${fontSize}px "Microsoft YaHei","KaiTi",sans-serif`;
+    ctx.shadowColor = 'rgba(0,0,0,.4)'; ctx.shadowBlur = 2;
+    ctx.fillText(FOODS[i], r * 0.74, 4);
+    ctx.restore();
+  }
+  ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0;
+
+  // 中心圆
+  ctx.beginPath(); ctx.arc(cx, cy, 22, 0, 2 * Math.PI);
+  const grd = ctx.createRadialGradient(cx, cy, 4, cx, cy, 22);
+  grd.addColorStop(0, '#fff'); grd.addColorStop(1, '#fce4ec');
+  ctx.fillStyle = grd; ctx.fill();
+  ctx.strokeStyle = '#f48fb1'; ctx.lineWidth = 3; ctx.stroke();
+  ctx.fillStyle = '#ec407a'; ctx.font = 'bold 12px "Microsoft YaHei"'; ctx.textAlign = 'center';
+  ctx.fillText('🎯', cx, cy + 5);
+}
+
+function spinWheel() {
+  if (wheelSpinning) return;
+  wheelSpinning = true;
+  document.getElementById('wheelSpinBtn').disabled = true;
+  document.getElementById('wheelSpinBtn').style.display = 'none';
+  document.getElementById('wheelResult').textContent = '';
+  document.getElementById('wheelResult').classList.remove('win');
+  document.getElementById('wheelChoices').style.display = 'none';
+
+  const spins = 4 + Math.random() * 6; // 4-10圈
+  const extraAngle = Math.random() * 360;
+  const totalAngle = spins * 360 + extraAngle;
+  const startAngle = wheelAngle;
+  const duration = 3500 + Math.random() * 1500;
+  const startTime = performance.now();
+
+  function animate(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    // ease-out
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = startAngle + totalAngle * eased;
+    wheelAngle = current % 360;
+    drawWheel(wheelAngle);
+
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      // 确定结果
+      const segAngle = 360 / FOODS.length;
+      const normalized = ((360 - (wheelAngle % 360)) % 360 + 360) % 360;
+      const idx = Math.floor(normalized / segAngle) % FOODS.length;
+      window._lastWheelIdx = idx;
+      const result = document.getElementById('wheelResult');
+      result.textContent = '🎉 今天吃：' + FOODS[idx] + '！';
+      result.classList.add('win');
+      wheelSpinning = false;
+      document.getElementById('wheelChoices').style.display = 'flex';
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+function confirmEat() {
+  const food = FOODS[window._lastWheelIdx || 0];
+  document.getElementById('wheelResult').textContent = '✅ 今天就吃：' + food + '！';
+  document.getElementById('wheelResult').classList.add('win');
+  document.getElementById('wheelChoices').style.display = 'none';
+  document.getElementById('wheelSpinBtn').style.display = 'none';
+  // 2秒后自动关闭
+  setTimeout(() => { closeWheel(); }, 2000);
+}
+
+function swapWheel() {
+  wheelSpinning = false;
+  document.getElementById('wheelChoices').style.display = 'none';
+  document.getElementById('wheelSpinBtn').style.display = 'block';
+  document.getElementById('wheelSpinBtn').disabled = false;
+  document.getElementById('wheelResult').textContent = '';
+  document.getElementById('wheelResult').classList.remove('win');
+  // 保持当前角度继续转
+  setTimeout(() => spinWheel(), 200);
+}
 
 // ========== 彩蛋 & 节日 ==========
 function closeEaster() {
