@@ -147,6 +147,7 @@ body{
 <img class="side-img right" src="fish-img.jpg" alt="">
 
 <audio id="bgMusic" loop preload="auto" style="display:none"><source src="Music-Overworld_Day.mp3" type="audio/mpeg"></audio>
+<div id="musicBar" style="display:none;position:fixed;bottom:12px;left:50%;transform:translateX(-50%);z-index:25;background:rgba(0,0,0,.5);color:#fff;padding:6px 18px;border-radius:20px;font-size:13px;letter-spacing:1px;display:flex;align-items:center;gap:8px;pointer-events:none">🔊 <span id="musicName">Overworld Day</span></div>
 <div class="trail-container" id="trailContainer"></div>
 <div class="fish-wrapper" id="fishWrapper" title="点我！"><div class="fish-float" id="mainFishSvg"></div></div>
 
@@ -575,14 +576,17 @@ let bgMusicPlaying = false;
 function toggleMusic() {
   const music = document.getElementById('bgMusic');
   const btn = document.getElementById('musicBtn');
+  const bar = document.getElementById('musicBar');
   if (bgMusicPlaying) {
     music.pause();
     btn.textContent = '🔇 音乐关';
+    bar.style.display = 'none';
     bgMusicPlaying = false;
   } else {
     music.volume = 0.4;
     music.play().catch(() => {});
     btn.textContent = '🎵 音乐开';
+    bar.style.display = 'flex';
     bgMusicPlaying = true;
   }
 }
