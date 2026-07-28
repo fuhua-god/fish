@@ -177,13 +177,60 @@ function buildLevel(lv) {
 window.addEventListener('keydown', e => { keys[e.key] = true; e.preventDefault(); });
 window.addEventListener('keyup', e => { keys[e.key] = false; e.preventDefault(); });
 
-// 移动端按钮
+// 移动端：使用 canvas 级多点触控，支持同时按跳跃+方向
 if (isMobile) {
-  ['btnLeft','btnRight','btnJump'].forEach(id => {
-    const btn = document.getElementById(id);
-    btn.addEventListener('pointerdown', () => { keys[id] = true; });
-    btn.addEventListener('pointerup', () => { keys[id] = false; });
-    btn.addEventListener('pointerleave', () => { keys[id] = false; });
+  const btnLeft = document.getElementById('btnLeft');
+  const btnRight = document.getElementById('btnRight');
+  const btnJump = document.getElementById('btnJump');
+  // 记录每个按钮上的活跃触摸ID
+  const btnTouches = {};
+
+  function getBtnFromEl(el) {
+    if (btnLeft.contains(el)) return 'btnLeft';
+    if (btnRight.contains(el)) return 'btnRight';
+    if (btnJump.contains(el)) return 'btnJump';
+    return null;
+  }
+
+  canvas.addEventListener('touchstart', e => {
+    e.preventDefault();
+    for (const t of e.changedTouches) {
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      const btn = getBtnFromEl(el);
+      if (btn) { keys[btn] = true; btnTouches[t.identifier] = btn; }
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    // 检查每个触摸点是否还在按钮上
+    const activeBtns = new Set();
+    for (const t of e.touches) {
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      const btn = getBtnFromEl(el);
+      if (btn) activeBtns.add(btn);
+    }
+    // 没在任何按钮上的触摸对应的按钮释放
+    for (const [id, btn] of Object.entries(btnTouches)) {
+      if (!activeBtns.has(btn)) { keys[btn] = false; delete btnTouches[id]; }
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('touchend', e => {
+    e.preventDefault();
+    for (const t of e.changedTouches) {
+      if (btnTouches[t.identifier]) {
+        keys[btnTouches[t.identifier]] = false;
+        delete btnTouches[t.identifier];
+      }
+    }
+  }, { passive: false });
+
+  canvas.addEventListener('touchcancel', e => {
+    // 全部释放
+    for (const [id, btn] of Object.entries(btnTouches)) {
+      keys[btn] = false; delete btnTouches[id];
+    }
   });
 }
 
