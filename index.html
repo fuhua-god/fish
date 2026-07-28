@@ -258,7 +258,10 @@ body{
   <div class="wheel-card">
     <button class="wheel-close" onclick="closeWheel()">✕</button>
     <div class="wheel-title">🍽️ 今天吃什么</div>
-    <canvas id="wheelCanvas" width="400" height="400" style="max-width:300px;max-height:300px"></canvas>
+    <div id="wheelSpinWrap" style="position:relative;transition:none">
+      <div style="position:absolute;top:6px;right:6px;z-index:5;font-size:28px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));transform:rotate(-30deg);pointer-events:none">👉</div>
+      <canvas id="wheelCanvas" width="400" height="400" style="max-width:300px;max-height:300px;display:block"></canvas>
+    </div>
     <div class="wheel-result" id="wheelResult"></div>
     <button class="wheel-btn" id="wheelSpinBtn" onclick="spinWheel()">🎯 开转！</button>
     <div id="wheelChoices" style="display:none;gap:12px;flex-wrap:wrap;justify-content:center">
@@ -975,10 +978,13 @@ const WHEEL_COLORS = [
 
 let wheelAngle = 0;
 let wheelSpinning = false;
+let wheelInited = false;
 
 document.getElementById('sideImgRight').addEventListener('click', () => {
   document.getElementById('wheelOverlay').classList.add('active');
-  drawWheel(0);
+  if (!wheelInited) { drawWheel(); wheelInited = true; }
+  document.getElementById('wheelSpinWrap').style.transform = 'rotate(0deg)';
+  wheelAngle = 0;
   document.getElementById('wheelResult').textContent = '';
   document.getElementById('wheelResult').classList.remove('win');
   document.getElementById('wheelSpinBtn').style.display = 'block';
@@ -988,24 +994,23 @@ document.getElementById('sideImgRight').addEventListener('click', () => {
 
 function closeWheel() { document.getElementById('wheelOverlay').classList.remove('active'); }
 
-function drawWheel(rotateDeg) {
+// 只画一次，不再重绘
+function drawWheel() {
   const canvas = document.getElementById('wheelCanvas');
   const ctx = canvas.getContext('2d');
   const cx = canvas.width / 2, cy = canvas.height / 2, r = Math.min(cx, cy) - 4;
   const segAngle = (2 * Math.PI) / FOODS.length;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // 外圈
   ctx.beginPath(); ctx.arc(cx, cy, r + 2, 0, 2 * Math.PI); ctx.fillStyle = '#f48fb1'; ctx.fill();
 
   for (let i = 0; i < FOODS.length; i++) {
-    const start = segAngle * i + rotateDeg * Math.PI / 180;
+    const start = segAngle * i;
     const end = start + segAngle;
     ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, start, end);
     ctx.fillStyle = WHEEL_COLORS[i]; ctx.fill();
     ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
 
-    // 文字
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(start + segAngle / 2);
@@ -1038,26 +1043,24 @@ function spinWheel() {
   document.getElementById('wheelResult').classList.remove('win');
   document.getElementById('wheelChoices').style.display = 'none';
 
-  const spins = 4 + Math.random() * 6; // 4-10圈
+  const spins = 4 + Math.random() * 6;
   const extraAngle = Math.random() * 360;
-  const totalAngle = spins * 360 + extraAngle;
-  const startAngle = wheelAngle;
+  const totalAngle = spins * 360 + extraAngle + wheelAngle;
   const duration = 3500 + Math.random() * 1500;
   const startTime = performance.now();
+  const wrap = document.getElementById('wheelSpinWrap');
 
   function animate(now) {
     const elapsed = now - startTime;
     const progress = Math.min(elapsed / duration, 1);
-    // ease-out
     const eased = 1 - Math.pow(1 - progress, 3);
-    const current = startAngle + totalAngle * eased;
-    wheelAngle = current % 360;
-    drawWheel(wheelAngle);
+    const current = totalAngle * eased;
+    wrap.style.transform = `rotate(${current}deg)`;
 
     if (progress < 1) {
       requestAnimationFrame(animate);
     } else {
-      // 确定结果
+      wheelAngle = totalAngle % 360;
       const segAngle = 360 / FOODS.length;
       const normalized = ((360 - (wheelAngle % 360)) % 360 + 360) % 360;
       const idx = Math.floor(normalized / segAngle) % FOODS.length;
