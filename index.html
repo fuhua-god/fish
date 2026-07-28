@@ -146,6 +146,7 @@ body{
 <img class="side-img left" src="fish-img.jpg" alt="" id="sideImgLeft" title="点我">
 <img class="side-img right" src="fish-img.jpg" alt="">
 
+<audio id="bgMusic" loop preload="auto" style="display:none"><source src="Music-Overworld_Day.mp3" type="audio/mpeg"></audio>
 <div class="trail-container" id="trailContainer"></div>
 <div class="fish-wrapper" id="fishWrapper" title="点我！"><div class="fish-float" id="mainFishSvg"></div></div>
 
@@ -160,6 +161,7 @@ body{
   <div class="main-btns">
     <button class="btn-album" onclick="openAlbum()">📖 图鉴</button>
     <button class="btn-album" id="feedBtn" onclick="feedFish()">🍥 喂食</button>
+    <button class="btn-album" id="musicBtn" onclick="toggleMusic()">🔇 音乐关</button>
   </div>
   <div class="game-entry">
     <button class="entry-btn" onclick="enterGame('tictactoe')">🎮 井字棋</button>
@@ -567,6 +569,22 @@ function playBubbleSound() {
   g.gain.setValueAtTime(.3, ctx.currentTime);
   g.gain.exponentialRampToValueAtTime(.01, ctx.currentTime + .2);
   o.start(ctx.currentTime); o.stop(ctx.currentTime + .2);
+}
+
+let bgMusicPlaying = false;
+function toggleMusic() {
+  const music = document.getElementById('bgMusic');
+  const btn = document.getElementById('musicBtn');
+  if (bgMusicPlaying) {
+    music.pause();
+    btn.textContent = '🔇 音乐关';
+    bgMusicPlaying = false;
+  } else {
+    music.volume = 0.4;
+    music.play().catch(() => {});
+    btn.textContent = '🎵 音乐开';
+    bgMusicPlaying = true;
+  }
 }
 
 function playMeowSound() {
