@@ -1174,16 +1174,16 @@ function closeFeed() {
   }
 }
 
-function updateAffectionBar() {
+async function updateAffectionBar() {
   const a = STATE.affection || 0;
   document.getElementById('affectionBar').textContent = `💖 好感度 ${a}`;
   const today = getToday();
-  // 新的一天重置饲料
+  // 新的一天重置饲料，同时同步到云端
   if (STATE.feed_date !== today) {
     STATE.feed_remaining = 10;
     STATE.feed_bonus_used = false;
     STATE.feed_date = today;
-    lsSet(LS_STATE_KEY, STATE);
+    await saveState({ feed_remaining: 10, feed_bonus_used: false, feed_date: today });
   }
   const r = (STATE.feed_remaining != null) ? STATE.feed_remaining : 10;
   document.getElementById('feedBtn').textContent = r > 0 ? `🍥 喂食(${r})` : '🍥 喂食(0)';
