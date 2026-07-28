@@ -949,7 +949,9 @@ function updateDaysDisplay() {
   const h = Math.floor((totalSec % 86400) / 3600);
   const m = Math.floor((totalSec % 3600) / 60);
   const s = totalSec % 60;
+  const totalH = Math.floor(totalSec / 3600);
   document.getElementById('daysNum').innerHTML = d + '<span style="font-size:24px">天</span> ' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  document.getElementById('daysSub').textContent = '总计 ' + totalH + ' 个小时';
 }
 document.getElementById('sideImgLeft').addEventListener('click', () => {
   updateDaysDisplay();
