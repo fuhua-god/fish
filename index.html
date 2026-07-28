@@ -1166,7 +1166,7 @@ function updateAffectionBar() {
     STATE.feed_date = today;
     lsSet(LS_STATE_KEY, STATE);
   }
-  const r = STATE.feed_remaining || 10;
+  const r = (STATE.feed_remaining != null) ? STATE.feed_remaining : 10;
   document.getElementById('feedBtn').textContent = r > 0 ? `🍥 喂食(${r})` : '🍥 喂食(0)';
 }
 
@@ -1179,7 +1179,7 @@ async function feedFish() {
     STATE.feed_date = today;
     await saveState({ feed_remaining: 10, feed_bonus_used: false, feed_date: today });
   }
-  const remaining = STATE.feed_remaining || 10;
+  const remaining = (STATE.feed_remaining != null) ? STATE.feed_remaining : 10;
   if (remaining <= 0) {
     document.getElementById('feedEmoji').textContent = '😿';
     document.getElementById('feedMsg').textContent = '今天的鱼饲料已经喂完啦～';
