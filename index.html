@@ -230,7 +230,7 @@ body{
     <div class="days-emoji">💕</div>
     <div class="days-text">这个网站已经陪伴鱼姐</div>
     <div class="days-num" id="daysNum"></div>
-    <div class="days-text">天</div>
+    <div class="days-text" id="daysSub"></div>
     <button class="days-close" onclick="closeDays()">💖 一直陪伴</button>
   </div>
 </div>
@@ -932,20 +932,36 @@ async function pickDisplayFish(id) {
 }
 
 // ========== 陪伴天数 ==========
-function getStartDate() {
-  // 从昨天开始算起
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  return yesterday.toISOString().split('T')[0];
+function getStartTime() {
+  // 昨天 00:00:00
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+let daysTimer = null;
+function updateDaysDisplay() {
+  const now = new Date();
+  const start = getStartTime();
+  const diff = now - start;
+  const totalSec = Math.floor(diff / 1000);
+  const d = Math.floor(totalSec / 86400);
+  const h = Math.floor((totalSec % 86400) / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  document.getElementById('daysNum').innerHTML = d + '<span style="font-size:24px">天</span> ' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
 }
 document.getElementById('sideImgLeft').addEventListener('click', () => {
-  const start = new Date(getStartDate());
-  const today = new Date(getToday());
-  const days = Math.max(1, Math.floor((today - start) / (1000 * 60 * 60 * 24)) + 1);
-  document.getElementById('daysNum').textContent = days;
+  updateDaysDisplay();
   document.getElementById('daysOverlay').classList.add('active');
+  // 每秒刷新
+  clearInterval(daysTimer);
+  daysTimer = setInterval(updateDaysDisplay, 1000);
 });
-function closeDays() { document.getElementById('daysOverlay').classList.remove('active'); }
+function closeDays() {
+  document.getElementById('daysOverlay').classList.remove('active');
+  clearInterval(daysTimer);
+}
 
 // ========== 美食转盘 ==========
 const FOODS = [
