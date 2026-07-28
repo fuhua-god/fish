@@ -1157,17 +1157,28 @@ function closeFeed() {
 function updateAffectionBar() {
   const a = STATE.affection || 0;
   document.getElementById('affectionBar').textContent = `💖 好感度 ${a}`;
-  const d = { date: STATE.feed_date, remaining: STATE.feed_remaining || 10, bonusUsed: STATE.feed_bonus_used || false };
   const today = getToday();
-  if (d.date !== today) { d.remaining = 10; d.bonusUsed = false; }
-  document.getElementById('feedBtn').textContent = d.remaining > 0 ? `🍥 喂食(${d.remaining})` : '🍥 喂食(0)';
+  // 新的一天重置饲料
+  if (STATE.feed_date !== today) {
+    STATE.feed_remaining = 10;
+    STATE.feed_bonus_used = false;
+    STATE.feed_date = today;
+    lsSet(LS_STATE_KEY, STATE);
+  }
+  const r = STATE.feed_remaining || 10;
+  document.getElementById('feedBtn').textContent = r > 0 ? `🍥 喂食(${r})` : '🍥 喂食(0)';
 }
 
 async function feedFish() {
-  let remaining = STATE.feed_remaining || 10;
-  let feedDate = STATE.feed_date || '';
+  // 确保日期最新
   const today = getToday();
-  if (feedDate !== today) { remaining = 10; feedDate = today; }
+  if (STATE.feed_date !== today) {
+    STATE.feed_remaining = 10;
+    STATE.feed_bonus_used = false;
+    STATE.feed_date = today;
+    await saveState({ feed_remaining: 10, feed_bonus_used: false, feed_date: today });
+  }
+  const remaining = STATE.feed_remaining || 10;
   if (remaining <= 0) {
     document.getElementById('feedEmoji').textContent = '😿';
     document.getElementById('feedMsg').textContent = '今天的鱼饲料已经喂完啦～';
@@ -1175,8 +1186,8 @@ async function feedFish() {
     document.getElementById('feedOverlay').classList.add('active');
     return;
   }
-  remaining--;
-  await saveState({ feed_remaining: remaining, feed_date: feedDate });
+  STATE.feed_remaining = remaining - 1;
+  await saveState({ feed_remaining: remaining - 1 });
 
   const rnd = Math.random();
   let points, emoji, label;
