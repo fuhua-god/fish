@@ -264,6 +264,24 @@ body{
 	.life-close{position:absolute;top:16px;right:20px;z-index:5;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:16px;width:36px;height:36px;border-radius:50%;cursor:pointer;font-family:inherit}
 	.life-loc{position:absolute;top:20px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.3);font-size:12px;letter-spacing:2px}
 	@media(max-width:768px){.life-age{font-size:42px}.life-advice{font-size:13px}}
+	/* 今日三件事 */
+	.task-overlay{position:fixed;inset:0;z-index:43;background:rgba(0,0,0,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+	.task-overlay.active{opacity:1;pointer-events:auto}
+	.task-title{color:#fff;font-size:22px;font-weight:bold;letter-spacing:4px;margin-bottom:20px}
+	.task-tabs{display:flex;gap:8px;margin-bottom:20px}
+	.task-tab{padding:6px 16px;border-radius:20px;border:1.5px solid rgba(255,255,255,.25);background:transparent;color:rgba(255,255,255,.6);font-size:12px;cursor:pointer;font-family:inherit;letter-spacing:2px;transition:all .2s}
+	.task-tab.on{background:rgba(255,255,255,.15);color:#fff;border-color:#fff}
+	.task-slots{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:20px}
+	.task-slot{width:180px;height:140px;background:rgba(255,255,255,.06);border:2px solid rgba(255,255,255,.15);border-radius:16px;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px 12px;font-size:13px;color:rgba(255,255,255,.25);letter-spacing:2px;line-height:1.6;transition:all .3s;overflow:hidden;position:relative}
+	.task-slot.done{color:#fff;border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.1);animation:popIn .4s cubic-bezier(.175,.885,.32,1.275)}
+	.task-slot.spinning{animation:slotSpin .08s linear infinite}
+	@keyframes slotSpin{0%{transform:translateY(-10px)}50%{transform:translateY(10px)}100%{transform:translateY(-10px)}}
+	.task-slot .n{position:absolute;top:8px;left:12px;font-size:11px;color:rgba(255,255,255,.3)}
+	.task-btn{padding:12px 36px;border-radius:30px;border:none;font-size:16px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:3px;background:#fff;color:#1a1a2e;transition:all .2s;box-shadow:0 4px 20px rgba(255,255,255,.2)}
+	.task-btn:hover{transform:scale(1.04)}
+	.task-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+	.task-close{position:absolute;top:16px;right:20px;background:none;border:none;color:rgba(255,255,255,.4);font-size:20px;cursor:pointer}
+	@media(max-width:768px){.task-slot{width:150px;height:120px;font-size:11px;padding:12px 8px}.task-slots{gap:8px}}
 	/* 小游戏菜单 */
 	.games-overlay{position:fixed;inset:0;z-index:38;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s}
 	.games-overlay.active{opacity:1;pointer-events:auto}
@@ -422,6 +440,23 @@ body{
     <div class="gp-title">🎮 小 游 戏</div>
     <div class="games-grid" id="gamesGrid"></div>
   </div>
+</div>
+
+<!-- 今日三件事 -->
+<div class="task-overlay" id="taskOverlay">
+  <button class="task-close" onclick="closeTask()">✕</button>
+  <div class="task-title">🎯 今日三件事</div>
+  <div class="task-tabs">
+    <button class="task-tab on" onclick="setTaskMode('mix',this)">🎲 混合</button>
+    <button class="task-tab" onclick="setTaskMode('introvert',this)">🧘 社恐友好</button>
+    <button class="task-tab" onclick="setTaskMode('extrovert',this)">🎉 社牛挑战</button>
+  </div>
+  <div class="task-slots">
+    <div class="task-slot" id="slot0"><span class="n">❶</span>？</div>
+    <div class="task-slot" id="slot1"><span class="n">❷</span>？</div>
+    <div class="task-slot" id="slot2"><span class="n">❸</span>？</div>
+  </div>
+  <button class="task-btn" id="taskSpinBtn" onclick="spinTasks()">🎰 转一发</button>
 </div>
 
 <!-- 人生时钟 -->
@@ -1272,7 +1307,7 @@ fishWrapper.addEventListener('click', async (e) => {
 // ========== 点击空白处投喂饲料 ==========
 document.addEventListener('click', (e) => {
   // 排除交互元素：按钮、链接、鱼、侧边图、kitty、各种弹窗
-  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, .bs-overlay.active, .stress-overlay.active, .zoom-overlay.active, .battery-overlay.active, .dande-overlay.active, .life-overlay.active, .games-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
+  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, .bs-overlay.active, .stress-overlay.active, .zoom-overlay.active, .battery-overlay.active, .dande-overlay.active, .life-overlay.active, .task-overlay.active, .games-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
   spawnFoodAt(e.clientX, e.clientY);
 });
 
@@ -2323,6 +2358,7 @@ const GAMES_LIST = [
   {icon:'🔋',name:'电量算命',desc:'读取电量 · 人生建议',fn:()=>{closeGames();setTimeout(openBattery,300);}},
   {icon:'🌬️',name:'吹蒲公英',desc:'麦克风吹气 · 绒毛飘散',fn:()=>{closeGames();setTimeout(openDande,300);}},
   {icon:'⏳',name:'人生时钟',desc:'日出日落 · 人生刻度',fn:()=>{closeGames();setTimeout(openLife,300);}},
+  {icon:'🎯',name:'今日三件事',desc:'随机任务 · 微小具体',fn:()=>{closeGames();setTimeout(openTask,300);}},
   {icon:'🎮',name:'井字棋',desc:'鱼姐 vs 你',fn:()=>{closeGames();enterGame('tictactoe');}},
   {icon:'♟️',name:'五子棋',desc:'先五连者胜',fn:()=>{closeGames();enterGame('gomoku');}},
   {icon:'⚠️',name:'千万别点',desc:'像素闯关大冒险',fn:()=>{closeGames();location.href='game.html';}},
@@ -3354,6 +3390,123 @@ window.openLife = async function() {
 
 window.closeLife = function() {
   document.getElementById('lifeOverlay').classList.remove('active');
+};
+
+// ========== 今日三件事 ==========
+const TASK_POOL = {
+  introvert: [
+    '今天摸到3种\n不同材质的物品',
+    '喝第一口水时\n默数3秒',
+    '写下今天让你\n笑的一个瞬间',
+    '找一个安静角落\n发呆5分钟',
+    '观察窗外的一朵云\n看它30秒',
+    '整理一个抽屉\n或一个文件夹',
+    '给自己泡一杯茶\n闻三次香气再喝',
+    '写下三个让你\n感恩的小事',
+    '关掉屏幕\n凝视远方10秒',
+    '听一首从来没\n听过的歌',
+    '找到房间里\n最旧的一件物品',
+    '做三次深呼吸\n每次闭眼5秒',
+    '用非惯用手\n写一个字',
+    '对自己说一句\n真心的赞美',
+    '看一眼天空\n记下今天的颜色',
+    '光脚在地板上\n站一分钟',
+    '翻开一本书\n只读第一段',
+    '撕一张纸\n慢慢撕成碎片',
+    '找一片叶子\n观察它的纹理',
+    '闭上眼睛\n听周围3种声音',
+  ],
+  extrovert: [
+    '对第一个看到的\n陌生人微笑',
+    '给一个朋友发\n一条真诚的赞美',
+    '在群里分享一件\n今天发生的趣事',
+    '给家人打一个电话\n哪怕只说两分钟',
+    '跟收银员说一句\n"辛苦了"',
+    '帮一个人扶门\n等他/她通过',
+    '对同事说一句\n"你今天看起来不错"',
+    '在朋友圈发一张\n不修图的照片',
+    '给外卖员或快递员\n真诚地说谢谢',
+    '对路边的小狗说\n"你好可爱"',
+    '跟电梯里的陌生人\n点个头微笑',
+    '在评论区和一个\n陌生人真诚互动',
+    '给妈妈或爸爸\n发一个暖心表情包',
+    '对镜子里的自己\n比个耶 ✌️',
+    '跟一个人说"谢谢"\n并说出理由',
+    '向一个人推荐\n你最近喜欢的东西',
+    '在便利店买东西\n排队时跟人闲聊一句',
+    '给今天遇到的\n一个服务人员鼓掌',
+    '对一个人说\n"我欣赏你"',
+    '参加一次集体活动\n哪怕是线上的',
+  ],
+};
+
+let taskMode = 'mix';
+let taskSpinning = false;
+
+function setTaskMode(mode, btn) {
+  taskMode = mode;
+  document.querySelectorAll('.task-tab').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+function pickTasks(mode) {
+  let pool;
+  if (mode === 'introvert') pool = [...TASK_POOL.introvert];
+  else if (mode === 'extrovert') pool = [...TASK_POOL.extrovert];
+  else pool = [...TASK_POOL.introvert, ...TASK_POOL.extrovert];
+
+  // Fisher-Yates 洗牌，取前3
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  // 如果是混合模式，确保至少来自两个分类
+  if (mode === 'mix') {
+    const intCount = pool.slice(0, 3).filter(t => TASK_POOL.introvert.includes(t)).length;
+    if (intCount === 0 || intCount === 3) {
+      // 重新随机：强制从每边各取一些
+      const a = TASK_POOL.introvert[Math.floor(Math.random() * TASK_POOL.introvert.length)];
+      const b = TASK_POOL.extrovert[Math.floor(Math.random() * TASK_POOL.extrovert.length)];
+      const rest = [...TASK_POOL.introvert, ...TASK_POOL.extrovert].filter(t => t !== a && t !== b);
+      const c = rest[Math.floor(Math.random() * rest.length)];
+      return [a, b, c];
+    }
+  }
+  return pool.slice(0, 3);
+}
+
+function spinTasks() {
+  if (taskSpinning) return;
+  taskSpinning = true;
+  const btn = document.getElementById('taskSpinBtn');
+  btn.disabled = true;
+  btn.textContent = '🎰 转动中...';
+
+  const tasks = pickTasks(taskMode);
+  const slots = [0, 1, 2].map(i => document.getElementById('slot' + i));
+  slots.forEach(s => { s.classList.remove('done'); s.classList.add('spinning'); s.textContent = '？'; });
+
+  // 依次停止三个槽位
+  [0, 1, 2].forEach(i => {
+    setTimeout(() => {
+      slots[i].classList.remove('spinning');
+      slots[i].classList.add('done');
+      slots[i].innerHTML = '<span class="n">' + ['❶','❷','❸'][i] + '</span>' + tasks[i].replace(/\n/g, '<br>');
+      if (i === 2) {
+        taskSpinning = false;
+        btn.disabled = false;
+        btn.textContent = '🔄 再转一发';
+      }
+    }, 600 + i * 700);
+  });
+}
+
+window.openTask = function() {
+  document.getElementById('taskOverlay').classList.add('active');
+};
+
+window.closeTask = function() {
+  document.getElementById('taskOverlay').classList.remove('active');
 };
 
 // ========== 场景初始化 ==========
