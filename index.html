@@ -183,6 +183,27 @@ body{
 	.fortune-close{position:absolute;top:8px;right:12px;background:none;border:none;color:#ffd740;font-size:18px;cursor:pointer}
 	.fortune-shake-hint{color:#8d6e63;font-size:11px;letter-spacing:2px;text-align:center}
 	@media(max-width:768px){#fortuneCanvas{width:180px;height:150px}.fortune-title{font-size:15px}.fortune-slip .lv{font-size:22px}.fortune-slip .txt{font-size:11px}}
+	/* 废话连篇生成器 */
+	.bs-overlay{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+	.bs-overlay.active{opacity:1;pointer-events:auto}
+	.bs-card{background:linear-gradient(160deg,#fafafa,#e8eaf6,#e3f2fd);border-radius:16px;padding:28px 22px 18px;box-shadow:0 20px 60px rgba(0,0,0,.35);display:flex;flex-direction:column;align-items:center;gap:14px;max-width:440px;width:93vw;position:relative;border:1px solid #cfd8dc}
+	.bs-card .bs-logo{font-size:13px;color:#90a4ae;letter-spacing:3px;font-weight:bold;text-align:center}
+	.bs-card .bs-output{background:#fff;border:2px dashed #b0bec5;border-radius:10px;padding:18px 16px;min-height:80px;width:100%;font-size:18px;color:#37474f;letter-spacing:2px;line-height:1.8;text-align:center;word-break:break-all;transition:all .3s;display:flex;align-items:center;justify-content:center}
+	.bs-card .bs-output.copying{background:#e8f5e9;border-color:#66bb6a;transition:all .15s}
+	.bs-card .bs-tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+	.bs-card .bs-tab{padding:6px 14px;border-radius:20px;border:1.5px solid #cfd8dc;background:#fff;font-size:12px;cursor:pointer;font-family:inherit;color:#78909c;transition:all .2s;letter-spacing:1px}
+	.bs-card .bs-tab.on{background:#37474f;color:#fff;border-color:#37474f}
+	.bs-card .bs-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%}
+	.bs-card .bs-btn{padding:10px 18px;border-radius:25px;border:none;font-size:13px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;transition:all .2s;display:flex;align-items:center;gap:4px}
+	.bs-btn.primary{background:#37474f;color:#fff;box-shadow:0 3px 10px rgba(55,71,79,.3)}
+	.bs-btn.primary:hover{background:#263238;transform:translateY(-1px)}
+	.bs-btn.secondary{background:#fff;color:#546e7a;border:1.5px solid #cfd8dc}
+	.bs-btn.secondary:hover{border-color:#90a4ae}
+	.bs-btn.copy{background:#66bb6a;color:#fff}
+	.bs-btn.copy:hover{background:#43a047}
+	.bs-close{position:absolute;top:12px;right:16px;background:none;border:none;font-size:18px;cursor:pointer;color:#b0bec5}
+	.bs-close:hover{color:#78909c}
+	@media(max-width:768px){.bs-card{padding:22px 14px 14px;gap:10px}.bs-card .bs-output{font-size:15px;padding:14px 12px;min-height:60px}.bs-card .bs-btn{padding:8px 14px;font-size:11px}}
 	.globe-entry-btn{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:28;width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#1a237e,#4fc3f7,#1a237e);background-size:200% 200%;animation:gp 3s ease-in-out infinite;border:none;cursor:pointer;font-size:36px;box-shadow:0 6px 30px rgba(79,195,247,.5);transition:transform .2s}
 	.globe-entry-btn:hover{transform:translateX(-50%) scale(1.1)}
 	.globe-entry-btn:active{transform:translateX(-50%) scale(.9)}
@@ -224,6 +245,7 @@ body{
     <button class="btn-album" id="musicBtn" onclick="toggleMusic()">🔇 音乐关</button>
     <button class="btn-album" onclick="openGlobe()">🌍 地球仪</button>
 	    <button class="btn-album" style="background:#1a1a2e;color:#ffd740;border-color:#ffd740" onclick="openFortune()">🐉 运势</button>
+	    <button class="btn-album" style="background:#37474f;color:#fff;border-color:#455a64" onclick="openBS()">📝 废话</button>
   </div>
   <div class="game-entry">
     <button class="entry-btn" onclick="enterGame('tictactoe')">🎮 井字棋</button>
@@ -323,6 +345,25 @@ body{
   </div>
 </div>
 <button class="globe-entry-btn" id="globeEntryBtn" onclick="openGlobe()" title="🌍 地球仪">🌍</button>
+
+<!-- 废话连篇生成器 -->
+<div class="bs-overlay" id="bsOverlay">
+  <div class="bs-card">
+    <button class="bs-close" onclick="closeBS()">✕</button>
+    <div class="bs-logo">📝 废 话 连 篇 生 成 器</div>
+    <div class="bs-tabs" id="bsTabs">
+      <button class="bs-tab on" onclick="setBSMode('corp',this)">💼 职场</button>
+      <button class="bs-tab" onclick="setBSMode('edu',this)">🎓 学术</button>
+      <button class="bs-tab" onclick="setBSMode('tech',this)">💻 互联网</button>
+    </div>
+    <div class="bs-output" id="bsOutput">点击下方按钮<br>生成一句高级废话</div>
+    <div class="bs-btns">
+      <button class="bs-btn primary" onclick="generateBS()">🔄 再生成一条</button>
+      <button class="bs-btn copy" onclick="copyBS()">📋 一键复制</button>
+      <button class="bs-btn secondary" onclick="generateBSPPT()">📊 生成PPT标题</button>
+    </div>
+  </div>
+</div>
 
 <!-- 今日运势 -->
 <div class="fortune-overlay" id="fortuneOverlay">
@@ -1090,7 +1131,7 @@ fishWrapper.addEventListener('click', async (e) => {
 // ========== 点击空白处投喂饲料 ==========
 document.addEventListener('click', (e) => {
   // 排除交互元素：按钮、链接、鱼、侧边图、kitty、各种弹窗
-  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
+  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, .bs-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
   spawnFoodAt(e.clientX, e.clientY);
 });
 
@@ -1717,6 +1758,113 @@ if (!window.DeviceMotionEvent) {
 
 // 预渲染第一帧
 renderFortuneFrame();
+
+// ========== 废话连篇生成器 ==========
+let bsMode = 'corp';
+
+const BS_DICT = {
+  corp: {
+    bg:['在当下的宏观背景下','面对日益复杂的市场环境','站在战略转型的关键节点','随着行业格局的深度重构','在VUCA时代的大潮中','面对不确定性的新常态','在高质量发展的要求下','身处存量博弈的深水区'],
+    v:['深度对齐','全面赋能','系统性重构','颗粒度细化','垂直打通','螺旋式上升','跨越式发展','闭环式增长','多维度渗透','战略性卡位','差异化破局','指数级爆发'],
+    n:['底层逻辑','核心打法','顶层设计','战略高地','护城河','引爆点','主战场','新赛道','价值锚点','增长飞轮','能力中台','生态位'],
+    p:['实现从0到1的范式转移','达成多边共赢的协同效应','构建可持续的竞争壁垒','形成端到端的业务闭环','释放组织冗余的潜在势能','完成从量变到质变的关键一跃','打造可复制的增长模型','重塑行业边界与游戏规则'],
+    filler:['正所谓','归根结底','坦率地讲','从某种意义上说','毋庸置疑','正如业界共识','本质上','不容忽视的是'],
+  },
+  edu: {
+    bg:['在后现代主义视域下','从跨学科交叉融合的角度审视','基于对既有范式的批判性反思','在知识生产模式转型的语境下','立足于本体论与认识论的辩证统一','面对学术话语体系的解构与重构','在全球学术共同体的话语场域中','在实证研究与理论建构的张力之间'],
+    v:['深度解构','系统性阐释','批判性审视','多维透视','谱系学追溯','现象学还原','话语分析','知识考古','范式革新','元理论建构','跨语境转译','发生学考察'],
+    n:['知识谱系','话语场域','理论框架','认知图式','学术生态','思想资源','方法论自觉','学科边界','问题意识','阐释框架','逻辑起点','价值坐标'],
+    p:['实现学科范式的创造性转化','推动知识生产的结构性转型','构建具有解释力的理论模型','揭示被遮蔽的深层话语机制','完成从经验描述到理论自觉的跃迁','拓展学术研究的边界与可能性','形成跨学科对话的有效接口','重构问题域与解题路径'],
+    filler:['值得深思的是','从学理上讲','严格来说','若加以批判性审视','不言而喻的是','就其本质而言','纵观学术史脉络','值得进一步追问的是'],
+  },
+  tech: {
+    bg:['在大模型技术爆发的当下','面对AIGC重构内容生态的新格局','在云原生与边缘计算融合的趋势下','身处Web3与元宇宙的交汇点','随着AGI技术奇点的临近','在数据要素化与算法治理的平衡中','面向下一代人机交互范式','在技术栈快速迭代的周期里'],
+    v:['深度耦合','无损对齐','异步解耦','热更新','冷启动','垂直切分','全链路追踪','弹性扩容','服务降级','流量分发','渐进式迁移','确定性消除'],
+    n:['技术底座','能力矩阵','中台战略','端到端方案','最佳实践','MVP验证','北极星指标','增长黑客','SOP流程','KPI看板','OKR体系','技术债'],
+    p:['实现从MVP到PMF的快速验证','构建高可用高并发的技术架构','达成研发效能与业务价值的双赢','形成数据驱动的增长飞轮','完成从单体到微服务的平滑迁移','打造面向未来的技术护城河','实现技术投入的ROI最大化','重塑产品与用户的连接方式'],
+    filler:['从工程视角看','严格意义上','业界普遍认为','不可否认','归根到底','正如某位技术大牛所言','数据告诉我们','实际上'],
+  }
+};
+
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function genBS(mode) {
+  const d = BS_DICT[mode || bsMode];
+  const templates = [
+    () => `${pick(d.bg)}，${pick(d.filler)}，我们需要${pick(d.v)}${pick(d.n)}，${pick(d.p)}。`,
+    () => `${pick(d.filler)}，${pick(d.n)}的本质是${pick(d.v)}${pick(d.n)}，这要求我们${pick(d.v)}，从而${pick(d.p)}。`,
+    () => `${pick(d.bg)}，${pick(d.n)}已成为新的${pick(d.n)}。${pick(d.filler)}，只有${pick(d.v)}${pick(d.n)}，才能${pick(d.p)}。`,
+    () => `${pick(d.filler)}${pick(d.n)}决定了${pick(d.n)}的上限。${pick(d.bg)}，我们必须${pick(d.v)}${pick(d.n)}，最终${pick(d.p)}。`,
+    () => `如果把${pick(d.n)}比作${pick(d.n)}的引擎，那么${pick(d.v)}就是方向盘。${pick(d.filler)}，${pick(d.bg)}，唯有${pick(d.v)}才是出路。`,
+    () => `${pick(d.bg)}，${pick(d.v)}与${pick(d.v)}的有机结合，将从${pick(d.n)}层面重新定义${pick(d.n)}，并最终${pick(d.p)}。`,
+    () => `${pick(d.filler)}，真正拉开差距的不是${pick(d.n)}，而是${pick(d.v)}${pick(d.n)}的能力。${pick(d.bg)}，让我们${pick(d.v)}，${pick(d.p)}。`,
+    () => `关于${pick(d.n)}的${pick(d.v)}，${pick(d.filler)}，这是一个${pick(d.n)}的问题，需要从${pick(d.n)}的维度来理解。${pick(d.bg)}，我们必须${pick(d.p)}。`,
+  ];
+  return pick(templates)();
+}
+
+function genPPTTitle(mode) {
+  const d = BS_DICT[mode || bsMode];
+  const titles = [
+    `关于${pick(d.n)}的${pick(d.v)}：方法与路径`,
+    `${pick(d.n)}${pick(d.v)}的底层逻辑与顶层设计`,
+    `${pick(d.bg)}：${pick(d.n)}的挑战与机遇`,
+    `从${pick(d.n)}到${pick(d.n)}：${pick(d.v)}驱动下的范式转移`,
+    `${pick(d.v)}${pick(d.n)}：构建面向未来的${pick(d.n)}`,
+    `${pick(d.n)}${pick(d.v)}的若干关键思考`,
+    `深度解读${pick(d.v)}${pick(d.n)}：趋势、挑战与对策`,
+    `以${pick(d.v)}推动${pick(d.n)}：实践路径与战略选择`,
+  ];
+  return pick(titles);
+}
+
+function generateBS() {
+  const text = genBS();
+  document.getElementById('bsOutput').textContent = text;
+  document.getElementById('bsOutput').classList.remove('copying');
+}
+
+function generateBSPPT() {
+  const title = genPPTTitle();
+  document.getElementById('bsOutput').textContent = '📊 ' + title;
+  document.getElementById('bsOutput').classList.remove('copying');
+}
+
+async function copyBS() {
+  const text = document.getElementById('bsOutput').textContent;
+  try {
+    await navigator.clipboard.writeText(text);
+    const out = document.getElementById('bsOutput');
+    out.classList.add('copying');
+    setTimeout(() => out.classList.remove('copying'), 600);
+  } catch(e) {
+    // 降级方案
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+}
+
+function setBSMode(mode, btn) {
+  bsMode = mode;
+  document.querySelectorAll('#bsTabs .bs-tab').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  generateBS();
+}
+
+window.openBS = function() {
+  document.getElementById('bsOverlay').classList.add('active');
+  if (document.getElementById('bsOutput').textContent.includes('点击下方按钮')) generateBS();
+};
+
+window.closeBS = function() {
+  document.getElementById('bsOverlay').classList.remove('active');
+};
 
 // ========== 场景初始化 ==========
 (function initScene() {
