@@ -767,8 +767,8 @@ function updateFishPos(ts) {
     if (fishY > window.innerHeight - fh - pad) { fishY = window.innerHeight - fh - pad; fishVY = -Math.abs(fishVY); }
     const newDir = fishVX >= 0 ? 1 : -1;
     if (newDir !== fishDir) { fishDir = newDir; }
-    // 更新食物物理
-    updateFoodPhysics();
+    // 更新食物物理（有食物时才执行）
+    if (foodPellets.length > 0) updateFoodPhysics();
   } catch(e) {
     // 食物系统出错不影响鱼游动：回退到原有游动逻辑
     console.warn('food system error:', e);
@@ -802,11 +802,11 @@ updateFishPos();
 
 // ========== 拖尾 ==========
 const TRAIL_CONFIG = {
-  3: { perFrame: 2, life: 700, size: [3, 6], colors: ['#ce93d8', '#e1bee7', '#f3e5f5', '#ba68c8', '#fff'], shapes: ['circle'] },
-  4: { perFrame: 3, life: 850, size: [4, 8], colors: ['#ffb74d', '#ffe0b2', '#ffcc80', '#fff8e1', '#fff', '#ff9800'], shapes: ['circle', 'star'] },
-  5: { perFrame: 3, life: 950, size: [3, 7], colors: ['#ef5350', '#b71c1c', '#7b1fa2', '#4a148c', '#ffcdd2', '#fff'], shapes: ['circle', 'circle', 'star'] },
-  6: { perFrame: 5, life: 1100, size: [5, 10], colors: ['#f48fb1', '#ce93d8', '#81d4fa', '#fff176', '#ff8a80', '#a5d6a7', '#ffe082', '#ef9a9a'], shapes: ['circle', 'star', 'star', 'diamond'] },
-  7: { perFrame: 8, life: 1400, size: [6, 14], colors: ['#ff1744','#ff4081','#ff9100','#ffd600','#76ff03','#00e5ff','#d500f9','#fff','#ff80ab','#ffe57f','#b9f6ca','#80d8ff','#ea80fc'], shapes: ['circle', 'star', 'star', 'diamond', 'diamond', 'star'] }
+  3: { perFrame: 1, life: 500, size: [3, 5], colors: ['#ce93d8', '#e1bee7', '#fff'], shapes: ['circle'] },
+  4: { perFrame: 1, life: 550, size: [4, 7], colors: ['#ffb74d', '#ffe0b2', '#fff', '#ff9800'], shapes: ['circle', 'star'] },
+  5: { perFrame: 2, life: 600, size: [3, 6], colors: ['#ef5350', '#ffcdd2', '#fff'], shapes: ['circle', 'star'] },
+  6: { perFrame: 3, life: 700, size: [5, 9], colors: ['#f48fb1', '#ce93d8', '#81d4fa', '#fff176', '#fff'], shapes: ['circle', 'star', 'diamond'] },
+  7: { perFrame: 4, life: 850, size: [6, 12], colors: ['#ff1744','#ff4081','#ff9100','#ffd600','#76ff03','#00e5ff','#d500f9','#fff','#ff80ab','#b9f6ca'], shapes: ['circle', 'star', 'diamond'] }
 };
 
 function getDisplayFishRarity() {
@@ -823,7 +823,9 @@ function spawnTrail(fx, fy, dir) {
   const cfg = TRAIL_CONFIG[rarity];
   if (!cfg) return;
   trailTick++;
-  if (trailTick % Math.max(1, Math.floor(3 / cfg.perFrame)) !== 0) return;
+  // 降低拖尾生成频率以优化移动端性能
+  const skipRate = window.innerWidth <= 768 ? Math.max(1, Math.floor(6 / cfg.perFrame)) : Math.max(1, Math.floor(3 / cfg.perFrame));
+  if (trailTick % skipRate !== 0) return;
   const container = document.getElementById('trailContainer');
   const tailX = dir === 1 ? fx + fishSize.w * 0.16 : fx + fishSize.w * 0.84;
   const tailY = fy + fishSize.h / 2;
@@ -991,9 +993,11 @@ async function eatFood(pellet) {
 }
 
 function updateFoodPhysics() {
+  let anyMoving = false;
   for (const p of foodPellets) {
     if (p.eaten) continue;
     if (!p.atBottom) {
+      anyMoving = true;
       p.vy += FOOD_GRAVITY;
       if (p.vy > FOOD_TERMINAL_VY) p.vy = FOOD_TERMINAL_VY;
       p.y += p.vy;
@@ -1006,13 +1010,16 @@ function updateFoodPhysics() {
         if (Math.abs(p.vy) < 0.4) { p.vy = 0; p.vx = 0; p.atBottom = true; }
       }
     }
-    if (p.element) {
+    // 仅更新运动中食物的 DOM
+    if (p.element && !p.atBottom) {
       p.wobble += 0.03;
-      const wobX = p.atBottom ? 0 : Math.sin(p.wobble) * 2;
-      p.element.style.left = (p.x + wobX) + 'px';
+      p.element.style.left = (p.x + Math.sin(p.wobble) * 2) + 'px';
       p.element.style.top = p.y + 'px';
-      if (p.atBottom) { p.element.style.transform = 'scale(0.8)'; p.element.style.opacity = '0.65'; }
     }
+  }
+  // 所有食物都静止后，清理数组引用（可选优化）
+  if (!anyMoving && foodPellets.every(p => p.eaten || p.atBottom)) {
+    // 静止食物不更新 DOM
   }
 }
 
@@ -1734,7 +1741,8 @@ function drawFortuneSlip(x, y, scale) {
 }
 
 function renderFortuneFrame(ts) {
-  if (fortuneState === 'idle' && !document.getElementById('fortuneOverlay').classList.contains('active')) {
+  if (!document.getElementById('fortuneOverlay').classList.contains('active') && fortuneState === 'idle') {
+    fortuneAnimId = null;
     fortuneFrame = 0;
     return;
   }
@@ -1822,7 +1830,7 @@ window.openFortune = function() {
     document.getElementById('fortuneBtn').disabled = false;
     fortuneState = 'idle';
   }
-  if (!fortuneAnimId) renderFortuneFrame();
+  if (!fortuneAnimId) fortuneAnimId = requestAnimationFrame(renderFortuneFrame);
 };
 
 window.closeFortune = function() {
