@@ -1737,26 +1737,15 @@ window.openFortune = function() {
   fortunePendingResult = savedResult || null;
 
   document.getElementById('fortuneOverlay').classList.add('active');
+  document.getElementById('fortuneSlip').classList.remove('show');
   if (fortuneDrawnToday && fortunePendingResult) {
-    // 今天已抽过，直接显示保存的结果
-    document.getElementById('fortuneSlip').classList.remove('show');
+    // 今日已抽签：直接展示保存的结果，不重播动画
+    fortuneState = 'done';
+    fortuneDanceStart = fortuneFrame - 50; // 让签文在画布上立刻全显
     document.getElementById('fortuneBtn').textContent = '✅ 今日已抽签';
     document.getElementById('fortuneBtn').disabled = true;
-    fortuneState = 'idle';
-    // 让龙先跳个舞再吐签
-    setTimeout(() => {
-      document.getElementById('fortuneSlip').classList.remove('show');
-      document.getElementById('fortuneBtn').textContent = '🐉 神兽起舞中...';
-      document.getElementById('fortuneBtn').disabled = true;
-      fortuneState = 'dancing';
-      fortuneDanceStart = fortuneFrame;
-      setTimeout(() => {
-        fortuneState = 'spitting';
-        fortuneDanceStart = fortuneFrame;
-      }, 1000);
-    }, 400);
+    showFortuneResult();
   } else {
-    document.getElementById('fortuneSlip').classList.remove('show');
     document.getElementById('fortuneBtn').textContent = '🎴 抽 取 签 文';
     document.getElementById('fortuneBtn').disabled = false;
     fortuneState = 'idle';
