@@ -1729,6 +1729,36 @@ const COUNTRIES = [
 [39,59,36,53,43,67,'central_asia','desert','土库曼斯坦','🇹🇲','🔥','地狱之门的火']
 ];
 
+// ========== 轮廓线生成 ==========
+function latLngToVec3(lat, lng, radius) {
+  const phi = (90 - lat) * Math.PI / 180;
+  const theta = (lng + 180) * Math.PI / 180;
+  return new THREE.Vector3(
+    -radius * Math.sin(phi) * Math.cos(theta),
+    radius * Math.cos(phi),
+    radius * Math.sin(phi) * Math.sin(theta)
+  );
+}
+
+function generateOutlinePoints(country, numPoints) {
+  const [cLat, cLng, minLat, minLng, maxLat, maxLng] = country;
+  const latR = (maxLat - minLat) / 2 * 1.1;
+  const lngR = (maxLng - minLng) / 2 * 1.1;
+  // 小国的轮廓点少一些
+  const n = Math.max(12, Math.min(numPoints, Math.floor((latR + lngR) * 8)));
+  const pts = [];
+  for (let i = 0; i < n; i++) {
+    const angle = (i / n) * Math.PI * 2;
+    const lat = cLat + latR * Math.cos(angle);
+    let lng = cLng + lngR * Math.sin(angle);
+    // 跨越180度经线时修正
+    if (lng > 180) lng -= 360;
+    if (lng < -180) lng += 360;
+    pts.push(latLngToVec3(lat, lng, EARTH_RADIUS + 0.02));
+  }
+  return pts;
+}
+
 // ========== Web Audio 合成引擎 ==========
 let audioCtx = null;
 let currentSoundNodes = [];
@@ -2097,6 +2127,8 @@ function spawnDanmaku(country, x, y) {
 let globeScene, globeCamera, globeRenderer, globeControls, globeMesh, globeAnimId;
 let globeActive = false;
 let globeAutoRotate = true;
+let highlightLine = null;
+let hoveredCountry = null;
 const EARTH_RADIUS = 2.5;
 
 function initGlobe() {
@@ -2136,6 +2168,14 @@ function initGlobe() {
   const glow = new THREE.Mesh(glowGeo, glowMat);
   globeScene.add(glow);
 
+  // 轮廓高亮线（初始为空）
+  highlightLine = new THREE.LineLoop(
+    new THREE.BufferGeometry(),
+    new THREE.LineBasicMaterial({ color: 0xffdd44, linewidth: 1, transparent: true, opacity: 0.85, depthTest: true })
+  );
+  highlightLine.visible = false;
+  globeScene.add(highlightLine);
+
   // 星空
   const starsGeo = new THREE.BufferGeometry();
   const starsVerts = [];
@@ -2161,9 +2201,10 @@ function initGlobe() {
   globeControls.target.set(0, 0, 0);
   globeControls.update();
 
-  // 点击检测
+  // 点击检测 & 悬停检测
   const raycaster = new THREE.Raycaster();
-  globeRenderer.domElement.addEventListener('click', (e) => {
+
+  function getCountryFromMouse(e) {
     const rect = globeRenderer.domElement.getBoundingClientRect();
     const mouse = new THREE.Vector2(
       ((e.clientX - rect.left) / rect.width) * 2 - 1,
@@ -2172,40 +2213,65 @@ function initGlobe() {
     raycaster.setFromCamera(mouse, globeCamera);
     const intersects = raycaster.intersectObject(globeMesh);
     if (intersects.length > 0) {
-      const point = intersects[0].point.clone();
-      // 转换为经纬度
+      const point = intersects[0].point;
       const lat = Math.asin(point.y / EARTH_RADIUS) * (180 / Math.PI);
       const lng = Math.atan2(point.z, point.x) * (180 / Math.PI);
-      // 找到最近的国家
-      const country = findNearestCountry(lat, lng);
-      if (country) {
-        globeAutoRotate = false;
-        globeControls.autoRotate = false;
-        // 显示信息
-        document.getElementById('globeCountry').textContent = country[9] + ' ' + country[8];
-        document.getElementById('globeSound').textContent = '🔊 ' + country[11];
-        document.getElementById('globeInfo').style.opacity = '1';
-        document.getElementById('globeHint').style.opacity = '0';
-        // 播放声音
-        playSoundPreset(country[7], country[0] * 0.3);
-        // 弹幕
-        spawnDanmaku(country, e.clientX, e.clientY);
-        // 3秒后恢复自动旋转
-        clearTimeout(window._globeResumeTimer);
-        window._globeResumeTimer = setTimeout(() => {
-          globeAutoRotate = true;
-          globeControls.autoRotate = true;
-          document.getElementById('globeInfo').style.opacity = '0';
-          document.getElementById('globeHint').style.opacity = '1';
-        }, 6000);
-      }
+      return findNearestCountry(lat, lng);
+    }
+    return null;
+  }
+
+  function setCountryHighlight(country) {
+    if (!country || country === hoveredCountry) return;
+    hoveredCountry = country;
+    const pts = generateOutlinePoints(country, 32);
+    highlightLine.geometry.dispose();
+    highlightLine.geometry = new THREE.BufferGeometry().setFromPoints(pts);
+    highlightLine.visible = true;
+  }
+
+  function clearCountryHighlight() {
+    hoveredCountry = null;
+    highlightLine.visible = false;
+  }
+
+  // 桌面悬停检测
+  globeRenderer.domElement.addEventListener('mousemove', (e) => {
+    if (!globeActive) return;
+    const country = getCountryFromMouse(e);
+    if (country) setCountryHighlight(country);
+    else clearCountryHighlight();
+  });
+
+  // 点击事件
+  globeRenderer.domElement.addEventListener('click', (e) => {
+    const country = getCountryFromMouse(e);
+    if (country) {
+      setCountryHighlight(country);
+      globeAutoRotate = false;
+      globeControls.autoRotate = false;
+      document.getElementById('globeCountry').textContent = country[9] + ' ' + country[8];
+      document.getElementById('globeSound').textContent = '🔊 ' + country[11];
+      document.getElementById('globeInfo').style.opacity = '1';
+      document.getElementById('globeHint').style.opacity = '0';
+      playSoundPreset(country[7], country[0] * 0.3);
+      spawnDanmaku(country, e.clientX, e.clientY);
+      clearTimeout(window._globeResumeTimer);
+      window._globeResumeTimer = setTimeout(() => {
+        globeAutoRotate = true;
+        globeControls.autoRotate = true;
+        document.getElementById('globeInfo').style.opacity = '0';
+        document.getElementById('globeHint').style.opacity = '1';
+        clearCountryHighlight();
+      }, 6000);
     }
   });
 
-  // 拖拽时停止自动旋转
+  // 拖拽时停止自动旋转并清除高亮
   globeRenderer.domElement.addEventListener('pointerdown', () => {
     globeAutoRotate = false;
     globeControls.autoRotate = false;
+    clearCountryHighlight();
   });
   globeRenderer.domElement.addEventListener('pointerup', () => {
     clearTimeout(window._globeResumeTimer);
@@ -2213,6 +2279,11 @@ function initGlobe() {
       globeAutoRotate = true;
       globeControls.autoRotate = true;
     }, 3000);
+  });
+
+  // 鼠标离开画布时清除高亮
+  globeRenderer.domElement.addEventListener('mouseleave', () => {
+    clearCountryHighlight();
   });
 }
 
@@ -2275,6 +2346,7 @@ window.closeGlobe = function() {
   document.getElementById('globeOverlay').classList.remove('active');
   stopAllSounds(500);
   document.getElementById('globeInfo').style.opacity = '0';
+  clearCountryHighlight();
 };
 
 // 键盘 ESC 关闭
