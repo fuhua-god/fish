@@ -1196,11 +1196,8 @@ async function pickDisplayFish(id) {
 
 // ========== 陪伴天数 ==========
 function getStartTime() {
-  // 昨天 00:00:00
-  const d = new Date();
-  d.setDate(d.getDate() - 1);
-  d.setHours(0, 0, 0, 0);
-  return d;
+  // 2026年7月27日 00:00:00
+  return new Date(2026, 6, 27, 0, 0, 0);
 }
 let daysTimer = null;
 function updateDaysDisplay() {
