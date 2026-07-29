@@ -222,6 +222,16 @@ body{
 	.stress-hint{position:absolute;bottom:50px;color:rgba(255,255,255,.5);font-size:14px;letter-spacing:3px;text-align:center;pointer-events:none}
 	.stress-force-bar{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);width:200px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden}
 	.stress-force-fill{height:100%;background:linear-gradient(90deg,#4fc3f7,#e040fb,#ff5252);border-radius:2px;transition:width .1s;width:0}
+	/* 缩放世界 */
+	.zoom-overlay{position:fixed;inset:0;z-index:43;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+	.zoom-overlay.active{opacity:1;pointer-events:auto;touch-action:none}
+	#zoomCanvas{display:block}
+	.zoom-label{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);color:#fff;font-size:20px;font-weight:bold;letter-spacing:4px;text-align:center;pointer-events:none;transition:all .5s;text-shadow:0 0 20px rgba(255,255,255,.5)}
+	.zoom-sub{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.6);font-size:13px;letter-spacing:2px;text-align:center;pointer-events:none;transition:all .5s}
+	.zoom-scale{position:absolute;top:20px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.4);font-size:12px;letter-spacing:2px;pointer-events:none}
+	.zoom-close{position:absolute;top:16px;right:20px;z-index:10;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:16px;width:36px;height:36px;border-radius:50%;cursor:pointer;font-family:inherit}
+	.zoom-hint{position:absolute;top:50px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.35);font-size:13px;letter-spacing:2px;pointer-events:none}
+	@media(max-width:768px){.zoom-label{font-size:16px;bottom:50px}.zoom-sub{font-size:11px;bottom:24px}}
 	/* 小游戏菜单 */
 	.games-overlay{position:fixed;inset:0;z-index:38;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s}
 	.games-overlay.active{opacity:1;pointer-events:auto}
@@ -380,6 +390,16 @@ body{
     <div class="gp-title">🎮 小 游 戏</div>
     <div class="games-grid" id="gamesGrid"></div>
   </div>
+</div>
+
+<!-- 缩放世界 -->
+<div class="zoom-overlay" id="zoomOverlay">
+  <canvas id="zoomCanvas"></canvas>
+  <button class="zoom-close" onclick="closeZoom()">✕</button>
+  <div class="zoom-scale" id="zoomScale">1.0x</div>
+  <div class="zoom-label" id="zoomLabel">🌌 星云</div>
+  <div class="zoom-sub" id="zoomSub">双指捏合缩放 · 探索不同尺度</div>
+  <div class="zoom-hint">👆🤏 双指缩放</div>
 </div>
 
 <!-- 压力释放器 -->
@@ -1183,7 +1203,7 @@ fishWrapper.addEventListener('click', async (e) => {
 // ========== 点击空白处投喂饲料 ==========
 document.addEventListener('click', (e) => {
   // 排除交互元素：按钮、链接、鱼、侧边图、kitty、各种弹窗
-  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, .bs-overlay.active, .stress-overlay.active, .games-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
+  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, .bs-overlay.active, .stress-overlay.active, .zoom-overlay.active, .games-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
   spawnFoodAt(e.clientX, e.clientY);
 });
 
@@ -2229,6 +2249,7 @@ const GAMES_LIST = [
   {icon:'🐉',name:'今日运势',desc:'像素神兽 · 每日抽签',fn:()=>{closeGames();setTimeout(openFortune,300);}},
   {icon:'📝',name:'废话连篇',desc:'职场学术 · 一键生成',fn:()=>{closeGames();setTimeout(openBS,300);}},
   {icon:'💧',name:'压力释放器',desc:'长按水球 · 炸裂解压',fn:()=>{closeGames();setTimeout(openStress,300);}},
+  {icon:'🔭',name:'缩放世界',desc:'双指缩放 · 探索尺度',fn:()=>{closeGames();setTimeout(openZoom,300);}},
   {icon:'🎮',name:'井字棋',desc:'鱼姐 vs 你',fn:()=>{closeGames();enterGame('tictactoe');}},
   {icon:'♟️',name:'五子棋',desc:'先五连者胜',fn:()=>{closeGames();enterGame('gomoku');}},
   {icon:'⚠️',name:'千万别点',desc:'像素闯关大冒险',fn:()=>{closeGames();location.href='game.html';}},
@@ -2249,6 +2270,425 @@ window.openGames = function() {
 };
 window.closeGames = function() {
   document.getElementById('gamesOverlay').classList.remove('active');
+};
+
+// ========== 缩放世界 ==========
+const zoomCanvas = document.getElementById('zoomCanvas');
+const zctx = zoomCanvas.getContext('2d');
+let zoomActive = false, zoomScale = 1, zoomTargetScale = 1;
+let zoomInitDist = 0, zoomInitScale = 1;
+let zoomAnimId = null;
+let zoomSeed = Math.random() * 10000;
+
+const ZOOM_LEVELS = [
+  {min:0,max:0.25,label:'⚛️ 量子',sub:'弦的振动 · 概率的舞蹈',bg:'#020210'},
+  {min:0.25,max:0.55,label:'🧬 细胞',sub:'生命的密码 · 微观的奇迹',bg:'#0a0a10'},
+  {min:0.55,max:1.6,label:'🌌 星云',sub:'恒星摇篮 · 光的织锦',bg:'#0a0a18'},
+  {min:1.6,max:3.5,label:'🌠 星系',sub:'千亿太阳的螺旋舞',bg:'#050510'},
+  {min:3.5,max:99,label:'🪐 宇宙',sub:'星系团 · 暗物质之网',bg:'#020208'},
+];
+
+function resizeZoomCanvas() {
+  zoomCanvas.width = window.innerWidth;
+  zoomCanvas.height = window.innerHeight;
+}
+resizeZoomCanvas();
+window.addEventListener('resize', () => { if (zoomActive) resizeZoomCanvas(); });
+
+// 简易伪随机
+function zrnd(x, y) { const n = Math.sin(x * 127.1 + y * 311.7 + zoomSeed) * 43758.5453; return n - Math.floor(n); }
+function zrnd2(x, y) { const n = Math.sin(x * 269.5 + y * 183.3 + zoomSeed + 100) * 43758.5453; return n - Math.floor(n); }
+
+// ---- 量子层 ----
+function drawQuantum(alpha) {
+  if (alpha <= 0) return;
+  zctx.globalAlpha = alpha;
+  const w = zoomCanvas.width, h = zoomCanvas.height;
+  // 背景场
+  for (let i = 0; i < 300; i++) {
+    const x = ((zrnd(i, 80) * 1.2) * w + w * 0.05) % w;
+    const y = ((zrnd(i, 81) * 1.2) * h + h * 0.05) % h;
+    const hue = 260 + zrnd(i, 82) * 60;
+    zctx.fillStyle = `hsla(${hue},80%,${50+zrnd(i,83)*30}%,${zrnd(i,84)*0.5})`;
+    zctx.beginPath();
+    zctx.arc(x, y, zrnd(i, 85) * 2.5, 0, Math.PI * 2);
+    zctx.fill();
+  }
+  // 弦振动线
+  for (let i = 0; i < 40; i++) {
+    const sx = zrnd(i, 86) * w, sy = zrnd(i, 87) * h;
+    zctx.strokeStyle = `hsla(${270+i*2},90%,70%,0.25)`;
+    zctx.lineWidth = 0.5;
+    zctx.beginPath();
+    zctx.moveTo(sx, sy);
+    for (let t = 0; t < 20; t++) {
+      const tx = sx + t * 15;
+      const ty = sy + Math.sin(t * 0.8 + i) * 8;
+      zctx.lineTo(tx, ty);
+    }
+    zctx.stroke();
+  }
+  // 概率云
+  for (let i = 0; i < 12; i++) {
+    const cx = zrnd(i, 90) * w, cy = zrnd(i, 91) * h;
+    const grad = zctx.createRadialGradient(cx, cy, 0, cx, cy, 40 + zrnd(i, 92) * 60);
+    grad.addColorStop(0, `hsla(280,80%,70%,0.2)`);
+    grad.addColorStop(1, 'transparent');
+    zctx.fillStyle = grad;
+    zctx.beginPath();
+    zctx.arc(cx, cy, 40 + zrnd(i, 92) * 60, 0, Math.PI * 2);
+    zctx.fill();
+  }
+  zctx.globalAlpha = 1;
+}
+
+// ---- 细胞层 ----
+function drawCells(alpha) {
+  if (alpha <= 0) return;
+  zctx.globalAlpha = alpha;
+  const w = zoomCanvas.width, h = zoomCanvas.height;
+  // 红细胞（小圆盘）
+  for (let i = 0; i < 40; i++) {
+    const cx = ((zrnd(i, 0) * 1.3) * w) % w;
+    const cy = ((zrnd(i, 1) * 1.3) * h) % h;
+    zctx.fillStyle = `rgba(220,${40+Math.floor(zrnd(i,44)*40)},${40+Math.floor(zrnd(i,45)*40)},0.6)`;
+    zctx.beginPath();
+    zctx.ellipse(cx, cy, 8 + zrnd(i, 2) * 5, 5 + zrnd(i, 3) * 3, zrnd(i, 4) * Math.PI, 0, Math.PI * 2);
+    zctx.fill();
+  }
+  // 白细胞（大圆带核）
+  for (let i = 0; i < 12; i++) {
+    const cx = ((zrnd(i, 5) * 1.2) * w + w * 0.05) % w;
+    const cy = ((zrnd(i, 6) * 1.2) * h + h * 0.05) % h;
+    const r = 25 + zrnd(i, 7) * 30;
+    zctx.fillStyle = `rgba(200,210,240,0.35)`;
+    zctx.beginPath();
+    const nPts = 14;
+    for (let j = 0; j < nPts; j++) {
+      const a = (j / nPts) * Math.PI * 2;
+      const vr = r * (0.75 + zrnd(i, j + 10) * 0.5);
+      const px = cx + Math.cos(a) * vr;
+      const py = cy + Math.sin(a) * vr;
+      j === 0 ? zctx.moveTo(px, py) : zctx.lineTo(px, py);
+    }
+    zctx.closePath();
+    zctx.fill();
+    zctx.strokeStyle = `rgba(180,190,220,0.5)`;
+    zctx.lineWidth = 1.5;
+    zctx.stroke();
+    // 多叶核
+    zctx.fillStyle = `rgba(140,100,200,0.5)`;
+    for (let k = 0; k < 3; k++) {
+      zctx.beginPath();
+      zctx.arc(cx + zrnd(i, 30 + k) * r * 0.3, cy + zrnd2(i, 30 + k) * r * 0.3, r * 0.18, 0, Math.PI * 2);
+      zctx.fill();
+    }
+  }
+  // 神经元
+  for (let i = 0; i < 8; i++) {
+    const cx = ((zrnd(i, 40) * 1.1) * w + w * 0.05) % w;
+    const cy = ((zrnd(i, 41) * 1.1) * h + h * 0.05) % h;
+    zctx.fillStyle = `rgba(255,200,100,0.5)`;
+    zctx.beginPath();
+    zctx.arc(cx, cy, 14, 0, Math.PI * 2);
+    zctx.fill();
+    // 树突
+    for (let d = 0; d < 6; d++) {
+      const da = (d / 6) * Math.PI * 2;
+      const dx = cx + Math.cos(da) * 30;
+      const dy = cy + Math.sin(da) * 30;
+      zctx.strokeStyle = `rgba(255,200,100,0.3)`;
+      zctx.lineWidth = 1;
+      zctx.beginPath();
+      zctx.moveTo(cx + Math.cos(da) * 14, cy + Math.sin(da) * 14);
+      zctx.lineTo(dx, dy);
+      zctx.stroke();
+      zctx.fillStyle = `rgba(255,200,100,0.4)`;
+      zctx.beginPath();
+      zctx.arc(dx, dy, 4, 0, Math.PI * 2);
+      zctx.fill();
+    }
+  }
+  // 病毒颗粒
+  for (let i = 0; i < 20; i++) {
+    const cx = ((zrnd(i, 50) * 1.25) * w + w * 0.05) % w;
+    const cy = ((zrnd(i, 51) * 1.25) * h + h * 0.05) % h;
+    zctx.fillStyle = `rgba(255,80,80,0.5)`;
+    zctx.beginPath();
+    zctx.arc(cx, cy, 6, 0, Math.PI * 2);
+    zctx.fill();
+    for (let s = 0; s < 8; s++) {
+      const sa = (s / 8) * Math.PI * 2;
+      zctx.fillStyle = `rgba(255,100,100,0.4)`;
+      zctx.beginPath();
+      zctx.arc(cx + Math.cos(sa) * 9, cy + Math.sin(sa) * 9, 3, 0, Math.PI * 2);
+      zctx.fill();
+    }
+  }
+  // 浮游粒子
+  for (let i = 0; i < 150; i++) {
+    const x = ((zrnd(i, 60) * 1.3) * w + w * 0.02) % w;
+    const y = ((zrnd(i, 61) * 1.3) * h + h * 0.02) % h;
+    zctx.fillStyle = `rgba(150,200,255,${zrnd(i,62)*0.35})`;
+    zctx.beginPath();
+    zctx.arc(x, y, zrnd(i, 63) * 2, 0, Math.PI * 2);
+    zctx.fill();
+  }
+  zctx.globalAlpha = 1;
+}
+
+// ---- 星云层 ----
+function drawNebula(alpha) {
+  if (alpha <= 0) return;
+  zctx.globalAlpha = alpha;
+  const w = zoomCanvas.width, h = zoomCanvas.height;
+  // 大型气团
+  const hues = [290, 210, 350, 25, 170, 10, 320, 45];
+  for (let i = 0; i < 8; i++) {
+    const cx = w * 0.15 + zrnd(i, 0) * w * 0.7;
+    const cy = h * 0.15 + zrnd(i, 1) * h * 0.7;
+    const rad = 60 + zrnd(i, 2) * 220;
+    const grad = zctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
+    grad.addColorStop(0, `hsla(${hues[i]},85%,65%,0.4)`);
+    grad.addColorStop(0.4, `hsla(${hues[i]},70%,45%,0.2)`);
+    grad.addColorStop(0.8, `hsla(${hues[i]},50%,30%,0.05)`);
+    grad.addColorStop(1, 'transparent');
+    zctx.fillStyle = grad;
+    zctx.beginPath();
+    zctx.arc(cx, cy, rad, 0, Math.PI * 2);
+    zctx.fill();
+  }
+  // 暗尘带
+  for (let i = 0; i < 5; i++) {
+    const sx = zrnd(i, 10) * w, sy = zrnd(i, 11) * h;
+    zctx.strokeStyle = `rgba(0,0,0,0.3)`;
+    zctx.lineWidth = 15 + zrnd(i, 12) * 40;
+    zctx.beginPath();
+    zctx.moveTo(sx, sy);
+    zctx.quadraticCurveTo(sx + zrnd(i, 13) * 300, sy + zrnd(i, 14) * 200, sx + 200 + zrnd(i, 15) * 400, sy + zrnd(i, 16) * 300);
+    zctx.stroke();
+  }
+  // 亮星团
+  for (let c = 0; c < 5; c++) {
+    const ccx = zrnd(c, 20) * w, ccy = zrnd(c, 21) * h;
+    for (let i = 0; i < 30; i++) {
+      const sx = ccx + (zrnd(c * 30 + i, 22) - 0.5) * 80;
+      const sy = ccy + (zrnd2(c * 30 + i, 22) - 0.5) * 80;
+      const b = zrnd(c * 30 + i, 23);
+      zctx.fillStyle = `rgba(255,${220+Math.floor(b*35)},${180+Math.floor(b*75)},${0.4+b*0.6})`;
+      zctx.beginPath();
+      zctx.arc(sx, sy, b > 0.8 ? 2 : 0.8, 0, Math.PI * 2);
+      zctx.fill();
+    }
+  }
+  // 满天星
+  for (let i = 0; i < 500; i++) {
+    const x = ((zrnd(i, 30) * 1.08) * w + w * 0.01) % w;
+    const y = ((zrnd(i, 31) * 1.08) * h + h * 0.01) % h;
+    const b = zrnd(i, 32);
+    zctx.fillStyle = `rgba(255,255,255,${b * 0.85})`;
+    const r = b > 0.95 ? 2 : (b > 0.8 ? 1.2 : 0.4);
+    zctx.beginPath();
+    zctx.arc(x, y, r, 0, Math.PI * 2);
+    zctx.fill();
+    if (b > 0.97) {
+      zctx.fillStyle = `rgba(180,210,255,${0.3+b*0.3})`;
+      zctx.beginPath();
+      zctx.arc(x, y, r * 4, 0, Math.PI * 2);
+      zctx.fill();
+    }
+  }
+  zctx.globalAlpha = 1;
+}
+
+// ---- 星系层 ----
+function drawGalaxy(alpha) {
+  if (alpha <= 0) return;
+  zctx.globalAlpha = alpha;
+  const w = zoomCanvas.width, h = zoomCanvas.height;
+  const cx = w / 2, cy = h / 2;
+  // 4条主螺旋臂 + 2条短臂
+  for (let arm = 0; arm < 6; arm++) {
+    const armAngle = (arm / 6) * Math.PI * 2;
+    const armLen = arm < 4 ? 1 : 0.6;
+    for (let i = 0; i < 400; i++) {
+      const t = i / 400;
+      const dist = t * w * 0.48 * armLen;
+      const spiralAngle = armAngle + t * Math.PI * 2.8;
+      const spread = t * 50 + 4;
+      const px = cx + Math.cos(spiralAngle) * dist + (zrnd(arm * 100, i) - 0.5) * spread;
+      const py = cy + Math.sin(spiralAngle) * dist + (zrnd2(arm * 100, i) - 0.5) * spread;
+      const hue = 28 + t * 18 + arm * 12;
+      const brightness = 0.2 + (1 - t) * 0.8;
+      zctx.fillStyle = `hsla(${hue},${55+(1-t)*45}%,${45+brightness*40}%,${brightness*0.85})`;
+      const sz = (1 - t) * 3.5 + 0.5;
+      zctx.beginPath();
+      zctx.arc(px, py, sz, 0, Math.PI * 2);
+      zctx.fill();
+    }
+  }
+  // 星系核心
+  const coreGrad = zctx.createRadialGradient(cx, cy, 0, cx, cy, 70);
+  coreGrad.addColorStop(0, 'rgba(255,245,220,0.95)');
+  coreGrad.addColorStop(0.15, 'rgba(255,210,130,0.6)');
+  coreGrad.addColorStop(0.5, 'rgba(255,150,50,0.15)');
+  coreGrad.addColorStop(1, 'transparent');
+  zctx.fillStyle = coreGrad;
+  zctx.beginPath();
+  zctx.arc(cx, cy, 70, 0, Math.PI * 2);
+  zctx.fill();
+  // 尘埃带环
+  zctx.strokeStyle = 'rgba(80,50,150,0.15)';
+  zctx.lineWidth = 20;
+  zctx.beginPath();
+  zctx.arc(cx, cy, w * 0.25, 0, Math.PI * 2);
+  zctx.stroke();
+  zctx.strokeStyle = 'rgba(50,30,100,0.1)';
+  zctx.lineWidth = 35;
+  zctx.beginPath();
+  zctx.arc(cx, cy, w * 0.35, 0, Math.PI * 2);
+  zctx.stroke();
+  // 伴星系（小麦哲伦云）
+  for (let s = 0; s < 2; s++) {
+    const sx = cx + (zrnd(s, 40) - 0.5) * w * 0.7;
+    const sy = cy + (zrnd(s, 41) - 0.5) * h * 0.6;
+    const sg = zctx.createRadialGradient(sx, sy, 0, sx, sy, 25);
+    sg.addColorStop(0, 'rgba(200,200,240,0.5)');
+    sg.addColorStop(1, 'transparent');
+    zctx.fillStyle = sg;
+    zctx.beginPath();
+    zctx.arc(sx, sy, 25 + zrnd(s, 42) * 15, 0, Math.PI * 2);
+    zctx.fill();
+  }
+  // 背景深空星
+  for (let i = 0; i < 300; i++) {
+    const x = ((zrnd(i, 50) * 1.05) * w + w * 0.02) % w;
+    const y = ((zrnd(i, 51) * 1.05) * h + h * 0.02) % h;
+    zctx.fillStyle = `rgba(255,255,255,${zrnd(i,52)*0.6})`;
+    zctx.beginPath();
+    zctx.arc(x, y, 0.4 + zrnd(i, 53) * 0.6, 0, Math.PI * 2);
+    zctx.fill();
+  }
+  zctx.globalAlpha = 1;
+}
+
+// ---- 宇宙层 ----
+function drawUniverse(alpha) {
+  if (alpha <= 0) return;
+  zctx.globalAlpha = alpha;
+  const w = zoomCanvas.width, h = zoomCanvas.height;
+  // 星系团（椭圆光斑）
+  for (let c = 0; c < 8; c++) {
+    const cx = ((zrnd(c, 60) * 1.2) * w + w * 0.05) % w;
+    const cy = ((zrnd(c, 61) * 1.2) * h + h * 0.05) % h;
+    const grad = zctx.createRadialGradient(cx, cy, 0, cx, cy, 30 + zrnd(c, 62) * 50);
+    grad.addColorStop(0, `hsla(${30+zrnd(c,63)*20},30%,70%,0.35)`);
+    grad.addColorStop(1, 'transparent');
+    zctx.fillStyle = grad;
+    zctx.beginPath();
+    zctx.arc(cx, cy, 30 + zrnd(c, 62) * 50, 0, Math.PI * 2);
+    zctx.fill();
+  }
+  // 宇宙网丝状结构
+  for (let f = 0; f < 20; f++) {
+    const fx = zrnd(f, 70) * w, fy = zrnd(f, 71) * h;
+    zctx.strokeStyle = `rgba(100,120,200,0.08)`;
+    zctx.lineWidth = 8 + zrnd(f, 72) * 15;
+    zctx.beginPath();
+    zctx.moveTo(fx, fy);
+    zctx.quadraticCurveTo(fx + zrnd(f, 73) * 300, fy + zrnd(f, 74) * 300, fx + zrnd(f, 75) * 500, fy + zrnd(f, 76) * 400);
+    zctx.stroke();
+  }
+  // 极远星系
+  for (let i = 0; i < 100; i++) {
+    const x = ((zrnd(i, 80) * 1.03) * w + w * 0.02) % w;
+    const y = ((zrnd(i, 81) * 1.03) * h + h * 0.02) % h;
+    zctx.fillStyle = `rgba(255,255,255,${zrnd(i,82)*0.35})`;
+    zctx.beginPath();
+    zctx.arc(x, y, 0.3 + zrnd(i, 83) * 0.5, 0, Math.PI * 2);
+    zctx.fill();
+  }
+  zctx.globalAlpha = 1;
+}
+
+function drawZoomFrame() {
+  const w = zoomCanvas.width, h = zoomCanvas.height;
+  const lvl = ZOOM_LEVELS.find(l => zoomScale >= l.min && zoomScale < l.max) || ZOOM_LEVELS[4];
+  zctx.fillStyle = lvl.bg;
+  zctx.fillRect(0, 0, w, h);
+
+  // 5层混合：用 smoothstep 在相邻层间交叉淡入淡出
+  const levels = [
+    {fn:drawQuantum,center:0.125,width:0.15},
+    {fn:drawCells,center:0.4,width:0.18},
+    {fn:drawNebula,center:1.0,width:0.5},
+    {fn:drawGalaxy,center:2.5,width:1.0},
+    {fn:drawUniverse,center:4.5,width:1.5},
+  ];
+  for (const l of levels) {
+    const dist = Math.abs(zoomScale - l.center);
+    const alpha = Math.max(0, 1 - dist / l.width);
+    l.fn(alpha);
+  }
+
+  // UI 更新
+  document.getElementById('zoomScale').textContent = zoomScale.toFixed(1) + 'x';
+  document.getElementById('zoomLabel').textContent = lvl.label;
+  document.getElementById('zoomSub').textContent = lvl.sub;
+}
+
+function zoomLoop() {
+  if (!zoomActive) { zoomAnimId = null; return; }
+  zoomAnimId = requestAnimationFrame(zoomLoop);
+  zoomScale += (zoomTargetScale - zoomScale) * 0.1;
+  drawZoomFrame();
+}
+
+// 触摸事件
+function onZoomTouchStart(e) {
+  if (e.touches.length === 2) {
+    zoomInitDist = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    zoomInitScale = zoomTargetScale;
+  }
+}
+function onZoomTouchMove(e) {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    const dist = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    if (zoomInitDist > 0) {
+      zoomTargetScale = Math.max(0.02, Math.min(7, zoomInitScale * (dist / zoomInitDist)));
+    }
+  }
+}
+function onZoomWheel(e) {
+  if (!zoomActive) return;
+  e.preventDefault();
+  zoomTargetScale = Math.max(0.02, Math.min(7, zoomTargetScale * (e.deltaY > 0 ? 0.88 : 1.12)));
+}
+
+window.openZoom = function() {
+  document.getElementById('zoomOverlay').classList.add('active');
+  zoomActive = true;
+  zoomScale = 1;
+  zoomTargetScale = 1;
+  resizeZoomCanvas();
+  zoomCanvas.addEventListener('touchstart', onZoomTouchStart, {passive:true});
+  zoomCanvas.addEventListener('touchmove', onZoomTouchMove, {passive:false});
+  zoomCanvas.addEventListener('wheel', onZoomWheel, {passive:false});
+  if (!zoomAnimId) zoomLoop();
+};
+
+window.closeZoom = function() {
+  zoomActive = false;
+  zoomScale = 1;
+  zoomTargetScale = 1;
+  document.getElementById('zoomOverlay').classList.remove('active');
 };
 
 // ========== 场景初始化 ==========
