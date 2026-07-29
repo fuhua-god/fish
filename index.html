@@ -2025,17 +2025,24 @@ function buildMaze() {
   const walls = [];
   const W = MAZE_W, H = MAZE_H, t = 10; // wall thickness
 
-  // 外框
+  // 外框（底部不封死，留给洞口）
   walls.push(Bodies.rectangle(W/2, -5, W+20, t*2, wallOpts)); // 顶
-  walls.push(Bodies.rectangle(W/2, H+5, W+20, t*2, wallOpts)); // 底（留两个洞口）
   walls.push(Bodies.rectangle(-5, H/2, t*2, H, wallOpts)); // 左
   walls.push(Bodies.rectangle(W+5, H/2, t*2, H, wallOpts)); // 右
 
-  // 洞口底部：左右各留一段空缺
-  const bottomWallL = Bodies.rectangle(40, H - 5, 80 - HOLE_R, t*2, wallOpts);
-  const bottomWallM = Bodies.rectangle(W/2, H - 5, W - 160 - HOLE_R*2, t*2, wallOpts);
-  const bottomWallR = Bodies.rectangle(W - 40, H - 5, 80 - HOLE_R, t*2, wallOpts);
-  walls.push(bottomWallL, bottomWallM, bottomWallR);
+  // 底部：三段墙留出两个洞口（gap = HOLE_R*2）
+  const gapHalf = HOLE_R;
+  const bottomY = H - 5;
+  const lGapCx = holes[0].x, rGapCx = holes[1].x;
+  // 左段：左边缘到左洞口前
+  const lw = Math.max(10, lGapCx - gapHalf);
+  walls.push(Bodies.rectangle(lw/2, bottomY, lw, t*2, wallOpts));
+  // 中段：两洞口之间
+  const mw = Math.max(10, rGapCx - gapHalf - (lGapCx + gapHalf));
+  walls.push(Bodies.rectangle(lGapCx + gapHalf + mw/2, bottomY, mw, t*2, wallOpts));
+  // 右段：右洞口后到右边缘
+  const rw = Math.max(10, W - (rGapCx + gapHalf));
+  walls.push(Bodies.rectangle(rGapCx + gapHalf + rw/2, bottomY, rw, t*2, wallOpts));
 
   // 内部迷宫墙
   const mz = [
@@ -2116,7 +2123,7 @@ function buildMaze() {
     for (const h of holes) {
       const dx = ballPos.x - h.x;
       const dy = ballPos.y - h.y;
-      if (Math.sqrt(dx*dx + dy*dy) < HOLE_R - 8) {
+      if (dx*dx + dy*dy < HOLE_R * HOLE_R && ballPos.y > MAZE_H - 60) {
         mazeSolved = true;
         // 移除钢珠
         Composite.remove(mazeEngine.world, mazeBall);
