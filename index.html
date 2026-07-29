@@ -242,6 +242,15 @@ body{
 	.battery-refresh{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:8px 20px;border-radius:20px;font-size:13px;cursor:pointer;font-family:inherit;margin-top:18px;letter-spacing:2px}
 	.battery-close{position:absolute;top:16px;right:20px;background:none;border:none;color:rgba(255,255,255,.4);font-size:20px;cursor:pointer}
 	@media(max-width:768px){.battery-advice{font-size:20px}.battery-sub{font-size:12px}.battery-pct{font-size:44px}}
+	/* 吹气蒲公英 */
+	.dande-overlay{position:fixed;inset:0;z-index:43;background:linear-gradient(180deg,#1a237e 0%,#283593 40%,#4a6fa5 70%,#87ceeb 100%);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .5s}
+	.dande-overlay.active{opacity:1;pointer-events:auto}
+	#dandeCanvas{display:block}
+	.dande-hint{position:absolute;bottom:80px;color:rgba(255,255,255,.6);font-size:16px;letter-spacing:3px;text-align:center;pointer-events:none;animation:pl 2s ease-in-out infinite}
+	.dande-close{position:absolute;top:16px;right:20px;z-index:5;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:16px;width:36px;height:36px;border-radius:50%;cursor:pointer;font-family:inherit}
+	.dande-vol-bar{position:absolute;bottom:50px;left:50%;transform:translateX(-50%);width:120px;height:3px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden}
+	.dande-vol-fill{height:100%;background:#fff;border-radius:2px;width:0;transition:width .08s}
+	@media(max-width:768px){.dande-hint{font-size:13px;bottom:60px}}
 	/* 小游戏菜单 */
 	.games-overlay{position:fixed;inset:0;z-index:38;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s}
 	.games-overlay.active{opacity:1;pointer-events:auto}
@@ -400,6 +409,14 @@ body{
     <div class="gp-title">🎮 小 游 戏</div>
     <div class="games-grid" id="gamesGrid"></div>
   </div>
+</div>
+
+<!-- 吹气蒲公英 -->
+<div class="dande-overlay" id="dandeOverlay">
+  <canvas id="dandeCanvas"></canvas>
+  <button class="dande-close" onclick="closeDande()">✕</button>
+  <div class="dande-hint" id="dandeHint">🌬️ 对着麦克风吹气</div>
+  <div class="dande-vol-bar"><div class="dande-vol-fill" id="dandeVolFill"></div></div>
 </div>
 
 <!-- 电量算命 -->
@@ -1230,7 +1247,7 @@ fishWrapper.addEventListener('click', async (e) => {
 // ========== 点击空白处投喂饲料 ==========
 document.addEventListener('click', (e) => {
   // 排除交互元素：按钮、链接、鱼、侧边图、kitty、各种弹窗
-  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, .bs-overlay.active, .stress-overlay.active, .zoom-overlay.active, .battery-overlay.active, .games-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
+  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, .bs-overlay.active, .stress-overlay.active, .zoom-overlay.active, .battery-overlay.active, .dande-overlay.active, .games-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
   spawnFoodAt(e.clientX, e.clientY);
 });
 
@@ -2279,6 +2296,7 @@ const GAMES_LIST = [
   {icon:'💧',name:'压力释放器',desc:'长按水球 · 炸裂解压',fn:()=>{closeGames();setTimeout(openStress,300);}},
   {icon:'🔭',name:'缩放世界',desc:'双指缩放 · 探索尺度',fn:()=>{closeGames();setTimeout(openZoom,300);}},
   {icon:'🔋',name:'电量算命',desc:'读取电量 · 人生建议',fn:()=>{closeGames();setTimeout(openBattery,300);}},
+  {icon:'🌬️',name:'吹蒲公英',desc:'麦克风吹气 · 绒毛飘散',fn:()=>{closeGames();setTimeout(openDande,300);}},
   {icon:'🎮',name:'井字棋',desc:'鱼姐 vs 你',fn:()=>{closeGames();enterGame('tictactoe');}},
   {icon:'♟️',name:'五子棋',desc:'先五连者胜',fn:()=>{closeGames();enterGame('gomoku');}},
   {icon:'⚠️',name:'千万别点',desc:'像素闯关大冒险',fn:()=>{closeGames();location.href='game.html';}},
@@ -2837,6 +2855,253 @@ window.openBattery = async function() {
 
 window.closeBattery = function() {
   document.getElementById('batteryOverlay').classList.remove('active');
+};
+
+// ========== 吹气蒲公英 ==========
+const dandeCanvas = document.getElementById('dandeCanvas');
+const dctx = dandeCanvas.getContext('2d');
+let dandeActive = false, dandeAnimId = null;
+let dandeSeeds = []; // 种子粒子
+let dandeStars = []; // 飞到边缘变星星
+let dandeVol = 0, dandeSmoothVol = 0;
+let dandeAudioCtx = null, dandeAnalyser = null, dandeMicData = null;
+let dandeBlownSeeds = new Set(); // 已吹散的种子索引
+
+function resizeDandeCanvas() {
+  dandeCanvas.width = window.innerWidth;
+  dandeCanvas.height = window.innerHeight;
+}
+resizeDandeCanvas();
+window.addEventListener('resize', () => { if (dandeActive) resizeDandeCanvas(); });
+
+// 生成初始蒲公英种子（附着在花头上）
+function initDandeSeeds() {
+  dandeSeeds = [];
+  dandeStars = [];
+  dandeBlownSeeds = new Set();
+  const cx = dandeCanvas.width / 2, cy = dandeCanvas.height * 0.45;
+  for (let i = 0; i < 60; i++) {
+    const angle = (i / 60) * Math.PI * 2 + (Math.random() - 0.5) * 0.3;
+    const dist = 30 + Math.random() * 14;
+    dandeSeeds.push({
+      id: i,
+      cx, cy, // 花头中心
+      angle, dist, // 附着位置
+      blown: false,
+      x: cx + Math.cos(angle) * dist,
+      y: cy + Math.sin(angle) * dist,
+      vx: 0, vy: 0,
+      life: 1,
+      size: 2 + Math.random() * 3,
+      tuftSize: 6 + Math.random() * 4,
+      isStar: false,
+    });
+  }
+}
+
+// 绘制蒲公英
+function drawDande() {
+  const w = dandeCanvas.width, h = dandeCanvas.height;
+  dctx.clearRect(0, 0, w, h);
+
+  const cx = w / 2, cy = h * 0.45;
+
+  // 花茎
+  dctx.strokeStyle = '#7cb342';
+  dctx.lineWidth = 3;
+  dctx.beginPath();
+  dctx.moveTo(cx, cy + 16);
+  dctx.quadraticCurveTo(cx + 10, cy + 100, cx - 5, h);
+  dctx.stroke();
+
+  // 花头中心
+  dctx.fillStyle = '#8d6e63';
+  dctx.beginPath();
+  dctx.arc(cx, cy, 10, 0, Math.PI * 2);
+  dctx.fill();
+  dctx.fillStyle = '#a1887f';
+  dctx.beginPath();
+  dctx.arc(cx, cy, 6, 0, Math.PI * 2);
+  dctx.fill();
+
+  // 种子
+  for (const s of dandeSeeds) {
+    if (s.isStar) continue;
+    if (s.blown) {
+      // 飘散的种子
+      dctx.strokeStyle = `rgba(255,255,255,${s.life * 0.7})`;
+      dctx.lineWidth = 0.5;
+      dctx.beginPath();
+      dctx.moveTo(s.x, s.y);
+      const tuftR = s.tuftSize;
+      for (let j = 0; j < 6; j++) {
+        const a = (j / 6) * Math.PI * 2;
+        dctx.moveTo(s.x, s.y);
+        dctx.lineTo(s.x + Math.cos(a) * tuftR * s.life, s.y - tuftR * s.life + Math.sin(a) * tuftR * 0.5 * s.life);
+      }
+      dctx.stroke();
+      // 种子本体
+      dctx.fillStyle = `rgba(139,119,101,${s.life})`;
+      dctx.beginPath();
+      dctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+      dctx.fill();
+    } else {
+      // 附着的种子
+      const sx = cx + Math.cos(s.angle) * s.dist;
+      const sy = cy + Math.sin(s.angle) * s.dist;
+      // 绒毛茎
+      dctx.strokeStyle = 'rgba(255,255,255,0.6)';
+      dctx.lineWidth = 0.5;
+      dctx.beginPath();
+      dctx.moveTo(cx + Math.cos(s.angle) * 12, cy + Math.sin(s.angle) * 12);
+      dctx.lineTo(sx, sy);
+      dctx.stroke();
+      // 绒毛伞
+      const tuftR = s.tuftSize;
+      dctx.strokeStyle = 'rgba(255,255,255,0.8)';
+      dctx.lineWidth = 0.4;
+      for (let j = 0; j < 5; j++) {
+        const a = (j / 5) * Math.PI * 2 + s.angle;
+        dctx.beginPath();
+        dctx.moveTo(sx, sy);
+        dctx.lineTo(sx + Math.cos(a) * tuftR, sy - tuftR * 0.6 + Math.sin(a) * tuftR * 0.3);
+        dctx.stroke();
+      }
+      // 种子本体
+      dctx.fillStyle = '#a0886e';
+      dctx.beginPath();
+      dctx.arc(sx, sy, s.size, 0, Math.PI * 2);
+      dctx.fill();
+    }
+  }
+
+  // 星星
+  for (const st of dandeStars) {
+    dctx.fillStyle = `rgba(255,215,64,${st.life})`;
+    dctx.font = `${st.size}px sans-serif`;
+    dctx.textAlign = 'center';
+    dctx.fillText('✦', st.x, st.y);
+  }
+}
+
+// 更新粒子
+function updateDandePhysics() {
+  const w = dandeCanvas.width, h = dandeCanvas.height;
+  const cx = w / 2, cy = h * 0.45;
+  const windForce = dandeSmoothVol * 8;
+
+  for (const s of dandeSeeds) {
+    if (s.isStar) continue;
+    if (s.blown) {
+      // 风中飘散
+      s.vy -= windForce * (0.8 + Math.random() * 0.4);
+      s.vx += (Math.random() - 0.5) * windForce * 0.6;
+      s.vx *= 0.99;
+      s.vy *= 0.99;
+      s.x += s.vx;
+      s.y += s.vy;
+      s.life -= 0.003;
+      // 飘到边缘 → 变成星星
+      if (s.y < -20 || s.y > h + 20 || s.x < -20 || s.x > w + 20) {
+        s.isStar = true;
+        dandeStars.push({
+          x: Math.max(10, Math.min(w - 10, s.x)),
+          y: Math.max(10, Math.min(h - 10, s.y)),
+          vx: (Math.random() - 0.5) * 3,
+          vy: -1 - Math.random() * 3,
+          life: 1,
+          size: 10 + Math.random() * 14,
+        });
+      }
+    } else if (dandeSmoothVol > 0.15 && !dandeBlownSeeds.has(s.id)) {
+      // 风力足够 → 吹散这颗种子
+      s.blown = true;
+      dandeBlownSeeds.add(s.id);
+      s.x = cx + Math.cos(s.angle) * s.dist;
+      s.y = cy + Math.sin(s.angle) * s.dist;
+      s.vx = (Math.random() - 0.5) * 2;
+      s.vy = -windForce * (0.5 + Math.random());
+    }
+  }
+
+  // 更新星星
+  for (const st of dandeStars) {
+    st.x += st.vx;
+    st.y += st.vy;
+    st.life -= 0.01;
+  }
+  dandeStars = dandeStars.filter(s => s.life > 0);
+
+  // 所有种子都吹散后，3秒自动重置
+  if (dandeBlownSeeds.size >= dandeSeeds.length && dandeStars.length === 0) {
+    setTimeout(initDandeSeeds, 2000);
+  }
+}
+
+function dandeLoop() {
+  if (!dandeActive) { dandeAnimId = null; return; }
+  dandeAnimId = requestAnimationFrame(dandeLoop);
+
+  // 读取麦克风音量
+  if (dandeAnalyser && dandeMicData) {
+    dandeAnalyser.getByteFrequencyData(dandeMicData);
+    let sum = 0;
+    for (let i = 0; i < dandeMicData.length; i++) sum += dandeMicData[i];
+    dandeVol = sum / dandeMicData.length / 255;
+    // 重点检测中高频（吹气声）
+    let hiSum = 0;
+    const hiStart = Math.floor(dandeMicData.length * 0.3);
+    for (let i = hiStart; i < dandeMicData.length; i++) hiSum += dandeMicData[i];
+    const hiVol = hiSum / (dandeMicData.length - hiStart) / 255;
+    dandeVol = Math.max(dandeVol, hiVol * 1.3);
+  }
+
+  dandeSmoothVol += (dandeVol - dandeSmoothVol) * 0.25;
+
+  // 音量条
+  document.getElementById('dandeVolFill').style.width = Math.min(100, dandeSmoothVol * 140) + '%';
+
+  updateDandePhysics();
+  drawDande();
+
+  // 微风震动
+  if (dandeSmoothVol > 0.2 && dandeBlownSeeds.size < dandeSeeds.length && navigator.vibrate) {
+    navigator.vibrate(8);
+  }
+}
+
+async function startDandeMic() {
+  try {
+    dandeAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const stream = await navigator.mediaDevices.getUserMedia({audio: true, video: false});
+    const source = dandeAudioCtx.createMediaStreamSource(stream);
+    dandeAnalyser = dandeAudioCtx.createAnalyser();
+    dandeAnalyser.fftSize = 256;
+    dandeMicData = new Uint8Array(dandeAnalyser.frequencyBinCount);
+    source.connect(dandeAnalyser);
+    document.getElementById('dandeHint').textContent = '🌬️ 对着麦克风吹气吧！';
+  } catch(e) {
+    document.getElementById('dandeHint').textContent = '🎤 无法访问麦克风，点击屏幕模拟吹气';
+    // 降级：点击屏幕模拟
+    dandeCanvas.addEventListener('click', () => { dandeVol = 0.8; });
+    dandeCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); dandeVol = 0.8; });
+  }
+}
+
+window.openDande = function() {
+  document.getElementById('dandeOverlay').classList.add('active');
+  dandeActive = true;
+  resizeDandeCanvas();
+  initDandeSeeds();
+  if (!dandeAudioCtx) startDandeMic();
+  if (!dandeAnimId) dandeLoop();
+};
+
+window.closeDande = function() {
+  dandeActive = false;
+  dandeVol = 0;
+  dandeSmoothVol = 0;
+  document.getElementById('dandeOverlay').classList.remove('active');
 };
 
 // ========== 场景初始化 ==========
