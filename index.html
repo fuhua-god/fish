@@ -138,6 +138,9 @@ body{
 .days-card .days-close{padding:10px 30px;border-radius:25px;font-size:15px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;border:none;background:#f48fb1;color:#fff;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
 .days-card .days-close:hover{background:#ec407a;transform:scale(1.05)}
 .trail-container{position:fixed;inset:0;z-index:4;pointer-events:none;overflow:hidden}
+	.food-container{position:fixed;inset:0;z-index:6;pointer-events:none;overflow:hidden}
+	.food-pellet{position:fixed;pointer-events:none;z-index:6;filter:drop-shadow(0 3px 6px rgba(0,0,0,.25));will-change:left,top,transform;transition:none;line-height:1}
+	.food-float-text{position:fixed;pointer-events:none;z-index:55;font-weight:bold;font-family:"Comic Sans MS","KaiTi","Microsoft YaHei",cursive,sans-serif;text-shadow:0 2px 6px rgba(0,0,0,.2);will-change:transform,opacity}
 /* 美食转盘 */
 .wheel-overlay{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
 .wheel-overlay.active{opacity:1;pointer-events:auto}
@@ -170,11 +173,12 @@ body{
 <div id="playlistPopup" style="display:none;position:fixed;bottom:55px;left:50%;transform:translateX(-50%);z-index:26;background:rgba(0,0,0,.85);color:#fff;padding:10px 6px;border-radius:16px;font-size:13px;min-width:180px;max-height:260px;overflow-y:auto">
 </div>
 <div class="trail-container" id="trailContainer"></div>
+<div class="food-container" id="foodContainer"></div>
 <div class="fish-wrapper" id="fishWrapper" title="点我！"><div class="fish-float" id="mainFishSvg"></div></div>
 
 <div class="main-page" id="mainPage">
   <div class="speech-text" id="speechText">我是傻鱼 🐟</div>
-  <p class="hint">✧ 点一下这条呆鱼 ✧</p>
+  <p class="hint">✧ 点击空白处投喂饲料 | 点一下呆鱼 ✧</p>
   <span class="ribbon-tag">🐟 小鱼</span>
   <p class="counter" id="counter"></p>
   <p class="clock" id="clock"></p>
@@ -182,7 +186,7 @@ body{
   <p class="counter" id="syncBadge" style="background:rgba(129,199,132,0.4);font-size:12px;padding:3px 12px">🔄 数据加载中...</p>
   <div class="main-btns">
     <button class="btn-album" onclick="openAlbum()">📖 图鉴</button>
-    <button class="btn-album" id="feedBtn" onclick="feedFish()">🍥 喂食</button>
+    <button class="btn-album" id="feedBtn" onclick="spawnFoodNearFish()">🍥 饲料</button>
     <button class="btn-album" id="musicBtn" onclick="toggleMusic()">🔇 音乐关</button>
   </div>
   <div class="game-entry">
@@ -507,6 +511,7 @@ let fishDir = 1;
 let fishAnimId = null;
 let fishPaused = false;
 let fishBouncing = false;
+	let fishEatCooldown = 0;
 // 时快时慢：心情系统
 let fishTargetSpd = 1.0;        // 目标速度倍率 (0.1~2.5)
 let fishCurSpd = 1.0;           // 当前平滑后的速度倍率
@@ -533,14 +538,32 @@ function updateFishPos(ts) {
   // 平滑过渡
   fishCurSpd += (fishTargetSpd - fishCurSpd) * dt * 1.5;
 
-  if (Math.random() < 0.01) { fishVX += (Math.random() - 0.5) * 1.0; fishVY += (Math.random() - 0.5) * 1.0; }
+  // 食物寻找：如果有未吃掉的食物，鱼主动游向最近的食物
+  if (fishEatCooldown > 0) fishEatCooldown--;
+  const nearestFood = findNearestFood();
+  const hasFood = nearestFood.pellet && !nearestFood.pellet.eaten;
   const speedScale = fishSize.w / 240;
-  const baseMin = 0.3 * speedScale, baseMax = 3.5 * speedScale;
-  const minSpd = baseMin * fishCurSpd * 0.3;
-  const maxSpd = baseMax * fishCurSpd;
-  let spd = Math.sqrt(fishVX * fishVX + fishVY * fishVY);
-  if (spd < minSpd && fishCurSpd > 0.15) { fishVX = (fishVX / (spd || 0.01)) * minSpd + (Math.random() - 0.5) * 0.5; fishVY = (fishVY / (spd || 0.01)) * minSpd + (Math.random() - 0.5) * 0.5; }
-  if (spd > maxSpd) { fishVX = (fishVX / spd) * maxSpd; fishVY = (fishVY / spd) * maxSpd; }
+  const baseMax = 3.5 * speedScale;
+  if (hasFood && fishEatCooldown <= 0 && nearestFood.dist > 25) {
+    const mouth = getFishMouth();
+    const dx = nearestFood.pellet.x + 16 - mouth.x;
+    const dy = nearestFood.pellet.y + 16 - mouth.y;
+    const dist = Math.max(nearestFood.dist, 1);
+    const seekSpd = baseMax * Math.max(fishCurSpd, 1.0) * 1.8;
+    fishVX += (dx / dist * seekSpd * 0.7 - fishVX) * 0.08;
+    fishVY += (dy / dist * seekSpd * 0.7 - fishVY) * 0.08;
+    let spd = Math.sqrt(fishVX * fishVX + fishVY * fishVY);
+    if (spd > seekSpd) { fishVX = (fishVX / spd) * seekSpd; fishVY = (fishVY / spd) * seekSpd; }
+    fishTargetSpd = Math.max(fishTargetSpd, 1.6);
+  } else {
+    if (Math.random() < 0.01) { fishVX += (Math.random() - 0.5) * 1.0; fishVY += (Math.random() - 0.5) * 1.0; }
+    const baseMin = 0.3 * speedScale;
+    const minSpd = baseMin * fishCurSpd * 0.3;
+    const maxSpd = baseMax * fishCurSpd;
+    let spd = Math.sqrt(fishVX * fishVX + fishVY * fishVY);
+    if (spd < minSpd && fishCurSpd > 0.15) { fishVX = (fishVX / (spd || 0.01)) * minSpd + (Math.random() - 0.5) * 0.5; fishVY = (fishVY / (spd || 0.01)) * minSpd + (Math.random() - 0.5) * 0.5; }
+    if (spd > maxSpd) { fishVX = (fishVX / spd) * maxSpd; fishVY = (fishVY / spd) * maxSpd; }
+  }
   fishX += fishVX; fishY += fishVY;
   const pad = 10, fw = fishSize.w, fh = fishSize.h;
   if (fishX < pad) { fishX = pad; fishVX = Math.abs(fishVX); }
@@ -549,6 +572,20 @@ function updateFishPos(ts) {
   if (fishY > window.innerHeight - fh - pad) { fishY = window.innerHeight - fh - pad; fishVY = -Math.abs(fishVY); }
   const newDir = fishVX >= 0 ? 1 : -1;
   if (newDir !== fishDir) { fishDir = newDir; }
+  // 检查是否吃到食物
+  if (hasFood && fishEatCooldown <= 0) {
+    const mouth = getFishMouth();
+    const fx = nearestFood.pellet.x + 16;
+    const fy = nearestFood.pellet.y + 16;
+    const dx = fx - mouth.x;
+    const dy = fy - mouth.y;
+    if (Math.sqrt(dx * dx + dy * dy) < FOOD_EAT_DIST) {
+      fishEatCooldown = 25;
+      eatFood(nearestFood.pellet);
+    }
+  }
+  // 更新食物物理
+  updateFoodPhysics();
   fishWrapper.style.left = fishX + 'px';
   fishWrapper.style.top = fishY + 'px';
   if (!fishBouncing) { fishWrapper.style.transform = `scaleX(${fishDir})`; }
@@ -611,6 +648,175 @@ function spawnTrail(fx, fy, dir) {
     container.appendChild(p);
     anim.onfinish = () => p.remove();
     setTimeout(() => { if (p.parentNode) p.remove(); }, cfg.life + 100);
+  }
+}
+
+// ========== 饲料系统 ==========
+const foodContainer = document.getElementById('foodContainer');
+let foodPellets = [];
+const FOOD_GRAVITY = 0.15;
+const FOOD_BOUNCE = 0.3;
+const FOOD_TERMINAL_VY = 6;
+const FOOD_EAT_DIST = 55;
+
+function getFoodGround() { return window.innerHeight - 130; }
+
+function getFoodQuality() {
+  const rnd = Math.random();
+  if (rnd < 0.5) return { points: 10, emoji: '🍞', label: '普通饲料' };
+  if (rnd < 0.8) return { points: 20, emoji: '🍰', label: '优质饲料' };
+  return { points: 50, emoji: '🍣', label: '上等饲料' };
+}
+
+function spawnFoodAt(clientX, clientY) {
+  const today = getToday();
+  if (STATE.feed_date !== today) {
+    STATE.feed_remaining = 10;
+    STATE.feed_bonus_used = false;
+    STATE.feed_date = today;
+    saveState({ feed_remaining: 10, feed_bonus_used: false, feed_date: today });
+  }
+  const remaining = (STATE.feed_remaining != null) ? STATE.feed_remaining : 10;
+  if (remaining <= 0) {
+    fishSay('今天的饲料吃完啦～明天再来吧 🐟');
+    return false;
+  }
+  const quality = getFoodQuality();
+  const id = Date.now() + Math.random();
+  const pellet = {
+    id,
+    x: clientX - 16,
+    y: clientY - 16,
+    vy: (Math.random() - 0.5) * 2,
+    vx: (Math.random() - 0.5) * 2,
+    emoji: quality.emoji,
+    points: quality.points,
+    label: quality.label,
+    eaten: false,
+    atBottom: false,
+    wobble: Math.random() * Math.PI * 2,
+    spawnTime: Date.now()
+  };
+  const el = document.createElement('div');
+  el.className = 'food-pellet';
+  el.textContent = quality.emoji;
+  el.style.left = pellet.x + 'px';
+  el.style.top = pellet.y + 'px';
+  el.style.fontSize = (window.innerWidth <= 480 ? '22px' : '30px');
+  foodContainer.appendChild(el);
+  pellet.element = el;
+  foodPellets.push(pellet);
+  STATE.feed_remaining = remaining - 1;
+  saveState({ feed_remaining: remaining - 1 });
+  updateAffectionBar();
+  return true;
+}
+
+function spawnFoodNearFish() {
+  const cx = fishX + fishSize.w / 2;
+  const cy = fishY + fishSize.h / 2 - 50;
+  if (!spawnFoodAt(cx, cy)) {
+    document.getElementById('feedEmoji').textContent = '😿';
+    document.getElementById('feedMsg').textContent = '今天的鱼饲料已经喂完啦～';
+    document.getElementById('feedDetail').textContent = '明天再来吧！';
+    document.getElementById('feedOverlay').classList.add('active');
+  }
+}
+
+function getFishMouth() {
+  const cx = fishX + fishSize.w / 2;
+  const cy = fishY + fishSize.h / 2;
+  return { x: cx + fishDir * fishSize.w * 0.23, y: cy };
+}
+
+function getFishCenter() {
+  return { x: fishX + fishSize.w / 2, y: fishY + fishSize.h / 2 };
+}
+
+function findNearestFood() {
+  let nearest = null;
+  let minDist = Infinity;
+  const mouth = getFishMouth();
+  for (const p of foodPellets) {
+    if (p.eaten) continue;
+    const dx = p.x + 16 - mouth.x;
+    const dy = p.y + 16 - mouth.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < minDist) { minDist = dist; nearest = p; }
+  }
+  return { pellet: nearest, dist: minDist };
+}
+
+async function eatFood(pellet) {
+  if (pellet.eaten) return;
+  pellet.eaten = true;
+  if (pellet.element) {
+    pellet.element.style.transition = 'transform 0.25s ease-out, opacity 0.25s ease-out';
+    pellet.element.style.transform = 'scale(0.2)';
+    pellet.element.style.opacity = '0';
+    setTimeout(() => { if (pellet.element && pellet.element.parentNode) pellet.element.remove(); }, 300);
+  }
+  // 浮动 +points
+  const ft = document.createElement('div');
+  ft.className = 'food-float-text';
+  ft.textContent = '+' + pellet.points;
+  ft.style.left = (pellet.x + 10) + 'px';
+  ft.style.top = (pellet.y - 5) + 'px';
+  ft.style.color = '#ec407a';
+  ft.style.fontSize = '20px';
+  document.body.appendChild(ft);
+  const anim = ft.animate([
+    { opacity: 1, transform: 'translateY(0) scale(1)' },
+    { opacity: 0, transform: 'translateY(-50px) scale(1.3)' }
+  ], { duration: 1000, easing: 'ease-out' });
+  anim.onfinish = () => ft.remove();
+
+  const oldAff = STATE.affection || 0;
+  const newAff = oldAff + pellet.points;
+  await saveState({ affection: newAff });
+
+  const choked = Math.random() < 0.33;
+  if (choked) { setTimeout(() => fishSay('咳咳咳…呛到了！😤'), 300); }
+
+  const oldMilestone = Math.floor(oldAff / 200);
+  const newMilestone = Math.floor(newAff / 200);
+  if (newMilestone > oldMilestone && !(STATE.feed_bonus_used)) {
+    await saveState({ feed_bonus_used: true });
+    window._bonusDraw = true;
+    window._bonusMsg = '💖 好感度 ' + (newMilestone * 200) + ' 奖励抽卡';
+    document.getElementById('feedEmoji').textContent = '🎉';
+    document.getElementById('feedMsg').innerHTML = '好感度突破 ' + (newMilestone * 200) + '！<br>鱼吃爽了，让你再抽一次卡！';
+    document.getElementById('feedDetail').textContent = pellet.emoji + ' ' + pellet.label + ' +' + pellet.points + '好感度';
+    document.getElementById('feedOverlay').classList.add('active');
+  }
+
+  updateAffectionBar();
+  foodPellets = foodPellets.filter(p => p !== pellet);
+}
+
+function updateFoodPhysics() {
+  for (const p of foodPellets) {
+    if (p.eaten) continue;
+    if (!p.atBottom) {
+      p.vy += FOOD_GRAVITY;
+      if (p.vy > FOOD_TERMINAL_VY) p.vy = FOOD_TERMINAL_VY;
+      p.y += p.vy;
+      p.x += p.vx;
+      p.vx *= 0.995;
+      const ground = getFoodGround();
+      if (p.y >= ground) {
+        p.y = ground;
+        p.vy *= -FOOD_BOUNCE;
+        if (Math.abs(p.vy) < 0.4) { p.vy = 0; p.vx = 0; p.atBottom = true; }
+      }
+    }
+    if (p.element) {
+      p.wobble += 0.03;
+      const wobX = p.atBottom ? 0 : Math.sin(p.wobble) * 2;
+      p.element.style.left = (p.x + wobX) + 'px';
+      p.element.style.top = p.y + 'px';
+      if (p.atBottom) { p.element.style.transform = 'scale(0.8)'; p.element.style.opacity = '0.65'; }
+    }
   }
 }
 
@@ -796,6 +1002,13 @@ fishWrapper.addEventListener('click', async (e) => {
       document.getElementById('easterOverlay').classList.add('active');
     }, 600);
   }
+});
+
+// ========== 点击空白处投喂饲料 ==========
+document.addEventListener('click', (e) => {
+  // 排除交互元素：按钮、链接、鱼、侧边图、kitty、各种弹窗
+  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
+  spawnFoodAt(e.clientX, e.clientY);
 });
 
 // ========== 游戏 ==========
@@ -1186,62 +1399,10 @@ async function updateAffectionBar() {
     await saveState({ feed_remaining: 10, feed_bonus_used: false, feed_date: today });
   }
   const r = (STATE.feed_remaining != null) ? STATE.feed_remaining : 10;
-  document.getElementById('feedBtn').textContent = r > 0 ? `🍥 喂食(${r})` : '🍥 喂食(0)';
+  document.getElementById('feedBtn').textContent = r > 0 ? `🍥 饲料(${r})` : '🍥 饲料(0)';
 }
 
-async function feedFish() {
-  // 确保日期最新
-  const today = getToday();
-  if (STATE.feed_date !== today) {
-    STATE.feed_remaining = 10;
-    STATE.feed_bonus_used = false;
-    STATE.feed_date = today;
-    await saveState({ feed_remaining: 10, feed_bonus_used: false, feed_date: today });
-  }
-  const remaining = (STATE.feed_remaining != null) ? STATE.feed_remaining : 10;
-  if (remaining <= 0) {
-    document.getElementById('feedEmoji').textContent = '😿';
-    document.getElementById('feedMsg').textContent = '今天的鱼饲料已经喂完啦～';
-    document.getElementById('feedDetail').textContent = '明天再来吧！';
-    document.getElementById('feedOverlay').classList.add('active');
-    return;
-  }
-  STATE.feed_remaining = remaining - 1;
-  await saveState({ feed_remaining: remaining - 1 });
-
-  const rnd = Math.random();
-  let points, emoji, label;
-  if (rnd < 0.5) { points = 10; emoji = '🍞'; label = '普通饲料'; }
-  else if (rnd < 0.8) { points = 20; emoji = '🍰'; label = '优质饲料'; }
-  else { points = 50; emoji = '🍣'; label = '上等饲料'; }
-
-  const oldAff = STATE.affection || 0;
-  const newAff = oldAff + points;
-  await saveState({ affection: newAff });
-
-  const choked = Math.random() < 0.33;
-  const oldMilestone = Math.floor(oldAff / 200);
-  const newMilestone = Math.floor(newAff / 200);
-  let bonusMsg = '';
-
-  if (newMilestone > oldMilestone && !(STATE.feed_bonus_used)) {
-    await saveState({ feed_bonus_used: true });
-    window._bonusDraw = true;
-    window._bonusMsg = '💖 好感度 ' + (newMilestone * 200) + ' 奖励抽卡';
-    bonusMsg = '<br>🎉 好感度突破 ' + (newMilestone * 200) + '！<br>今天鱼吃爽了，让你再抽一次卡！';
-  }
-
-  const cEmoji = choked ? '😤' : '😋';
-  const cMsg = choked ? '鱼吃太快呛到了！咳咳咳…' : '鱼吃得津津有味～';
-  document.getElementById('feedEmoji').textContent = cEmoji;
-  document.getElementById('feedMsg').innerHTML = cMsg + bonusMsg;
-  const afterFeed = STATE.feed_remaining;
-  document.getElementById('feedDetail').textContent = `${emoji} ${label} +${points}好感度 | 剩余饲料:${afterFeed}`;
-  document.getElementById('feedOverlay').classList.add('active');
-  updateAffectionBar();
-
-  if (choked) { setTimeout(() => fishSay('咳咳咳…呛到了！😤'), 400); }
-}
+// feedFish 已替换为 spawnFoodAt / spawnFoodNearFish + eatFood 系统
 
 // ========== 场景初始化 ==========
 (function initScene() {
