@@ -5,6 +5,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐟</text></svg>">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🐟 我是傻鱼 ~ ♪</title>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.157.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.157.0/examples/jsm/"}}</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{
@@ -154,6 +155,22 @@ body{
 .wheel-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
 .wheel-close{position:absolute;top:12px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:#bbb;-webkit-tap-highlight-color:transparent;outline:none}
 .wheel-close:hover{color:#888}
+	/* 地球仪 */
+	.globe-overlay{position:fixed;inset:0;z-index:45;background:radial-gradient(ellipse at center,#0a0a2e 0%,#000 100%);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .5s}
+	.globe-overlay.active{opacity:1;pointer-events:auto}
+	.globe-canvas-wrap{position:relative;width:100%;height:100%}
+	.globe-close-btn{position:absolute;top:20px;right:24px;z-index:50;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:18px;width:40px;height:40px;border-radius:50%;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;font-family:inherit}
+	.globe-close-btn:hover{background:rgba(255,255,255,.3)}
+	.globe-info{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:50;background:rgba(0,0,0,.7);color:#fff;padding:12px 24px;border-radius:25px;font-size:16px;letter-spacing:2px;text-align:center;pointer-events:none;transition:all .3s;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+	.globe-info .cn{font-size:22px;font-weight:bold}
+	.globe-info .sn{font-size:13px;opacity:.7;margin-top:4px}
+	.globe-hint-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:48;color:rgba(255,255,255,.5);font-size:15px;letter-spacing:2px;pointer-events:none;transition:opacity .6s;text-align:center}
+	.globe-danmaku{position:fixed;pointer-events:none;z-index:55;font-weight:bold;white-space:nowrap;text-shadow:0 2px 8px rgba(0,0,0,.5);will-change:transform,opacity;font-family:"Comic Sans MS","KaiTi","Microsoft YaHei",cursive,sans-serif}
+	.globe-entry-btn{position:fixed;bottom:100px;right:24px;z-index:28;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1a237e,#4fc3f7,#1a237e);background-size:200% 200%;animation:gp 3s ease-in-out infinite;border:none;cursor:pointer;font-size:28px;box-shadow:0 4px 20px rgba(79,195,247,.4);transition:transform .2s}
+	.globe-entry-btn:hover{transform:scale(1.1)}
+	.globe-entry-btn:active{transform:scale(.9)}
+	@keyframes gp{0%,100%{background-position:0% 50%;box-shadow:0 4px 20px rgba(79,195,247,.4)}50%{background-position:100% 50%;box-shadow:0 4px 30px rgba(79,195,247,.7)}}
+	@media(max-width:768px){.globe-info{bottom:16px;padding:8px 14px;font-size:11px}.globe-info .cn{font-size:16px}.globe-info .sn{font-size:10px}.globe-entry-btn{bottom:75px;right:10px;width:44px;height:44px;font-size:22px}.globe-hint-text{font-size:11px;line-height:1.6;text-align:center;width:90%}.globe-close-btn{top:12px;right:12px;width:36px;height:36px;font-size:16px}.globe-danmaku{font-size:14px!important}}
 
 </style>
 </head>
@@ -188,6 +205,7 @@ body{
     <button class="btn-album" onclick="openAlbum()">📖 图鉴</button>
     <button class="btn-album" id="feedBtn" onclick="spawnFoodNearFish()">🍥 饲料</button>
     <button class="btn-album" id="musicBtn" onclick="toggleMusic()">🔇 音乐关</button>
+    <button class="btn-album" onclick="openGlobe()">🌍 地球仪</button>
   </div>
   <div class="game-entry">
     <button class="entry-btn" onclick="enterGame('tictactoe')">🎮 井字棋</button>
@@ -275,6 +293,18 @@ body{
     </div>
   </div>
 </div>
+
+<!-- 地球仪 -->
+<div class="globe-overlay" id="globeOverlay">
+  <div class="globe-canvas-wrap" id="globeCanvasWrap"></div>
+  <button class="globe-close-btn" onclick="closeGlobe()">✕</button>
+  <div class="globe-hint-text" id="globeHint">🖱 拖拽旋转 &nbsp;|&nbsp; 滚轮缩放 &nbsp;|&nbsp; 点击国家</div>
+  <div class="globe-info" id="globeInfo" style="opacity:0">
+    <div class="cn" id="globeCountry"></div>
+    <div class="sn" id="globeSound"></div>
+  </div>
+</div>
+<button class="globe-entry-btn" id="globeEntryBtn" onclick="openGlobe()" title="🌍 地球仪">🌍</button>
 
 <script>
 // ========== 数据存储（Supabase + localStorage 双写互通） ==========
@@ -1026,7 +1056,7 @@ fishWrapper.addEventListener('click', async (e) => {
 // ========== 点击空白处投喂饲料 ==========
 document.addEventListener('click', (e) => {
   // 排除交互元素：按钮、链接、鱼、侧边图、kitty、各种弹窗
-  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
+  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
   spawnFoodAt(e.clientX, e.clientY);
 });
 
@@ -1520,6 +1550,739 @@ async function updateAffectionBar() {
   markSynced();
   console.log('🐟 傻鱼已就绪 | 点击:' + (STATE.click_count||0) + ' | 图鉴:' + UNLOCKED.length + '种 | 好感度:' + (STATE.affection||0));
 })();
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ========== 国家数据 [lat,lng,minLat,minLng,maxLat,maxLng,region,sound,cnName,flag,danmakuEmoji,danmakuText] ==========
+const COUNTRIES = [
+[35.7,139.8,30,129,46,146,'east_asia','train','日本','🇯🇵','🙇','电车的轰鸣声'],
+[36,128,33,126,39,130,'east_asia','train','韩国','🇰🇷','🤖','K-pop与泡菜'],
+[39.9,116.4,18,74,54,135,'east_asia','train','中国','🇨🇳','🏮','龙啸与编钟'],
+[23.7,121,22,120,25,122,'east_asia','train','台湾','🇹🇼','🧋','珍珠奶茶的甜'],
+[22.3,114.2,22,114,23,115,'east_asia','train','香港','🇭🇰','🏙️','霓虹灯下的街道'],
+[47.9,106.9,42,88,52,120,'east_asia','train','蒙古','🇲🇳','🐎','马蹄踏过草原'],
+[21,105.8,9,102,23,110,'se_asia','temple','越南','🇻🇳','🍜','摩托车的洪流'],
+[19.9,102.5,14,100,23,108,'se_asia','temple','老挝','🇱🇦','🛕','晨钟暮鼓'],
+[12.6,104.9,10,102,15,108,'se_asia','temple','柬埔寨','🇰🇭','🏛️','吴哥窟的微风'],
+[15.9,100.9,6,97,20,106,'se_asia','temple','泰国','🇹🇭','🐘','大象的脚步声'],
+[21.9,95.9,10,92,29,101,'se_asia','temple','缅甸','🇲🇲','🛎️','佛塔间的风铃'],
+[1.4,103.8,1,104,1.5,104,'se_asia','city','新加坡','🇸🇬','🦁','狮城的雨声'],
+[4.2,102,1,100,7,105,'se_asia','rainforest','马来西亚','🇲🇾','🌴','热带雨林的蝉鸣'],
+[-0.8,113.9,-11,95,6,141,'se_asia','rainforest','印度尼西亚','🇮🇩','🦎','火山与丛林'],
+[12.9,121.8,5,117,19,127,'se_asia','ocean','菲律宾','🇵🇭','🌊','千岛的海浪'],
+[-6.2,106.8,-11,95,6,141,'se_asia','rainforest','印度尼西亚','🇮🇩','🦜','雨林的清晨'],
+[20.6,78.9,7,68,36,97,'south_asia','temple','印度','🇮🇳','🕉️','恒河的钟声'],
+[30.4,70,24,61,37,77,'south_asia','temple','巴基斯坦','🇵🇰','🕌','清真寺的唤礼'],
+[23.7,90.4,21,88,27,93,'south_asia','temple','孟加拉国','🇧🇩','🛶','水乡的桨声'],
+[7.9,80.8,6,80,10,82,'south_asia','temple','斯里兰卡','🇱🇰','🍃','茶园的风声'],
+[27.7,85.3,26,80,30,88,'south_asia','temple','尼泊尔','🇳🇵','🏔️','喜马拉雅的风'],
+[27.5,89.6,27,89,28,92,'south_asia','temple','不丹','🇧🇹','🐉','龙之国的静谧'],
+[35,65,30,61,39,75,'central_asia','desert','阿富汗','🇦🇫','🏜️','风沙中的驼铃'],
+[55.8,49,41,46,82,88,'eastern_europe','arctic','俄罗斯','🇷🇺','🐻','西伯利亚的雪'],
+[48.4,31.2,44,22,53,41,'eastern_europe','accordion','乌克兰','🇺🇦','🌾','麦田上的风声'],
+[53.7,27.9,51,23,57,33,'eastern_europe','arctic','白俄罗斯','🇧🇾','❄️','北国的寂静'],
+[52.2,21,49,14,55,24,'eastern_europe','accordion','波兰','🇵🇱','🕊️','广场的鸽哨'],
+[49.8,15.5,48,12,51,19,'eastern_europe','accordion','捷克','🇨🇿','🍺','啤酒泡沫的声音'],
+[48.7,19.7,48,17,50,23,'eastern_europe','accordion','斯洛伐克','🇸🇰','🏰','古堡的风声'],
+[47.2,19.5,45,16,49,23,'eastern_europe','accordion','匈牙利','🇭🇺','🎻','多瑙河的波光'],
+[45.8,24.2,44,21,48,30,'eastern_europe','accordion','罗马尼亚','🇷🇴','🧛','森林的低语'],
+[42.7,23.3,41,23,44,29,'eastern_europe','accordion','保加利亚','🇧🇬','🌹','玫瑰谷的香'],
+[51.1,17,49,14,55,24,'eastern_europe','accordion','波兰','🇵🇱','🎹','肖邦的夜曲'],
+[48.7,21.5,48,17,50,23,'eastern_europe','accordion','斯洛伐克','🇸🇰','⛰️','塔特拉山的风'],
+[42,22,38,19,46,28,'eastern_europe','temple','北马其顿','🇲🇰','🏺','古道的足音'],
+[41.3,19.8,40,19,43,21,'eastern_europe','ocean','阿尔巴尼亚','🇦🇱','🦅','山鹰之国'],
+[44.8,20.5,42,19,46,23,'eastern_europe','accordion','塞尔维亚','🇷🇸','💃','科罗舞的节拍'],
+[43.9,17.7,43,16,46,20,'eastern_europe','accordion','波黑','🇧🇦','☕','咖啡的香气'],
+[45.8,16,42,14,47,19,'eastern_europe','accordion','克罗地亚','🇭🇷','🌊','亚得里亚海的浪'],
+[46.1,14.5,45,14,47,17,'eastern_europe','accordion','斯洛文尼亚','🇸🇮','🏞️','布莱德湖的涟漪'],
+[48.7,19.7,48,17,50,23,'eastern_europe','accordion','斯洛伐克','🇸🇰','🪗','乡村的牧笛'],
+[52.4,13.4,47,6,55,15,'western_europe','train','德国','🇩🇪','🚅','ICE列车进站'],
+[46.8,8.2,46,6,48,11,'western_europe','accordion','瑞士','🇨🇭','🦯','阿尔卑斯牛铃'],
+[47.3,13.3,46,10,49,17,'western_europe','accordion','奥地利','🇦🇹','🎻','金色大厅的回响'],
+[52.1,5.3,51,4,54,7,'western_europe','city','荷兰','🇳🇱','🚲','运河的流水'],
+[50.5,4.5,50,3,52,6,'western_europe','pigeon','比利时','🇧🇪','🧇','布鲁塞尔大广场'],
+[49.6,6.1,50,6,50,7,'western_europe','accordion','卢森堡','🇱🇺','🏰','古堡的钟声'],
+[46.8,2.2,42,-5,51,8,'western_europe','accordion','法国','🇫🇷','🥐','街角的香颂'],
+[40.4,-3.7,36,-10,44,4,'western_europe','pigeon','西班牙','🇪🇸','💃','弗拉明戈的脚步声'],
+[39.4,-8.2,37,-10,42,-6,'western_europe','pigeon','葡萄牙','🇵🇹','🎸','法多的忧伤'],
+[55.7,12.6,55,8,58,15,'western_europe','ocean','丹麦','🇩🇰','🧜','小美人鱼的叹息'],
+[41.9,12.5,37,7,47,19,'western_europe','pigeon','意大利','🇮🇹','🍕','广场的鸽子声'],
+[39,22,35,20,42,28,'western_europe','pigeon','希腊','🇬🇷','🏛️','爱琴海的浪花'],
+[64,26,60,20,70,32,'northern_europe','arctic','芬兰','🇫🇮','🧖','桑拿房的水汽'],
+[60,18,55,11,69,24,'northern_europe','arctic','瑞典','🇸🇪','🎵','ABBA的节拍'],
+[62,10,58,5,71,31,'northern_europe','arctic','挪威','🇳🇴','🌌','极光下的峡湾'],
+[64.8,-18,63,-25,67,-13,'northern_europe','arctic','冰岛','🇮🇸','🌋','地热的喷涌'],
+[55.4,-3.4,50,-6,58,2,'northern_europe','city','英国','🇬🇧','☕','下午茶的瓷杯'],
+[53.3,-6.3,51,-11,56,-6,'northern_europe','ocean','爱尔兰','🇮🇪','🍀','风笛与绿野'],
+[56,24,54,21,58,27,'northern_europe','accordion','拉脱维亚','🇱🇻','🌲','松林的呼吸'],
+[55,24,54,21,57,27,'northern_europe','accordion','立陶宛','🇱🇹','🕯️','琥珀之光'],
+[58.6,25,58,22,60,28,'northern_europe','arctic','爱沙尼亚','🇪🇪','🌲','波罗的海的风'],
+[56.9,-3.9,55,-8,61,-1,'northern_europe','accordion','苏格兰','🏴󠁧󠁢󠁳󠁣󠁴󠁿','🎵','风笛的高地'],
+[31.8,35.2,30,34,34,36,'middle_east','desert','以色列','🇮🇱','🕍','耶路撒冷的钟'],
+[31.9,36,30,35,33,39,'middle_east','desert','约旦','🇯🇴','🏜️','佩特拉的峡谷'],
+[33.8,36,34,36,36,39,'middle_east','desert','叙利亚','🇸🇾','🕌','大马士革的玫瑰'],
+[33.9,35.5,33,35,35,37,'middle_east','desert','黎巴嫩','🇱🇧','🌿','雪松的低语'],
+[38.9,45,39,44,40,48,'middle_east','desert','亚美尼亚','🇦🇲','⛪','修道院的钟鸣'],
+[40.2,47.6,39,45,42,51,'middle_east','desert','阿塞拜疆','🇦🇿','🔥','火焰塔的风'],
+[32,53,25,44,40,64,'middle_east','desert','伊朗','🇮🇷','🏛️','波斯的回响'],
+[33.2,44,30,39,37,49,'middle_east','desert','伊拉克','🇮🇶','📜','两河流域的风'],
+[24.7,46.7,17,35,32,56,'middle_east','desert','沙特阿拉伯','🇸🇦','🕋','麦加的唤礼'],
+[25,55.3,23,51,27,57,'middle_east','desert','阿联酋','🇦🇪','🏙️','迪拜的喷泉'],
+[21.5,55,17,52,27,60,'middle_east','desert','阿曼','🇴🇲','🌴','乳香的芬芳'],
+[15.4,44.2,13,43,17,46,'middle_east','desert','也门','🇾🇪','🏜️','古城的叹息'],
+[35,33.2,35,33,36,34,'middle_east','pigeon','塞浦路斯','🇨🇾','🏖️','地中海的暖风'],
+[39,35,36,26,42,45,'middle_east','pigeon','土耳其','🇹🇷','🎈','卡帕多奇亚的热气球'],
+[37.8,24,35,20,42,29,'western_europe','pigeon','希腊','🇬🇷','🫒','橄榄树下的蝉'],
+[26.8,30.8,22,25,32,36,'north_africa','desert','埃及','🇪🇬','🐪','金字塔的风沙'],
+[33.9,-6.8,28,-14,36,-1,'north_africa','desert','摩洛哥','🇲🇦','🕌','马拉喀什的夜市'],
+[36.8,3,19,-9,38,12,'north_africa','desert','阿尔及利亚','🇩🇿','🏜️','撒哈拉的星夜'],
+[34,9,31,8,38,12,'north_africa','desert','突尼斯','🇹🇳','🏛️','迦太基的遗迹'],
+[27,17,20,10,34,25,'north_africa','desert','利比亚','🇱🇾','🏜️','沙漠的寂静'],
+[15.6,32.5,4,22,22,38,'east_africa','savanna','苏丹','🇸🇩','🌅','尼罗河的日落'],
+[-1.3,36.8,-5,34,5,42,'east_africa','savanna','肯尼亚','🇰🇪','🦁','草原的狮吼'],
+[-6.2,35.7,-11,30,-1,41,'east_africa','savanna','坦桑尼亚','🇹🇿','🐘','角马的迁徙'],
+[-1.9,30,-3,29,-1,31,'east_africa','savanna','卢旺达','🇷🇼','🦍','云雾森林'],
+[-3.4,30,-5,29,-3,31,'east_africa','savanna','布隆迪','🇧🇮','🥁','鼓点的节奏'],
+[9.1,39.7,3,33,15,48,'east_africa','temple','埃塞俄比亚','🇪🇹','☕','咖啡的醇香'],
+[2.3,45.3,-2,41,12,51,'east_africa','ocean','索马里','🇸🇴','🌊','印度洋的浪'],
+[0.3,32.6,-1,30,4,35,'east_africa','savanna','乌干达','🇺🇬','🦜','维多利亚湖的波'],
+[9.5,7.5,4,3,13,15,'west_africa','savanna','尼日利亚','🇳🇬','🥁','Afrobeat的节奏'],
+[5.6,-0.2,5,-4,11,2,'west_africa','savanna','加纳','🇬🇭','🌟','黄金海岸的海风'],
+[7.6,-5.5,4,-9,10,-3,'west_africa','savanna','科特迪瓦','🇨🇮','🍫','可可的香气'],
+[1.3,32.3,-1,30,4,35,'east_africa','rainforest','乌干达','🇺🇬','🦍','山地大猩猩'],
+[14.5,-14.5,12,-18,17,-12,'west_africa','savanna','塞内加尔','🇸🇳','🥜','花生的收获'],
+[-22.6,17.1,-29,12,-17,25,'southern_africa','savanna','纳米比亚','🇳🇦','🏜️','红色沙漠'],
+[-24.7,25.9,-27,20,-18,30,'southern_africa','savanna','博茨瓦纳','🇧🇼','🐘','奥卡万戈的水'],
+[-30.6,23.9,-35,16,-22,33,'southern_africa','savanna','南非','🇿🇦','🦏','好望角的风暴'],
+[-20,30,-22,25,-16,33,'southern_africa','savanna','津巴布韦','🇿🇼','🏞️','维多利亚瀑布'],
+[-13,28,-17,22,-8,34,'southern_africa','savanna','赞比亚','🇿🇲','🌊','赞比西河的轰鸣'],
+[-18.7,35.5,-27,30,-11,41,'southern_africa','ocean','莫桑比克','🇲🇿','🏝️','印度洋的珍珠'],
+[-18.8,47.5,-26,43,-12,51,'southern_africa','rainforest','马达加斯加','🇲🇬','🦎','狐猴的叫声'],
+[-20.2,57.5,-21,57,-20,58,'southern_africa','ocean','毛里求斯','🇲🇺','🏖️','天堂的海风'],
+[56.1,-106.3,42,-141,83,-52,'north_america','arctic','加拿大','🇨🇦','🍁','枫叶飘落的声音'],
+[38.9,-95.7,25,-125,49,-67,'north_america','city','美国','🇺🇸','🚕','纽约的街声'],
+[23.6,-102.6,15,-118,33,-87,'north_america','desert','墨西哥','🇲🇽','🌮','玛利亚奇的号角'],
+[13.7,-88.9,13,-92,18,-84,'central_america','rainforest','萨尔瓦多','🇸🇻','🌋','火山的轰鸣'],
+[15.2,-86.2,13,-89,18,-83,'central_america','rainforest','洪都拉斯','🇭🇳','🦜','热带雨林的雨'],
+[12.1,-85,11,-88,15,-83,'central_america','rainforest','尼加拉瓜','🇳🇮','🌊','大湖的风'],
+[9.6,-84,8,-86,11,-83,'central_america','rainforest','哥斯达黎加','🇨🇷','🦥','树懒的哈欠'],
+[8.5,-80.8,7,-83,10,-77,'central_america','rainforest','巴拿马','🇵🇦','🚢','运河的汽笛'],
+[21.5,-92,16,-89,23,-86,'central_america','rainforest','危地马拉','🇬🇹','🏛️','玛雅的回响'],
+[17.2,-88.5,16,-89,19,-88,'central_america','rainforest','伯利兹','🇧🇿','🐚','加勒比的海'],
+[23.6,-82.4,20,-85,24,-74,'caribbean','ocean','古巴','🇨🇺','💃','莎莎舞的鼓点'],
+[18.7,-70.2,18,-72,20,-68,'caribbean','ocean','多米尼加','🇩🇴','🏝️','棕榈树的风'],
+[18.1,-76.8,17,-79,19,-74,'caribbean','ocean','牙买加','🇯🇲','🎸','雷鬼的节奏'],
+[18.4,-64.7,18,-65,19,-64,'caribbean','ocean','波多黎各','🇵🇷','🥥','椰风海韵'],
+[4.6,-74.1,-4,-79,12,-67,'south_america','rainforest','哥伦比亚','🇨🇴','☕','咖啡庄园的鸟鸣'],
+[6.4,-66.6,1,-73,12,-60,'south_america','rainforest','委内瑞拉','🇻🇪','⛰️','天使瀑布'],
+[-0.2,-78.5,-5,-81,2,-75,'south_america','rainforest','厄瓜多尔','🇪🇨','🐢','加拉帕戈斯的风'],
+[-9.2,-75,-19,-81,0,-69,'south_america','rainforest','秘鲁','🇵🇪','🦙','安第斯的风笛'],
+[-16.5,-68.2,-23,-70,-10,-57,'south_america','accordion','玻利维亚','🇧🇴','🏔️','天空之镜'],
+[-35.5,-71.7,-56,-76,-18,-67,'south_america','accordion','智利','🇨🇱','🏔️','巴塔哥尼亚的风'],
+[-34.6,-58.4,-55,-74,-21,-54,'south_america','accordion','阿根廷','🇦🇷','💃','探戈的舞步'],
+[-14.2,-51.9,-34,-74,5,-35,'south_america','rainforest','巴西','🇧🇷','🌴','亚马逊的雨林'],
+[-23.4,-58.4,-27,-63,-19,-54,'south_america','accordion','巴拉圭','🇵🇾','🎵','竖琴的旋律'],
+[-33,-56,-35,-59,-30,-53,'south_america','accordion','乌拉圭','🇺🇾','🧉','马黛茶的香气'],
+[4,-73,4,-74,5,-72,'south_america','rainforest','哥伦比亚','🇨🇴','🦋','蝴蝶翅膀的扇动'],
+[-4.4,15.3,-6,12,6,18,'central_africa','rainforest','刚果','🇨🇩','🦍','丛林的鼓点'],
+[3.9,12,-2,8,7,16,'central_africa','rainforest','喀麦隆','🇨🇲','🦁','草原的雷鸣'],
+[0.4,9.5,-1,8,1,12,'central_africa','rainforest','加蓬','🇬🇦','🐘','森林象的足音'],
+[-1.3,15.3,-5,11,4,19,'central_africa','rainforest','刚果（布）','🇨🇬','🌳','刚果河的流水'],
+[6.4,2.4,6,1,7,3,'west_africa','ocean','贝宁','🇧🇯','🥁','伏都的鼓声'],
+[8.6,-0.5,5,-4,11,2,'west_africa','savanna','多哥','🇹🇬','🕊️','大地的呼吸'],
+[-8.8,13.2,-18,12,-5,24,'southern_africa','ocean','安哥拉','🇦🇴','🌊','大西洋的浪'],
+[12.2,-1.2,9,-6,15,3,'west_africa','savanna','布基纳法索','🇧🇫','🌾','萨赫勒的风'],
+[17.1,-2.5,10,-13,25,5,'west_africa','desert','马里','🇲🇱','🏜️','廷巴克图的沙'],
+[16,-6,15,-17,26,5,'west_africa','desert','毛里塔尼亚','🇲🇷','🐪','撒哈拉的驼铃'],
+[13.5,-2,10,-6,15,2,'west_africa','savanna','布基纳法索','🇧🇫','🎭','面具舞的节奏'],
+[-25.1,134,-44,113,-10,154,'oceania','ocean','澳大利亚','🇦🇺','🦘','内陆的风声'],
+[-41.3,174.8,-47,166,-34,179,'oceania','ocean','新西兰','🇳🇿','🥝','毛利战舞的节拍'],
+[-7.5,147,-11,141,-1,156,'oceania','rainforest','巴布亚新几内亚','🇵🇬','🐦','天堂鸟的鸣叫'],
+[-17.7,177.4,-19,176,-16,180,'oceania','ocean','斐济','🇫🇯','🌺','南太平洋的浪'],
+[-21.1,-175.2,-22,-176,-19,-174,'oceania','ocean','汤加','🇹🇴','🐋','鲸鱼的歌声'],
+[-8.5,179.2,-9,176,-6,180,'oceania','ocean','图瓦卢','🇹🇻','🏝️','环礁的海风'],
+[6.9,158.2,5,155,10,163,'oceania','ocean','密克罗尼西亚','🇫🇲','🐠','珊瑚礁的细语'],
+[43.7,7.3,44,7,44,8,'western_europe','pigeon','摩纳哥','🇲🇨','🏎️','F1的引擎声'],
+[41.9,12.5,41,12,42,13,'western_europe','pigeon','梵蒂冈','🇻🇦','⛪','圣彼得广场的钟'],
+[47.1,9.5,47,9,48,10,'western_europe','train','列支敦士登','🇱🇮','🏰','阿尔卑斯的回音'],
+[42.5,1.5,43,1,43,2,'western_europe','pigeon','安道尔','🇦🇩','⛷️','山间的溪流'],
+[43.9,12.5,44,12,44,13,'western_europe','pigeon','圣马力诺','🇸🇲','🏛️','中世纪的钟楼'],
+[35.2,33.5,35,33,36,35,'middle_east','pigeon','塞浦路斯','🇨🇾','🏺','爱神之岛的浪'],
+[42.4,19,42,19,43,20,'eastern_europe','pigeon','黑山','🇲🇪','🏔️','峡湾的回声'],
+[41.6,21.7,41,21,42,22,'eastern_europe','accordion','北马其顿','🇲🇰','🕊️','奥赫里德湖'],
+[27.4,90.4,27,89,28,92,'south_asia','temple','不丹','🇧🇹','🏔️','雷龙的故乡'],
+[3.2,73.2,-1,73,7,74,'south_asia','ocean','马尔代夫','🇲🇻','🏖️','珊瑚海的泡泡'],
+[38.1,46.2,38,45,39,48,'middle_east','desert','亚美尼亚','🇦🇲','🗻','亚拉腊的风'],
+[41.8,44.8,41,40,44,47,'middle_east','accordion','格鲁吉亚','🇬🇪','🍷','葡萄酒的醇香'],
+[24.3,54.5,23,52,27,57,'middle_east','desert','阿联酋','🇦🇪','🕌','沙漠中的奇迹'],
+[25.3,51.5,24,51,27,52,'middle_east','desert','卡塔尔','🇶🇦','🏟️','世界杯的欢呼'],
+[29.3,48,29,47,30,49,'middle_east','desert','科威特','🇰🇼','🛢️','油井的节奏'],
+[26,50.5,26,50,27,51,'middle_east','desert','巴林','🇧🇭','🫧','珍珠之岛的浪'],
+[41.6,20,41,19,43,21,'eastern_europe','temple','科索沃','🇽🇰','🕊️','新生的钟鸣'],
+[20,77,8,68,36,89,'south_asia','temple','印度','🇮🇳','🎵','西塔琴的悠扬'],
+[38.2,67,37,65,41,71,'central_asia','desert','乌兹别克斯坦','🇺🇿','🏛️','丝路的驼铃'],
+[48,66,40,60,55,72,'central_asia','desert','哈萨克斯坦','🇰🇿','🐎','草原的风'],
+[41.5,74,40,70,44,81,'central_asia','desert','吉尔吉斯斯坦','🇰🇬','🏔️','天山的雪'],
+[38.5,68.8,37,68,40,70,'central_asia','desert','塔吉克斯坦','🇹🇯','⛰️','帕米尔的鹰'],
+[39,59,36,53,43,67,'central_asia','desert','土库曼斯坦','🇹🇲','🔥','地狱之门的火']
+];
+
+// ========== Web Audio 合成引擎 ==========
+let audioCtx = null;
+let currentSoundNodes = [];
+let soundGainNode = null;
+let soundFadeTimer = null;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function stopAllSounds(fadeTime = 300) {
+  if (!soundGainNode) return;
+  const now = getAudioCtx().currentTime;
+  soundGainNode.gain.linearRampToValueAtTime(0.001, now + fadeTime / 1000);
+  clearTimeout(soundFadeTimer);
+  soundFadeTimer = setTimeout(() => {
+    currentSoundNodes.forEach(n => { try { n.stop(); } catch(e) {} });
+    currentSoundNodes = [];
+    if (soundGainNode) { try { soundGainNode.disconnect(); } catch(e) {} soundGainNode = null; }
+  }, fadeTime + 100);
+}
+
+function playSoundPreset(preset, variation = 0) {
+  stopAllSounds(200);
+  const ctx = getAudioCtx();
+  const now = ctx.currentTime;
+  soundGainNode = ctx.createGain();
+  soundGainNode.gain.setValueAtTime(0, now);
+  soundGainNode.gain.linearRampToValueAtTime(0.3, now + 0.3);
+  soundGainNode.connect(ctx.destination);
+  const nodes = [];
+  const v = variation || 0;
+
+  if (preset === 'train') {
+    // 低频节奏脉冲 + 高频电子铃声
+    for (let i = 0; i < 3; i++) {
+      const osc = ctx.createOscillator();
+      const gn = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.value = 80 + i * 20 + v * 5;
+      gn.gain.setValueAtTime(0.12, now);
+      gn.gain.setTargetAtTime(0.03, now + 0.1, 0.3);
+      osc.connect(gn); gn.connect(soundGainNode);
+      osc.start(now); osc.stop(now + 60);
+      nodes.push(osc, gn);
+    }
+    // 高频铃声
+    const chime = ctx.createOscillator();
+    const cg = ctx.createGain();
+    chime.type = 'sine';
+    chime.frequency.value = 1200 + v * 20;
+    cg.gain.setValueAtTime(0, now);
+    for (let i = 0; i < 10; i++) {
+      cg.gain.setTargetAtTime(0.08, now + i * 2.5 + Math.random() * 0.5, 0.05);
+      cg.gain.setTargetAtTime(0.001, now + i * 2.5 + 0.3, 0.1);
+    }
+    chime.connect(cg); cg.connect(soundGainNode);
+    chime.start(now); chime.stop(now + 60);
+    nodes.push(chime, cg);
+
+  } else if (preset === 'pigeon') {
+    // 带通滤波噪声 + 不规则咕咕声
+    const bufferSize = 4096;
+    const noiseNode = ctx.createScriptProcessor(bufferSize, 1, 1);
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 600 + v * 30;
+    filter.Q.value = 2;
+    const ng = ctx.createGain();
+    ng.gain.value = 0.06;
+    noiseNode.onaudioprocess = e => {
+      const out = e.outputBuffer.getChannelData(0);
+      for (let i = 0; i < out.length; i++) out[i] = Math.random() * 2 - 1;
+    };
+    noiseNode.connect(filter); filter.connect(ng); ng.connect(soundGainNode);
+    nodes.push(noiseNode, filter, ng);
+    // 咕咕声
+    for (let i = 0; i < 6; i++) {
+      const coo = ctx.createOscillator();
+      const cg2 = ctx.createGain();
+      coo.type = 'sine';
+      coo.frequency.value = 350 + Math.random() * 100 + v * 10;
+      const t = now + i * 2 + Math.random();
+      cg2.gain.setValueAtTime(0, t);
+      cg2.gain.linearRampToValueAtTime(0.1, t + 0.05);
+      cg2.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+      coo.connect(cg2); cg2.connect(soundGainNode);
+      coo.start(t); coo.stop(t + 0.3);
+      nodes.push(coo, cg2);
+    }
+
+  } else if (preset === 'rainforest') {
+    // 粉红噪声 + 鸟鸣
+    const bufferSize = 4096;
+    const noiseNode = ctx.createScriptProcessor(bufferSize, 1, 1);
+    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+    const ng = ctx.createGain();
+    ng.gain.value = 0.08;
+    noiseNode.onaudioprocess = e => {
+      const out = e.outputBuffer.getChannelData(0);
+      for (let i = 0; i < out.length; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.969 * b2 + white * 0.153852;
+        b3 = 0.8665 * b3 + white * 0.3104856;
+        b4 = 0.55 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.016898;
+        out[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+        b6 = white * 0.115926;
+      }
+    };
+    noiseNode.connect(ng); ng.connect(soundGainNode);
+    nodes.push(noiseNode, ng);
+    // 鸟鸣
+    for (let i = 0; i < 8; i++) {
+      const bird = ctx.createOscillator();
+      const bg = ctx.createGain();
+      bird.type = 'sine';
+      const t = now + i * 1.5 + Math.random() * 3;
+      bird.frequency.setValueAtTime(2000 + Math.random() * 2000 + v * 100, t);
+      bird.frequency.setValueAtTime(2800 + Math.random() * 1500, t + 0.08);
+      bird.frequency.setValueAtTime(2200 + Math.random() * 1800, t + 0.16);
+      bg.gain.setValueAtTime(0, t);
+      bg.gain.linearRampToValueAtTime(0.06, t + 0.02);
+      bg.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+      bird.connect(bg); bg.connect(soundGainNode);
+      bird.start(t); bird.stop(t + 0.25);
+      nodes.push(bird, bg);
+    }
+
+  } else if (preset === 'ocean') {
+    // 白噪声扫频
+    const bufferSize = 4096;
+    const noiseNode = ctx.createScriptProcessor(bufferSize, 1, 1);
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 400 + v * 20;
+    const lfo = ctx.createOscillator();
+    const lfoGain = ctx.createGain();
+    lfo.type = 'sine';
+    lfo.frequency.value = 0.08 + v * 0.01;
+    lfoGain.gain.value = 150;
+    lfo.connect(lfoGain); lfoGain.connect(filter.frequency);
+    lfo.start(now);
+    const ng = ctx.createGain();
+    ng.gain.value = 0.1;
+    noiseNode.onaudioprocess = e => {
+      const out = e.outputBuffer.getChannelData(0);
+      for (let i = 0; i < out.length; i++) out[i] = Math.random() * 2 - 1;
+    };
+    noiseNode.connect(filter); filter.connect(ng); ng.connect(soundGainNode);
+    nodes.push(noiseNode, filter, lfo, lfoGain, ng);
+
+  } else if (preset === 'city') {
+    // 低频嗡鸣 + 随机喇叭
+    for (let i = 0; i < 2; i++) {
+      const osc = ctx.createOscillator();
+      const gn = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.value = 50 + i * 15 + v * 3;
+      gn.gain.value = 0.04;
+      osc.connect(gn); gn.connect(soundGainNode);
+      osc.start(now); osc.stop(now + 60);
+      nodes.push(osc, gn);
+    }
+    for (let i = 0; i < 4; i++) {
+      const honk = ctx.createOscillator();
+      const hg = ctx.createGain();
+      honk.type = 'square';
+      honk.frequency.value = 300 + Math.random() * 200 + v * 10;
+      const t = now + i * 5 + Math.random() * 3;
+      hg.gain.setValueAtTime(0, t);
+      hg.gain.linearRampToValueAtTime(0.05, t + 0.02);
+      hg.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+      honk.connect(hg); hg.connect(soundGainNode);
+      honk.start(t); honk.stop(t + 0.4);
+      nodes.push(honk, hg);
+    }
+
+  } else if (preset === 'temple') {
+    // 钟声衰减 + 持续低音嗡鸣
+    const drone = ctx.createOscillator();
+    const dg = ctx.createGain();
+    drone.type = 'sine';
+    drone.frequency.value = 110 + v * 5;
+    dg.gain.value = 0.06;
+    drone.connect(dg); dg.connect(soundGainNode);
+    drone.start(now); drone.stop(now + 60);
+    nodes.push(drone, dg);
+    // 钟声
+    for (let i = 0; i < 5; i++) {
+      const bell = ctx.createOscillator();
+      const bg = ctx.createGain();
+      bell.type = 'sine';
+      bell.frequency.value = 440 + i * 80 + v * 20;
+      const t = now + i * 3 + Math.random();
+      bg.gain.setValueAtTime(0, t);
+      bg.gain.linearRampToValueAtTime(0.15, t + 0.03);
+      bg.gain.exponentialRampToValueAtTime(0.001, t + 2.5);
+      bell.connect(bg); bg.connect(soundGainNode);
+      bell.start(t); bell.stop(t + 3);
+      nodes.push(bell, bg);
+    }
+
+  } else if (preset === 'accordion') {
+    // 简单旋律 + 颤音
+    const notes = [262, 294, 330, 349, 392, 349, 330, 294];
+    for (let i = 0; i < 16; i++) {
+      const osc = ctx.createOscillator();
+      const gn = ctx.createGain();
+      osc.type = 'triangle';
+      const note = notes[i % notes.length] + v * 3;
+      const t = now + i * 0.5;
+      osc.frequency.value = note;
+      // 颤音
+      const vibrato = ctx.createOscillator();
+      const vg = ctx.createGain();
+      vibrato.type = 'sine';
+      vibrato.frequency.value = 5;
+      vg.gain.value = 3;
+      vibrato.connect(vg); vg.connect(osc.frequency);
+      vibrato.start(t); vibrato.stop(t + 0.5);
+      gn.gain.setValueAtTime(0, t);
+      gn.gain.linearRampToValueAtTime(0.1, t + 0.03);
+      gn.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+      osc.connect(gn); gn.connect(soundGainNode);
+      osc.start(t); osc.stop(t + 0.5);
+      nodes.push(osc, gn, vibrato, vg);
+    }
+
+  } else if (preset === 'desert') {
+    // 风声 + 弦乐嗡鸣
+    const bufferSize = 4096;
+    const noiseNode = ctx.createScriptProcessor(bufferSize, 1, 1);
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 1000 + v * 30;
+    filter.Q.value = 0.5;
+    const ng = ctx.createGain();
+    ng.gain.value = 0.08;
+    noiseNode.onaudioprocess = e => {
+      const out = e.outputBuffer.getChannelData(0);
+      for (let i = 0; i < out.length; i++) out[i] = Math.random() * 2 - 1;
+    };
+    noiseNode.connect(filter); filter.connect(ng); ng.connect(soundGainNode);
+    nodes.push(noiseNode, filter, ng);
+    // 弦乐嗡鸣
+    const strOsc = ctx.createOscillator();
+    const sg = ctx.createGain();
+    strOsc.type = 'sawtooth';
+    strOsc.frequency.value = 100 + v * 5;
+    sg.gain.value = 0.03;
+    strOsc.connect(sg); sg.connect(soundGainNode);
+    strOsc.start(now); strOsc.stop(now + 60);
+    nodes.push(strOsc, sg);
+
+  } else if (preset === 'arctic') {
+    // 呼啸风声 + 低频隆隆
+    const bufferSize = 4096;
+    const noiseNode = ctx.createScriptProcessor(bufferSize, 1, 1);
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 300 + v * 20;
+    const lfo = ctx.createOscillator();
+    const lfoGain = ctx.createGain();
+    lfo.type = 'sine';
+    lfo.frequency.value = 0.15;
+    lfoGain.gain.value = 200;
+    lfo.connect(lfoGain); lfoGain.connect(filter.frequency);
+    lfo.start(now);
+    const ng = ctx.createGain();
+    ng.gain.value = 0.12;
+    noiseNode.onaudioprocess = e => {
+      const out = e.outputBuffer.getChannelData(0);
+      for (let i = 0; i < out.length; i++) out[i] = Math.random() * 2 - 1;
+    };
+    noiseNode.connect(filter); filter.connect(ng); ng.connect(soundGainNode);
+    nodes.push(noiseNode, filter, lfo, lfoGain, ng);
+    // 低频隆隆
+    const rumble = ctx.createOscillator();
+    const rg = ctx.createGain();
+    rumble.type = 'sine';
+    rumble.frequency.value = 35 + v;
+    rg.gain.value = 0.08;
+    rumble.connect(rg); rg.connect(soundGainNode);
+    rumble.start(now); rumble.stop(now + 60);
+    nodes.push(rumble, rg);
+
+  } else if (preset === 'savanna') {
+    // 低频鼓点 + 动物声
+    for (let i = 0; i < 8; i++) {
+      const drum = ctx.createOscillator();
+      const dg = ctx.createGain();
+      drum.type = 'triangle';
+      drum.frequency.setValueAtTime(120 + v * 5, now + i * 1.2);
+      drum.frequency.exponentialRampToValueAtTime(40, now + i * 1.2 + 0.15);
+      dg.gain.setValueAtTime(0.2, now + i * 1.2);
+      dg.gain.exponentialRampToValueAtTime(0.001, now + i * 1.2 + 0.2);
+      drum.connect(dg); dg.connect(soundGainNode);
+      drum.start(now + i * 1.2); drum.stop(now + i * 1.2 + 0.25);
+      nodes.push(drum, dg);
+    }
+    // 虫鸣
+    for (let i = 0; i < 5; i++) {
+      const bug = ctx.createOscillator();
+      const bg = ctx.createGain();
+      bug.type = 'square';
+      bug.frequency.value = 2000 + Math.random() * 3000 + v * 50;
+      const t = now + i * 2 + Math.random();
+      bg.gain.setValueAtTime(0, t);
+      bg.gain.linearRampToValueAtTime(0.03, t + 0.01);
+      bg.gain.linearRampToValueAtTime(0, t + 0.05);
+      bg.gain.setValueAtTime(0.03, t + 0.3);
+      bg.gain.linearRampToValueAtTime(0, t + 0.35);
+      bug.connect(bg); bg.connect(soundGainNode);
+      bug.start(t); bug.stop(t + 0.4);
+      nodes.push(bug, bg);
+    }
+  }
+
+  currentSoundNodes = nodes;
+  setTimeout(() => {
+    currentSoundNodes = currentSoundNodes.filter(n => nodes.indexOf(n) === -1);
+  }, 61000);
+}
+
+// ========== 弹幕系统 ==========
+function spawnDanmaku(country, x, y) {
+  const texts = [
+    `${country[9]} ${country[8]} ${country[10]} ${country[11]}`,
+    `${country[9]} 欢迎来到${country[8]}！${country[10]}`,
+    `${country[9]} ${country[8]} · ${country[11]}`,
+    `${country[10]} ${country[8]} ${country[9]}`,
+  ];
+  const text = texts[Math.floor(Math.random() * texts.length)];
+  const colors = ['#ff80ab','#82b1ff','#b9f6ca','#ffe57f','#ff8a80','#80d8ff','#ea80fc','#ffd740'];
+  const color = colors[Math.floor(Math.random() * colors.length)];
+
+  for (let i = 0; i < 3; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'globe-danmaku';
+      el.textContent = text;
+      el.style.color = color;
+      el.style.fontSize = (18 + Math.random() * 14) + 'px';
+      const startX = window.innerWidth;
+      const startY = 60 + Math.random() * (window.innerHeight - 200);
+      el.style.left = startX + 'px';
+      el.style.top = startY + 'px';
+      document.body.appendChild(el);
+      const duration = 4000 + Math.random() * 3000;
+      const anim = el.animate([
+        { transform: `translateX(0)`, opacity: 1 },
+        { transform: `translateX(-${startX + 400}px)`, opacity: 0 }
+      ], { duration, easing: 'linear' });
+      anim.onfinish = () => el.remove();
+      setTimeout(() => { if (el.parentNode) el.remove(); }, duration + 200);
+    }, i * 400);
+  }
+}
+
+// ========== Three.js 地球仪 ==========
+let globeScene, globeCamera, globeRenderer, globeControls, globeMesh, globeAnimId;
+let globeActive = false;
+let globeAutoRotate = true;
+const EARTH_RADIUS = 2.5;
+
+function initGlobe() {
+  const wrap = document.getElementById('globeCanvasWrap');
+  const w = wrap.clientWidth;
+  const h = wrap.clientHeight;
+
+  globeScene = new THREE.Scene();
+
+  globeCamera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100);
+  globeCamera.position.set(0, 0, 7);
+  globeCamera.lookAt(0, 0, 0);
+
+  globeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  globeRenderer.setSize(w, h);
+  globeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  wrap.appendChild(globeRenderer.domElement);
+
+  // 光照
+  const ambient = new THREE.AmbientLight(0x444466, 1.2);
+  globeScene.add(ambient);
+  const sun = new THREE.DirectionalLight(0xffffff, 1.5);
+  sun.position.set(5, 3, 5);
+  globeScene.add(sun);
+
+  // 地球
+  const geo = new THREE.SphereGeometry(EARTH_RADIUS, 64, 48);
+  const textureLoader = new THREE.TextureLoader();
+  const map = textureLoader.load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg');
+  const mat = new THREE.MeshPhongMaterial({ map, specular: 0x333333, shininess: 15 });
+  globeMesh = new THREE.Mesh(geo, mat);
+  globeScene.add(globeMesh);
+
+  // 大气光晕
+  const glowGeo = new THREE.SphereGeometry(EARTH_RADIUS + 0.03, 64, 48);
+  const glowMat = new THREE.MeshBasicMaterial({ color: 0x4488ff, transparent: true, opacity: 0.08 });
+  const glow = new THREE.Mesh(glowGeo, glowMat);
+  globeScene.add(glow);
+
+  // 星空
+  const starsGeo = new THREE.BufferGeometry();
+  const starsVerts = [];
+  for (let i = 0; i < 1500; i++) {
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    const r = 8 + Math.random() * 7;
+    starsVerts.push(r * Math.sin(phi) * Math.cos(theta), r * Math.sin(phi) * Math.sin(theta), r * Math.cos(phi));
+  }
+  starsGeo.setAttribute('position', new THREE.Float32BufferAttribute(starsVerts, 3));
+  const starsMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.03 });
+  const stars = new THREE.Points(starsGeo, starsMat);
+  globeScene.add(stars);
+
+  // OrbitControls
+  globeControls = new OrbitControls(globeCamera, globeRenderer.domElement);
+  globeControls.enableDamping = true;
+  globeControls.dampingFactor = 0.08;
+  globeControls.minDistance = 5.5;
+  globeControls.maxDistance = 15;
+  globeControls.autoRotate = true;
+  globeControls.autoRotateSpeed = 0.3;
+  globeControls.target.set(0, 0, 0);
+  globeControls.update();
+
+  // 点击检测
+  const raycaster = new THREE.Raycaster();
+  globeRenderer.domElement.addEventListener('click', (e) => {
+    const rect = globeRenderer.domElement.getBoundingClientRect();
+    const mouse = new THREE.Vector2(
+      ((e.clientX - rect.left) / rect.width) * 2 - 1,
+      -((e.clientY - rect.top) / rect.height) * 2 + 1
+    );
+    raycaster.setFromCamera(mouse, globeCamera);
+    const intersects = raycaster.intersectObject(globeMesh);
+    if (intersects.length > 0) {
+      const point = intersects[0].point.clone();
+      // 转换为经纬度
+      const lat = Math.asin(point.y / EARTH_RADIUS) * (180 / Math.PI);
+      const lng = Math.atan2(point.z, point.x) * (180 / Math.PI);
+      // 找到最近的国家
+      const country = findNearestCountry(lat, lng);
+      if (country) {
+        globeAutoRotate = false;
+        globeControls.autoRotate = false;
+        // 显示信息
+        document.getElementById('globeCountry').textContent = country[9] + ' ' + country[8];
+        document.getElementById('globeSound').textContent = '🔊 ' + country[11];
+        document.getElementById('globeInfo').style.opacity = '1';
+        document.getElementById('globeHint').style.opacity = '0';
+        // 播放声音
+        playSoundPreset(country[7], country[0] * 0.3);
+        // 弹幕
+        spawnDanmaku(country, e.clientX, e.clientY);
+        // 3秒后恢复自动旋转
+        clearTimeout(window._globeResumeTimer);
+        window._globeResumeTimer = setTimeout(() => {
+          globeAutoRotate = true;
+          globeControls.autoRotate = true;
+          document.getElementById('globeInfo').style.opacity = '0';
+          document.getElementById('globeHint').style.opacity = '1';
+        }, 6000);
+      }
+    }
+  });
+
+  // 拖拽时停止自动旋转
+  globeRenderer.domElement.addEventListener('pointerdown', () => {
+    globeAutoRotate = false;
+    globeControls.autoRotate = false;
+  });
+  globeRenderer.domElement.addEventListener('pointerup', () => {
+    clearTimeout(window._globeResumeTimer);
+    window._globeResumeTimer = setTimeout(() => {
+      globeAutoRotate = true;
+      globeControls.autoRotate = true;
+    }, 3000);
+  });
+}
+
+function findNearestCountry(lat, lng) {
+  // 先按包围盒粗筛
+  const candidates = COUNTRIES.filter(c => {
+    return lat >= c[2] && lat <= c[4] && lng >= c[3] && lng <= c[5];
+  });
+  // 如果包围盒没命中，找最近的
+  const pool = candidates.length > 0 ? candidates : COUNTRIES;
+  let best = pool[0];
+  let bestDist = Infinity;
+  for (const c of pool) {
+    const dlat = lat - c[0];
+    const dlng = lng - c[1];
+    const dist = dlat * dlat + dlng * dlng;
+    if (dist < bestDist) { bestDist = dist; best = c; }
+  }
+  // 如果距离太远（>20度），可能是海洋
+  if (candidates.length === 0 && bestDist > 400) return null;
+  return best;
+}
+
+function animateGlobe() {
+  if (!globeActive) return;
+  globeAnimId = requestAnimationFrame(animateGlobe);
+  globeControls.update();
+  globeRenderer.render(globeScene, globeCamera);
+}
+
+function onGlobeResize() {
+  if (!globeRenderer || !globeActive) return;
+  const wrap = document.getElementById('globeCanvasWrap');
+  const w = wrap.clientWidth;
+  const h = wrap.clientHeight;
+  globeCamera.aspect = w / h;
+  globeCamera.updateProjectionMatrix();
+  globeRenderer.setSize(w, h);
+}
+
+window.openGlobe = function() {
+  if (globeActive) return;
+  globeActive = true;
+  const overlay = document.getElementById('globeOverlay');
+  overlay.classList.add('active');
+  document.getElementById('globeHint').style.opacity = '1';
+  document.getElementById('globeInfo').style.opacity = '0';
+  if (!globeScene) {
+    initGlobe();
+    window.addEventListener('resize', onGlobeResize);
+  } else {
+    onGlobeResize();
+  }
+  animateGlobe();
+};
+
+window.closeGlobe = function() {
+  globeActive = false;
+  if (globeAnimId) cancelAnimationFrame(globeAnimId);
+  document.getElementById('globeOverlay').classList.remove('active');
+  stopAllSounds(500);
+  document.getElementById('globeInfo').style.opacity = '0';
+};
+
+// 键盘 ESC 关闭
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && globeActive) window.closeGlobe();
+});
+
+console.log('🌍 地球仪模块已就绪 | 国家数:' + COUNTRIES.length);
 </script>
 </body>
 </html>
