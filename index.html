@@ -6,8 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🐟 我是傻鱼 ~ ♪</title>
 <script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.157.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.157.0/examples/jsm/"}}</script>
-	<script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
-<style>
+	<style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{
   min-height:100vh;display:flex;align-items:center;justify-content:center;
@@ -215,19 +214,14 @@ body{
 	@keyframes crPopIn{0%{transform:scale(.3);opacity:0}60%{transform:scale(1.05);opacity:1}100%{transform:scale(1);opacity:1}}
 	@keyframes crFadeIn{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
 	@media(max-width:768px){.color-reveal .cr-name{font-size:22px}.color-reveal .cr-mood{font-size:14px}.color-reveal .cr-hex{font-size:11px}}
-	/* 弹珠迷宫 */
-	.maze-overlay{position:fixed;inset:0;z-index:42;background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
-	.maze-overlay.active{opacity:1;pointer-events:auto}
-	.maze-wrap{position:relative;border:3px solid #4fc3f7;border-radius:8px;overflow:hidden;box-shadow:0 0 30px rgba(79,195,247,.3)}
-	.maze-wrap canvas{display:block}
-	.maze-result{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.75);opacity:0;pointer-events:none;transition:opacity .5s;z-index:5}
-	.maze-result.show{opacity:1}
-	.maze-result .mr-icon{font-size:60px;animation:popIn .5s cubic-bezier(.175,.885,.32,1.275)}
-	.maze-result .mr-text{font-size:26px;font-weight:bold;color:#fff;letter-spacing:3px;margin-top:10px}
-	.maze-result .mr-sub{font-size:14px;color:rgba(255,255,255,.7);letter-spacing:2px;margin-top:8px}
-	.maze-result .mr-btn{padding:10px 28px;border-radius:25px;border:none;font-size:15px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;margin-top:20px;background:#4fc3f7;color:#1a1a2e}
-	.maze-close{position:absolute;top:10px;right:16px;z-index:10;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:16px;width:34px;height:34px;border-radius:50%;cursor:pointer}
-	.maze-hint{color:rgba(255,255,255,.5);font-size:12px;letter-spacing:2px;margin-top:10px}
+	/* 压力释放器 */
+	.stress-overlay{position:fixed;inset:0;z-index:42;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s}
+	.stress-overlay.active{opacity:1;pointer-events:auto}
+	#stressCanvas{display:block;border-radius:50%}
+	.stress-close{position:absolute;top:16px;right:20px;z-index:10;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:16px;width:36px;height:36px;border-radius:50%;cursor:pointer;font-family:inherit}
+	.stress-hint{position:absolute;bottom:50px;color:rgba(255,255,255,.5);font-size:14px;letter-spacing:3px;text-align:center;pointer-events:none}
+	.stress-force-bar{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);width:200px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden}
+	.stress-force-fill{height:100%;background:linear-gradient(90deg,#4fc3f7,#e040fb,#ff5252);border-radius:2px;transition:width .1s;width:0}
 	/* 小游戏菜单 */
 	.games-overlay{position:fixed;inset:0;z-index:38;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s}
 	.games-overlay.active{opacity:1;pointer-events:auto}
@@ -388,18 +382,12 @@ body{
   </div>
 </div>
 
-<!-- 弹珠迷宫 -->
-<div class="maze-overlay" id="mazeOverlay">
-  <div class="maze-wrap" id="mazeWrap">
-    <div class="maze-result" id="mazeResult">
-      <div class="mr-icon" id="mrIcon"></div>
-      <div class="mr-text" id="mrText"></div>
-      <div class="mr-sub" id="mrSub"></div>
-      <button class="mr-btn" onclick="resetMaze()">🔄 再来一次</button>
-    </div>
-  </div>
-  <button class="maze-close" onclick="closeMaze()">✕</button>
-  <span class="maze-hint">📱 倾斜手机控制钢珠滚动</span>
+<!-- 压力释放器 -->
+<div class="stress-overlay" id="stressOverlay">
+  <canvas id="stressCanvas" width="300" height="300"></canvas>
+  <div class="stress-force-bar"><div class="stress-force-fill" id="stressForceFill"></div></div>
+  <button class="stress-close" onclick="closeStress()">✕</button>
+  <span class="stress-hint" id="stressHint">长按水球释放压力</span>
 </div>
 
 <!-- 摇一摇命定颜色 -->
@@ -1195,7 +1183,7 @@ fishWrapper.addEventListener('click', async (e) => {
 // ========== 点击空白处投喂饲料 ==========
 document.addEventListener('click', (e) => {
   // 排除交互元素：按钮、链接、鱼、侧边图、kitty、各种弹窗
-  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, .bs-overlay.active, .maze-overlay.active, .games-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
+  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, .bs-overlay.active, .stress-overlay.active, .games-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
   spawnFoodAt(e.clientX, e.clientY);
 });
 
@@ -2026,220 +2014,213 @@ window.addEventListener('devicemotion', (e) => {
 
 console.log('🎨 摇一摇命定颜色已就绪 | 共' + COLOR_PALETTE.length + '种颜色');
 
-// ========== 弹珠迷宫 (Matter.js) ==========
-let mazeEngine, mazeRender, mazeRunner, mazeBall, mazeActive = false, mazeSolved = false;
-const MAZE_W = 360, MAZE_H = 560;
-const HOLE_R = 22;
-const holes = [
-  {x: 80, y: MAZE_H - 55, label:'今日好运', icon:'🍀', sub:'好运正在路上～'},
-  {x: MAZE_W - 80, y: MAZE_H - 55, label:'今日躺平', icon:'😴', sub:'休息是为了走更远的路'},
-];
+// ========== 压力释放器 ==========
+const stressCanvas = document.getElementById('stressCanvas');
+const sctx = stressCanvas.getContext('2d');
+let stressActive = false, stressPressing = false, stressBurst = false;
+let stressBallR = 60, stressBallTargetR = 60, stressBallBounce = 0;
+let stressPressStart = 0, stressPressForce = 0;
+let stressParticles = [];
+let stressFrameId = null;
 
-function buildMaze() {
-  const {Engine, Render, Runner, Bodies, Body, World, Events, Composite} = Matter;
-  mazeEngine = Engine.create({gravity:{x:0,y:0}});
-  const wallOpts = {isStatic:true, friction:0.3, render:{fillStyle:'#4fc3f7'}};
-  const walls = [];
-  const W = MAZE_W, H = MAZE_H, t = 10; // wall thickness
+function resetStressBall() {
+  stressBallR = 60;
+  stressBallTargetR = 60;
+  stressBallBounce = 0;
+  stressPressing = false;
+  stressBurst = false;
+  stressParticles = [];
+  stressPressForce = 0;
+  document.getElementById('stressForceFill').style.width = '0';
+  document.getElementById('stressHint').textContent = '长按水球释放压力';
+}
 
-  // 外框（底部不封死，留给洞口）
-  walls.push(Bodies.rectangle(W/2, -5, W+20, t*2, wallOpts)); // 顶
-  walls.push(Bodies.rectangle(-5, H/2, t*2, H, wallOpts)); // 左
-  walls.push(Bodies.rectangle(W+5, H/2, t*2, H, wallOpts)); // 右
-
-  // 底部：三段墙留出两个洞口（gap = HOLE_R*2）
-  const gapHalf = HOLE_R;
-  const bottomY = H - 5;
-  const lGapCx = holes[0].x, rGapCx = holes[1].x;
-  // 左段：左边缘到左洞口前
-  const lw = Math.max(10, lGapCx - gapHalf);
-  walls.push(Bodies.rectangle(lw/2, bottomY, lw, t*2, wallOpts));
-  // 中段：两洞口之间
-  const mw = Math.max(10, rGapCx - gapHalf - (lGapCx + gapHalf));
-  walls.push(Bodies.rectangle(lGapCx + gapHalf + mw/2, bottomY, mw, t*2, wallOpts));
-  // 右段：右洞口后到右边缘
-  const rw = Math.max(10, W - (rGapCx + gapHalf));
-  walls.push(Bodies.rectangle(rGapCx + gapHalf + rw/2, bottomY, rw, t*2, wallOpts));
-
-  // 内部迷宫墙
-  const mz = [
-    // [x, y, w, h] - 中心坐标 + 宽高
-    [W/2, 80, 100, t],       // 第一横
-    [W/2 - 80, 150, 80, t],  // 左横
-    [W/2 + 80, 150, 80, t],  // 右横
-    [W/4, 110, t, 80],       // 竖
-    [W*3/4, 110, t, 80],      // 竖
-    [W/2, 220, 120, t],       // 横
-    [W/4 + 30, 185, t, 80],  // 短竖
-    [W*3/4 - 30, 185, t, 80], // 短竖
-    [W/2 - 70, 290, 80, t],  // 左横
-    [W/2 + 70, 290, 80, t],  // 右横
-    [W/3, 260, t, 80],       // 竖
-    [W*2/3, 260, t, 80],     // 竖
-    [W/2, 360, 140, t],       // 横
-    [W/5, 330, t, 80],       // 左竖
-    [W*4/5, 330, t, 80],     // 右竖
-    [W/2 - 80, 430, 80, t],  // 左横
-    [W/2 + 80, 430, 80, t],  // 右横
-    [W/6, 400, t, 80],       // 左竖
-    [W*5/6, 400, t, 80],      // 右竖
-    [W/2, 500, W, t],         // 终点前横
-  ];
-  mz.forEach(([x,y,w,h]) => walls.push(Bodies.rectangle(x,y,w,h,wallOpts)));
-
-  // 钢珠
-  mazeBall = Bodies.circle(W/2, 30, 10, {
-    restitution:0.4, friction:0.05, density:0.002,
-    render:{fillStyle:'#e0e0e0', strokeStyle:'#999', lineWidth:2}
-  });
-  // 钢珠光泽（通过渲染）
-  Composite.add(mazeEngine.world, [...walls, mazeBall]);
-
-  // 渲染器
-  mazeRender = Render.create({
-    element: document.getElementById('mazeWrap'),
-    engine: mazeEngine,
-    options: {
-      width: MAZE_W, height: MAZE_H,
-      wireframes: false,
-      background: '#0d1b2a',
-      pixelRatio: Math.min(window.devicePixelRatio, 2),
-    }
-  });
-
-  // 自定义洞口渲染
-  Events.on(mazeRender, 'afterRender', () => {
-    const ctx = mazeRender.context;
-    holes.forEach(h => {
-      // 黑洞
-      ctx.beginPath();
-      ctx.arc(h.x, h.y, HOLE_R, 0, Math.PI*2);
-      ctx.fillStyle = '#0a0a15';
-      ctx.fill();
-      ctx.strokeStyle = '#4fc3f7';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      // 标签
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 14px "Microsoft YaHei","KaiTi",sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(h.label, h.x, h.y + HOLE_R + 20);
-      ctx.fillText(h.icon, h.x, h.y + HOLE_R + 40);
+function burstStressBall() {
+  stressBurst = true;
+  const cx = stressCanvas.width / 2, cy = stressCanvas.height / 2;
+  const colors = ['#ff5252','#ff4081','#e040fb','#7c4dff','#448aff','#40c4ff','#69f0ae','#ffd740','#ff6e40','#ff1744','#76ff03','#00e5ff'];
+  for (let i = 0; i < 80; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 3 + Math.random() * 10;
+    stressParticles.push({
+      x: cx, y: cy,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - Math.random() * 3,
+      r: 2 + Math.random() * 6,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      life: 1, decay: 0.008 + Math.random() * 0.025,
     });
-    // 起始标记
-    ctx.fillStyle = 'rgba(255,255,255,.3)';
-    ctx.font = '11px "Microsoft YaHei","KaiTi",sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('▼ 起点', W/2, 18);
-  });
+  }
+  // 震动
+  if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+  // "噗"音效
+  try {
+    const actx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = actx.createOscillator();
+    const gain = actx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(300, actx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(80, actx.currentTime + 0.15);
+    gain.gain.setValueAtTime(0.4, actx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.2);
+    osc.connect(gain); gain.connect(actx.destination);
+    osc.start(actx.currentTime); osc.stop(actx.currentTime + 0.25);
+  } catch(e) {}
+  document.getElementById('stressHint').textContent = '💥 爽！点击任意处再来';
+}
 
-  // 碰撞检测：钢珠落入洞口
-  Events.on(mazeEngine, 'beforeUpdate', () => {
-    if (mazeSolved) return;
-    const ballPos = mazeBall.position;
-    for (const h of holes) {
-      const dx = ballPos.x - h.x;
-      const dy = ballPos.y - h.y;
-      if (dx*dx + dy*dy < HOLE_R * HOLE_R && ballPos.y > MAZE_H - 60) {
-        mazeSolved = true;
-        // 移除钢珠
-        Composite.remove(mazeEngine.world, mazeBall);
-        setTimeout(() => showMazeResult(h), 200);
-        break;
-      }
+function updateStressParticles() {
+  for (const p of stressParticles) {
+    p.x += p.vx; p.y += p.vy;
+    p.vy += 0.15; // 重力
+    p.life -= p.decay;
+  }
+  stressParticles = stressParticles.filter(p => p.life > 0);
+}
+
+function drawStressBall() {
+  const w = stressCanvas.width, h = stressCanvas.height;
+  const cx = w / 2, cy = h / 2;
+  sctx.clearRect(0, 0, w, h);
+
+  // 粒子
+  for (const p of stressParticles) {
+    sctx.globalAlpha = p.life;
+    sctx.fillStyle = p.color;
+    sctx.beginPath();
+    sctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    sctx.fill();
+  }
+  sctx.globalAlpha = 1;
+
+  if (stressBurst) {
+    if (stressParticles.length === 0) {
+      // 所有粒子消失，重置
+      setTimeout(resetStressBall, 500);
     }
-  });
+    return;
+  }
 
-  Render.run(mazeRender);
-  mazeRunner = Runner.create();
-  Runner.run(mazeRunner, mazeEngine);
+  // 水的渐变
+  const r = stressBallR;
+  const bounceOffset = Math.sin(stressBallBounce) * (8 + stressPressForce * 4);
+  const ballCy = cy + bounceOffset;
+
+  // 水球阴影
+  sctx.fillStyle = 'rgba(0,0,0,.25)';
+  sctx.beginPath();
+  sctx.ellipse(cx, ballCy + r * 0.85, r * 0.8, r * 0.15, 0, 0, Math.PI * 2);
+  sctx.fill();
+
+  // 水球主体
+  const grad = sctx.createRadialGradient(cx - r * 0.25, ballCy - r * 0.3, r * 0.05, cx, ballCy, r);
+  const intensity = Math.min(1, stressPressForce / 3);
+  const blue = Math.floor(100 - intensity * 60);
+  grad.addColorStop(0, `rgba(${180 + intensity * 50},${220 - intensity * 60},255,0.95)`);
+  grad.addColorStop(0.5, `rgba(33,${150 - intensity * 40},243,0.85)`);
+  grad.addColorStop(1, `rgba(${blue},${blue + 50},200,0.75)`);
+
+  sctx.fillStyle = grad;
+  sctx.beginPath();
+  // 稍微变形：按压时横向拉宽
+  const squeezeX = 1 + stressPressForce * 0.08;
+  const squeezeY = 1 - stressPressForce * 0.06;
+  sctx.ellipse(cx, ballCy, r * squeezeX, r * squeezeY, 0, 0, Math.PI * 2);
+  sctx.fill();
+
+  // 高光
+  const hlGrad = sctx.createRadialGradient(cx - r * 0.3, ballCy - r * 0.3, r * 0.02, cx - r * 0.15, ballCy - r * 0.2, r * 0.35);
+  hlGrad.addColorStop(0, 'rgba(255,255,255,0.7)');
+  hlGrad.addColorStop(1, 'rgba(255,255,255,0)');
+  sctx.fillStyle = hlGrad;
+  sctx.beginPath();
+  sctx.ellipse(cx - r * 0.15, ballCy - r * 0.2, r * 0.3, r * 0.25, -0.3, 0, Math.PI * 2);
+  sctx.fill();
+
+  // 小高光点
+  sctx.fillStyle = 'rgba(255,255,255,0.9)';
+  sctx.beginPath();
+  sctx.arc(cx - r * 0.25, ballCy - r * 0.28, r * 0.06, 0, Math.PI * 2);
+  sctx.fill();
 }
 
-function showMazeResult(hole) {
-  document.getElementById('mrIcon').textContent = hole.icon;
-  document.getElementById('mrText').textContent = hole.label + '！';
-  document.getElementById('mrSub').textContent = hole.sub;
-  document.getElementById('mazeResult').classList.add('show');
-  mazeActive = false;
-}
+function stressLoop() {
+  if (!stressActive) { stressFrameId = null; return; }
+  stressFrameId = requestAnimationFrame(stressLoop);
 
-function resetMaze() {
-  const {World, Engine, Render, Runner, Composite} = Matter;
-  document.getElementById('mazeResult').classList.remove('show');
-  if (mazeRunner) { Runner.stop(mazeRunner); mazeRunner = null; }
-  if (mazeRender) { Render.stop(mazeRender); mazeRender = null; }
-  if (mazeEngine) { World.clear(mazeEngine.world); Engine.clear(mazeEngine); mazeEngine = null; }
-  mazeSolved = false;
-  mazeBall = null;
-  // 清空画布
-  const wrap = document.getElementById('mazeWrap');
-  wrap.querySelectorAll('canvas').forEach(c => c.remove());
-  buildMaze();
-}
-
-// 陀螺仪 → 重力
-let mazeOrientationHandler = null;
-function startMazeGyro() {
-  if (mazeOrientationHandler) return;
-  mazeOrientationHandler = (e) => {
-    if (!mazeActive || mazeSolved || !mazeEngine) return;
-    const gamma = e.gamma || 0;  // -90 ~ 90  左右
-    const beta = e.beta || 0;    // -180 ~ 180 前后
-    const gx = Math.max(-1, Math.min(1, gamma / 45));
-    const gy = Math.max(-1, Math.min(1, (beta - 45) / 45));
-    mazeEngine.gravity.x = gx * 2.5;
-    mazeEngine.gravity.y = gy * 2.5;
-  };
-  window.addEventListener('deviceorientation', mazeOrientationHandler);
-}
-
-// 桌面端用键盘模拟
-let mazeKbStarted = false;
-function startMazeKeyboard() {
-  if (mazeKbStarted) return;
-  mazeKbStarted = true;
-  const keys = {ArrowLeft:false,ArrowRight:false,ArrowUp:false,ArrowDown:false};
-  window.addEventListener('keydown', e => { if (e.key in keys) { keys[e.key]=true; e.preventDefault(); } });
-  window.addEventListener('keyup', e => { if (e.key in keys) keys[e.key]=false; });
-  const kbLoop = () => {
-    if (mazeActive && !mazeSolved && mazeEngine) {
-      mazeEngine.gravity.x = ((keys.ArrowRight?1:0) - (keys.ArrowLeft?1:0)) * 2.5;
-      mazeEngine.gravity.y = ((keys.ArrowDown?1:0) - (keys.ArrowUp?1:0)) * 2.5;
-    }
-    requestAnimationFrame(kbLoop);
-  };
-  kbLoop();
-}
-
-window.openMaze = function() {
-  document.getElementById('mazeOverlay').classList.add('active');
-  if (!mazeEngine) {
-    buildMaze();
-    startMazeGyro();
-    // 桌面端降级
-    if (!('DeviceOrientationEvent' in window) || !('ontouchstart' in window)) {
-      startMazeKeyboard();
-      document.querySelector('.maze-hint').textContent = '⌨ 方向键控制钢珠滚动';
-    } else if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-      // iOS 13+ 需要用户手势触发权限
-      document.querySelector('.maze-hint').textContent = '📱 点击屏幕启用陀螺仪';
-      document.getElementById('mazeWrap').addEventListener('click', function reqGyro() {
-        DeviceOrientationEvent.requestPermission().then(r => {
-          if (r === 'granted') {
-            document.querySelector('.maze-hint').textContent = '📱 倾斜手机控制钢珠滚动';
-          }
-        }).catch(() => {});
-      }, {once: true});
+  if (!stressBurst) {
+    // 弹跳物理
+    stressBallBounce += 0.05;
+    if (!stressPressing) {
+      stressBallTargetR = 60 + Math.sin(stressBallBounce * 0.7) * 8;
+      stressBallR += (stressBallTargetR - stressBallR) * 0.15;
+      stressPressForce *= 0.9;
+    } else {
+      // 按压中：膨胀
+      const elapsed = (Date.now() - stressPressStart) / 1000;
+      const forceFactor = Math.max(0, stressPressForce);
+      stressBallTargetR = 60 + elapsed * 18 + forceFactor * 30;
+      stressBallTargetR = Math.min(stressBallTargetR, 170);
+      stressBallR += (stressBallTargetR - stressBallR) * 0.12;
+      stressBallBounce += 0.15;
     }
   }
-  mazeActive = true;
-  mazeSolved = false;
-  document.getElementById('mazeResult').classList.remove('show');
+
+  updateStressParticles();
+  drawStressBall();
+}
+
+// 按压事件
+function onStressDown(e) {
+  if (stressBurst) { resetStressBall(); return; }
+  e.preventDefault();
+  stressPressing = true;
+  stressPressStart = Date.now();
+  stressPressForce = e.touches ? (e.touches[0].force || 1) : 1;
+  document.getElementById('stressHint').textContent = '用力按！别松手！';
+}
+function onStressMove(e) {
+  if (!stressPressing) return;
+  e.preventDefault();
+  if (e.touches && e.touches[0].force) {
+    stressPressForce = Math.max(stressPressForce, e.touches[0].force);
+  } else {
+    stressPressForce = Math.min(3, (Date.now() - stressPressStart) / 800);
+  }
+  document.getElementById('stressForceFill').style.width = Math.min(100, stressPressForce / 3 * 100) + '%';
+}
+function onStressUp(e) {
+  if (!stressPressing) return;
+  e.preventDefault();
+  stressPressing = false;
+  document.getElementById('stressForceFill').style.width = '0';
+  if (stressBallR > 85) {
+    burstStressBall();
+  } else {
+    stressPressForce = 0;
+    document.getElementById('stressHint').textContent = '长按水球释放压力（再用力一点！）';
+  }
+}
+
+window.openStress = function() {
+  document.getElementById('stressOverlay').classList.add('active');
+  stressActive = true;
+  resetStressBall();
+  const c = stressCanvas;
+  c.addEventListener('touchstart', onStressDown, {passive:false});
+  c.addEventListener('touchmove', onStressMove, {passive:false});
+  c.addEventListener('touchend', onStressUp);
+  c.addEventListener('mousedown', onStressDown);
+  c.addEventListener('mousemove', (e) => { if (stressPressing) { stressPressForce = Math.min(3, (Date.now() - stressPressStart) / 800); document.getElementById('stressForceFill').style.width = Math.min(100, stressPressForce/3*100) + '%'; }});
+  c.addEventListener('mouseup', onStressUp);
+  c.addEventListener('mouseleave', onStressUp);
+  if (!stressFrameId) stressLoop();
 };
 
-window.closeMaze = function() {
-  mazeActive = false;
-  document.getElementById('mazeOverlay').classList.remove('active');
+window.closeStress = function() {
+  stressActive = false;
+  stressPressing = false;
+  document.getElementById('stressOverlay').classList.remove('active');
 };
 
 // ========== 小游戏菜单 ==========
@@ -2247,7 +2228,7 @@ const GAMES_LIST = [
   {icon:'🌍',name:'地球仪',desc:'点击国家 · 听环境音',fn:()=>{closeGames();setTimeout(openGlobe,300);}},
   {icon:'🐉',name:'今日运势',desc:'像素神兽 · 每日抽签',fn:()=>{closeGames();setTimeout(openFortune,300);}},
   {icon:'📝',name:'废话连篇',desc:'职场学术 · 一键生成',fn:()=>{closeGames();setTimeout(openBS,300);}},
-  {icon:'🔮',name:'弹珠迷宫',desc:'倾斜手机 · 物理迷宫',fn:()=>{closeGames();setTimeout(openMaze,300);}},
+  {icon:'💧',name:'压力释放器',desc:'长按水球 · 炸裂解压',fn:()=>{closeGames();setTimeout(openStress,300);}},
   {icon:'🎮',name:'井字棋',desc:'鱼姐 vs 你',fn:()=>{closeGames();enterGame('tictactoe');}},
   {icon:'♟️',name:'五子棋',desc:'先五连者胜',fn:()=>{closeGames();enterGame('gomoku');}},
   {icon:'⚠️',name:'千万别点',desc:'像素闯关大冒险',fn:()=>{closeGames();location.href='game.html';}},
