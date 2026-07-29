@@ -232,6 +232,16 @@ body{
 	.zoom-close{position:absolute;top:16px;right:20px;z-index:10;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:16px;width:36px;height:36px;border-radius:50%;cursor:pointer;font-family:inherit}
 	.zoom-hint{position:absolute;top:50px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.35);font-size:13px;letter-spacing:2px;pointer-events:none}
 	@media(max-width:768px){.zoom-label{font-size:16px;bottom:50px}.zoom-sub{font-size:11px;bottom:24px}}
+	/* 电量算命 */
+	.battery-overlay{position:fixed;inset:0;z-index:44;background:rgba(0,0,0,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+	.battery-overlay.active{opacity:1;pointer-events:auto}
+	#batteryCanvas{display:block}
+	.battery-advice{color:#fff;font-size:26px;font-weight:bold;letter-spacing:3px;text-align:center;margin-top:20px;padding:0 20px;animation:popIn .5s cubic-bezier(.175,.885,.32,1.275)}
+	.battery-sub{color:rgba(255,255,255,.65);font-size:14px;letter-spacing:2px;text-align:center;margin-top:10px;padding:0 20px;line-height:1.7}
+	.battery-pct{color:rgba(255,255,255,.35);font-size:60px;font-weight:bold;letter-spacing:2px;margin-top:8px}
+	.battery-refresh{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:8px 20px;border-radius:20px;font-size:13px;cursor:pointer;font-family:inherit;margin-top:18px;letter-spacing:2px}
+	.battery-close{position:absolute;top:16px;right:20px;background:none;border:none;color:rgba(255,255,255,.4);font-size:20px;cursor:pointer}
+	@media(max-width:768px){.battery-advice{font-size:20px}.battery-sub{font-size:12px}.battery-pct{font-size:44px}}
 	/* 小游戏菜单 */
 	.games-overlay{position:fixed;inset:0;z-index:38;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s}
 	.games-overlay.active{opacity:1;pointer-events:auto}
@@ -390,6 +400,16 @@ body{
     <div class="gp-title">🎮 小 游 戏</div>
     <div class="games-grid" id="gamesGrid"></div>
   </div>
+</div>
+
+<!-- 电量算命 -->
+<div class="battery-overlay" id="batteryOverlay">
+  <canvas id="batteryCanvas" width="160" height="280"></canvas>
+  <button class="battery-close" onclick="closeBattery()">✕</button>
+  <div class="battery-advice" id="batteryAdvice"></div>
+  <div class="battery-sub" id="batterySub"></div>
+  <div class="battery-pct" id="batteryPct"></div>
+  <button class="battery-refresh" onclick="refreshBattery()">🔄 刷新</button>
 </div>
 
 <!-- 缩放世界 -->
@@ -1210,7 +1230,7 @@ fishWrapper.addEventListener('click', async (e) => {
 // ========== 点击空白处投喂饲料 ==========
 document.addEventListener('click', (e) => {
   // 排除交互元素：按钮、链接、鱼、侧边图、kitty、各种弹窗
-  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, .bs-overlay.active, .stress-overlay.active, .zoom-overlay.active, .games-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
+  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, .bs-overlay.active, .stress-overlay.active, .zoom-overlay.active, .battery-overlay.active, .games-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
   spawnFoodAt(e.clientX, e.clientY);
 });
 
@@ -2258,6 +2278,7 @@ const GAMES_LIST = [
   {icon:'📝',name:'废话连篇',desc:'职场学术 · 一键生成',fn:()=>{closeGames();setTimeout(openBS,300);}},
   {icon:'💧',name:'压力释放器',desc:'长按水球 · 炸裂解压',fn:()=>{closeGames();setTimeout(openStress,300);}},
   {icon:'🔭',name:'缩放世界',desc:'双指缩放 · 探索尺度',fn:()=>{closeGames();setTimeout(openZoom,300);}},
+  {icon:'🔋',name:'电量算命',desc:'读取电量 · 人生建议',fn:()=>{closeGames();setTimeout(openBattery,300);}},
   {icon:'🎮',name:'井字棋',desc:'鱼姐 vs 你',fn:()=>{closeGames();enterGame('tictactoe');}},
   {icon:'♟️',name:'五子棋',desc:'先五连者胜',fn:()=>{closeGames();enterGame('gomoku');}},
   {icon:'⚠️',name:'千万别点',desc:'像素闯关大冒险',fn:()=>{closeGames();location.href='game.html';}},
@@ -2697,6 +2718,125 @@ window.closeZoom = function() {
   zoomScale = 1;
   zoomTargetScale = 1;
   document.getElementById('zoomOverlay').classList.remove('active');
+};
+
+// ========== 电量算命 ==========
+const BATTERY_TIERS = [
+  {min:95,max:100,emoji:'🔋',title:'电力满格！',sub:'满电的人生不需要解释\n今天适合主动出击\n把想做的事情统统列出来\n一个一个去实现',color:'#69f0ae'},
+  {min:80,max:94,emoji:'⚡',title:'能量充沛',sub:'状态在线，效率翻倍\n把最难的任务放在上午\n一口气拿下它\n成就感是最好的充电宝',color:'#b9f6ca'},
+  {min:65,max:79,emoji:'🌟',title:'蓄势待发',sub:'电量刚好，不急不躁\n专注做一件重要的事\n比同时做十件小事更有意义\n稳扎稳打，步步为营',color:'#ffe57f'},
+  {min:50,max:64,emoji:'🔋',title:'半格电量',sub:'一半是火焰一半是海水\n不要透支今天的自己\n留点余力给明天的惊喜\n适时中场休息也很重要',color:'#ffd740'},
+  {min:40,max:49,emoji:'📱',title:'低电量模式',sub:'身体在发出信号了\n关掉不必要的后台程序\n只保留真正重要的事\n善待自己，做减法',color:'#ffab40'},
+  {min:30,max:39,emoji:'⚠️',title:'电量告急',sub:'是时候停下来想想\n哪些消耗你的人和事可以放手\n不要为了迁就别人\n而耗光自己的电量',color:'#ff9100'},
+  {min:20,max:29,emoji:'🪫',title:'红灯预警',sub:'拒绝所有不必要的社交\n找个安静的角落给自己充电\n一杯热茶，一首好歌\n你值得被温柔对待',color:'#ff6e40'},
+  {min:11,max:19,emoji:'🆘',title:'请立刻充电',sub:'手机需要充电\n你也需要充电\n放下手头的一切\n闭眼深呼吸，给自己三分钟',color:'#ff5252'},
+  {min:5,max:10,emoji:'💀',title:'奄奄一息',sub:'已经到极限了\n别硬撑，你已经很棒了\n今天剩下的时间\n只做让自己开心的事',color:'#ff1744'},
+  {min:0,max:4,emoji:'🕯️',title:'最后一丝光',sub:'蜡烛即将燃尽\n但黑暗之后就是黎明\n关机，充电，睡觉\n明天又是崭新的一天',color:'#b71c1c'},
+];
+
+function drawBatteryIcon(level, charging) {
+  const canvas = document.getElementById('batteryCanvas');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+  // 兜底：旧浏览器不支持 roundRect
+  if (!ctx.roundRect) {
+    ctx.roundRect = function(x, y, w, h, r) {
+      r = Math.min(r, w/2, h/2);
+      ctx.beginPath();
+      ctx.moveTo(x+r, y); ctx.lineTo(x+w-r, y);
+      ctx.arcTo(x+w, y, x+w, y+r, r);
+      ctx.lineTo(x+w, y+h-r); ctx.arcTo(x+w, y+h, x+w-r, y+h, r);
+      ctx.lineTo(x+r, y+h); ctx.arcTo(x, y+h, x, y+h-r, r);
+      ctx.lineTo(x, y+r); ctx.arcTo(x, y, x+r, y, r);
+      ctx.closePath();
+    };
+  }
+
+  const bx = 30, by = 60, bw = 100, bh = 180, br = 12;
+  const capW = 40, capH = 10;
+
+  // 电池外壳
+  ctx.fillStyle = 'rgba(255,255,255,.1)';
+  ctx.strokeStyle = 'rgba(255,255,255,.4)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.roundRect(bx, by + capH, bw, bh, br);
+  ctx.stroke();
+  ctx.fill();
+
+  // 电池正极帽
+  ctx.fillStyle = 'rgba(255,255,255,.3)';
+  ctx.beginPath();
+  ctx.roundRect(bx + bw/2 - capW/2, by, capW, capH + 4, 4);
+  ctx.fill();
+
+  // 电量填充
+  const fillH = (bh - 16) * (level / 100);
+  const fillY = by + capH + bh - 8 - fillH;
+  const tier = BATTERY_TIERS.find(t => level >= t.min && level <= t.max) || BATTERY_TIERS[5];
+  const fillGrad = ctx.createLinearGradient(0, fillY, 0, fillY + fillH);
+  const c = tier.color;
+  fillGrad.addColorStop(0, c);
+  fillGrad.addColorStop(1, c + '88');
+  ctx.fillStyle = fillGrad;
+  ctx.beginPath();
+  ctx.roundRect(bx + 6, fillY, bw - 12, fillH, 6);
+  ctx.fill();
+
+  // 电量波纹（充电时）
+  if (charging) {
+    const waveY = fillY + Math.sin(Date.now() * 0.005) * 6;
+    ctx.fillStyle = 'rgba(255,255,255,.15)';
+    ctx.beginPath();
+    ctx.roundRect(bx + 6, waveY, bw - 12, 20, 6);
+    ctx.fill();
+  }
+
+  // 闪电图标
+  if (charging) {
+    ctx.fillStyle = '#ffd740';
+    ctx.font = '24px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('⚡', bx + bw/2, by + capH + bh/2 + 8);
+  }
+}
+
+// 上次读取的电量缓存
+let batteryLevel = null;
+let batteryCharging = false;
+
+async function refreshBattery() {
+  try {
+    const battery = await navigator.getBattery();
+    batteryLevel = Math.round(battery.level * 100);
+    batteryCharging = battery.charging;
+
+    const tier = BATTERY_TIERS.find(t => batteryLevel >= t.min && batteryLevel <= t.max) || BATTERY_TIERS[9];
+    document.getElementById('batteryAdvice').textContent = tier.emoji + ' ' + tier.title;
+    document.getElementById('batterySub').textContent = tier.sub;
+    document.getElementById('batteryPct').textContent = batteryLevel + '%' + (batteryCharging ? ' ⚡充电中' : '');
+    document.getElementById('batteryAdvice').style.color = tier.color;
+    drawBatteryIcon(batteryLevel, batteryCharging);
+  } catch(e) {
+    // 不支持 Battery API 时模拟
+    batteryLevel = Math.floor(Math.random() * 60) + 20;
+    batteryCharging = false;
+    const tier = BATTERY_TIERS.find(t => batteryLevel >= t.min && batteryLevel <= t.max) || BATTERY_TIERS[5];
+    document.getElementById('batteryAdvice').textContent = tier.emoji + ' ' + tier.title;
+    document.getElementById('batterySub').textContent = tier.sub + '\n\n💡 提示：你的浏览器不支持电量读取，这是模拟数据';
+    document.getElementById('batteryPct').textContent = batteryLevel + '% (模拟)';
+    drawBatteryIcon(batteryLevel, false);
+  }
+}
+
+window.openBattery = async function() {
+  document.getElementById('batteryOverlay').classList.add('active');
+  await refreshBattery();
+};
+
+window.closeBattery = function() {
+  document.getElementById('batteryOverlay').classList.remove('active');
 };
 
 // ========== 场景初始化 ==========
