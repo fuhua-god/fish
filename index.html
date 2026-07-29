@@ -138,7 +138,7 @@ body{
 .days-card .days-close{padding:10px 30px;border-radius:25px;font-size:15px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;border:none;background:#f48fb1;color:#fff;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
 .days-card .days-close:hover{background:#ec407a;transform:scale(1.05)}
 .trail-container{position:fixed;inset:0;z-index:4;pointer-events:none;overflow:hidden}
-	.food-container{position:fixed;inset:0;z-index:6;pointer-events:none;overflow:hidden}
+	.food-container{position:fixed;inset:0;z-index:6;pointer-events:none}
 	.food-pellet{position:fixed;pointer-events:none;z-index:6;filter:drop-shadow(0 3px 6px rgba(0,0,0,.25));will-change:left,top,transform;transition:none;line-height:1}
 	.food-float-text{position:fixed;pointer-events:none;z-index:55;font-weight:bold;font-family:"Comic Sans MS","KaiTi","Microsoft YaHei",cursive,sans-serif;text-shadow:0 2px 6px rgba(0,0,0,.2);will-change:transform,opacity}
 /* 美食转盘 */
@@ -539,53 +539,67 @@ function updateFishPos(ts) {
   fishCurSpd += (fishTargetSpd - fishCurSpd) * dt * 1.5;
 
   // 食物寻找：如果有未吃掉的食物，鱼主动游向最近的食物
-  if (fishEatCooldown > 0) fishEatCooldown--;
-  const nearestFood = findNearestFood();
-  const hasFood = nearestFood.pellet && !nearestFood.pellet.eaten;
-  const speedScale = fishSize.w / 240;
-  const baseMax = 3.5 * speedScale;
-  if (hasFood && fishEatCooldown <= 0 && nearestFood.dist > 25) {
-    const mouth = getFishMouth();
-    const dx = nearestFood.pellet.x + 16 - mouth.x;
-    const dy = nearestFood.pellet.y + 16 - mouth.y;
-    const dist = Math.max(nearestFood.dist, 1);
-    const seekSpd = baseMax * Math.max(fishCurSpd, 1.0) * 1.8;
-    fishVX += (dx / dist * seekSpd * 0.7 - fishVX) * 0.08;
-    fishVY += (dy / dist * seekSpd * 0.7 - fishVY) * 0.08;
-    let spd = Math.sqrt(fishVX * fishVX + fishVY * fishVY);
-    if (spd > seekSpd) { fishVX = (fishVX / spd) * seekSpd; fishVY = (fishVY / spd) * seekSpd; }
-    fishTargetSpd = Math.max(fishTargetSpd, 1.6);
-  } else {
+  try {
+    if (fishEatCooldown > 0) fishEatCooldown--;
+    const nearestFood = findNearestFood();
+    const hasFood = nearestFood.pellet && !nearestFood.pellet.eaten;
+    const speedScale = fishSize.w / 240;
+    const baseMax = 3.5 * speedScale;
+    if (hasFood && fishEatCooldown <= 0 && nearestFood.dist > 25) {
+      const mouth = getFishMouth();
+      const dx = nearestFood.pellet.x + 16 - mouth.x;
+      const dy = nearestFood.pellet.y + 16 - mouth.y;
+      const dist = Math.max(nearestFood.dist, 1);
+      const seekSpd = baseMax * Math.max(fishCurSpd, 1.0) * 1.8;
+      fishVX += (dx / dist * seekSpd * 0.7 - fishVX) * 0.08;
+      fishVY += (dy / dist * seekSpd * 0.7 - fishVY) * 0.08;
+      let spd = Math.sqrt(fishVX * fishVX + fishVY * fishVY);
+      if (spd > seekSpd) { fishVX = (fishVX / spd) * seekSpd; fishVY = (fishVY / spd) * seekSpd; }
+      fishTargetSpd = Math.max(fishTargetSpd, 1.6);
+    } else {
+      if (Math.random() < 0.01) { fishVX += (Math.random() - 0.5) * 1.0; fishVY += (Math.random() - 0.5) * 1.0; }
+      const baseMin = 0.3 * speedScale;
+      const minSpd = baseMin * fishCurSpd * 0.3;
+      const maxSpd = baseMax * fishCurSpd;
+      let spd = Math.sqrt(fishVX * fishVX + fishVY * fishVY);
+      if (spd < minSpd && fishCurSpd > 0.15) { fishVX = (fishVX / (spd || 0.01)) * minSpd + (Math.random() - 0.5) * 0.5; fishVY = (fishVY / (spd || 0.01)) * minSpd + (Math.random() - 0.5) * 0.5; }
+      if (spd > maxSpd) { fishVX = (fishVX / spd) * maxSpd; fishVY = (fishVY / spd) * maxSpd; }
+    }
+    fishX += fishVX; fishY += fishVY;
+    const pad = 10, fw = fishSize.w, fh = fishSize.h;
+    if (fishX < pad) { fishX = pad; fishVX = Math.abs(fishVX); }
+    if (fishX > window.innerWidth - fw - pad) { fishX = window.innerWidth - fw - pad; fishVX = -Math.abs(fishVX); }
+    if (fishY < 50) { fishY = 50; fishVY = Math.abs(fishVY); }
+    if (fishY > window.innerHeight - fh - pad) { fishY = window.innerHeight - fh - pad; fishVY = -Math.abs(fishVY); }
+    const newDir = fishVX >= 0 ? 1 : -1;
+    if (newDir !== fishDir) { fishDir = newDir; }
+    // 检查是否吃到食物
+    if (hasFood && fishEatCooldown <= 0) {
+      const mouth = getFishMouth();
+      const fx = nearestFood.pellet.x + 16;
+      const fy = nearestFood.pellet.y + 16;
+      const dx = fx - mouth.x;
+      const dy = fy - mouth.y;
+      if (Math.sqrt(dx * dx + dy * dy) < FOOD_EAT_DIST) {
+        fishEatCooldown = 25;
+        eatFood(nearestFood.pellet);
+      }
+    }
+    // 更新食物物理
+    updateFoodPhysics();
+  } catch(e) {
+    // 食物系统出错不影响鱼游动：回退到原有游动逻辑
+    console.warn('food system error:', e);
     if (Math.random() < 0.01) { fishVX += (Math.random() - 0.5) * 1.0; fishVY += (Math.random() - 0.5) * 1.0; }
-    const baseMin = 0.3 * speedScale;
+    const speedScale = fishSize.w / 240;
+    const baseMin = 0.3 * speedScale, baseMax = 3.5 * speedScale;
     const minSpd = baseMin * fishCurSpd * 0.3;
     const maxSpd = baseMax * fishCurSpd;
     let spd = Math.sqrt(fishVX * fishVX + fishVY * fishVY);
     if (spd < minSpd && fishCurSpd > 0.15) { fishVX = (fishVX / (spd || 0.01)) * minSpd + (Math.random() - 0.5) * 0.5; fishVY = (fishVY / (spd || 0.01)) * minSpd + (Math.random() - 0.5) * 0.5; }
     if (spd > maxSpd) { fishVX = (fishVX / spd) * maxSpd; fishVY = (fishVY / spd) * maxSpd; }
+    fishX += fishVX; fishY += fishVY;
   }
-  fishX += fishVX; fishY += fishVY;
-  const pad = 10, fw = fishSize.w, fh = fishSize.h;
-  if (fishX < pad) { fishX = pad; fishVX = Math.abs(fishVX); }
-  if (fishX > window.innerWidth - fw - pad) { fishX = window.innerWidth - fw - pad; fishVX = -Math.abs(fishVX); }
-  if (fishY < 50) { fishY = 50; fishVY = Math.abs(fishVY); }
-  if (fishY > window.innerHeight - fh - pad) { fishY = window.innerHeight - fh - pad; fishVY = -Math.abs(fishVY); }
-  const newDir = fishVX >= 0 ? 1 : -1;
-  if (newDir !== fishDir) { fishDir = newDir; }
-  // 检查是否吃到食物
-  if (hasFood && fishEatCooldown <= 0) {
-    const mouth = getFishMouth();
-    const fx = nearestFood.pellet.x + 16;
-    const fy = nearestFood.pellet.y + 16;
-    const dx = fx - mouth.x;
-    const dy = fy - mouth.y;
-    if (Math.sqrt(dx * dx + dy * dy) < FOOD_EAT_DIST) {
-      fishEatCooldown = 25;
-      eatFood(nearestFood.pellet);
-    }
-  }
-  // 更新食物物理
-  updateFoodPhysics();
   fishWrapper.style.left = fishX + 'px';
   fishWrapper.style.top = fishY + 'px';
   if (!fishBouncing) { fishWrapper.style.transform = `scaleX(${fishDir})`; }
