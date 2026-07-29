@@ -2168,13 +2168,8 @@ function initGlobe() {
   const glow = new THREE.Mesh(glowGeo, glowMat);
   globeScene.add(glow);
 
-  // 轮廓高亮线（初始为空）
-  highlightLine = new THREE.LineLoop(
-    new THREE.BufferGeometry(),
-    new THREE.LineBasicMaterial({ color: 0xffdd44, linewidth: 1, transparent: true, opacity: 0.85, depthTest: true })
-  );
-  highlightLine.visible = false;
-  globeScene.add(highlightLine);
+  // 轮廓高亮（初始为空，hover 时动态创建 TubeGeometry）
+  highlightLine = null;
 
   // 星空
   const starsGeo = new THREE.BufferGeometry();
@@ -2215,7 +2210,10 @@ function initGlobe() {
     if (intersects.length > 0) {
       const point = intersects[0].point;
       const lat = Math.asin(point.y / EARTH_RADIUS) * (180 / Math.PI);
-      const lng = Math.atan2(point.z, point.x) * (180 / Math.PI);
+      // 正确转换：atan2(z, -x) → theta，再算经度
+      const theta = Math.atan2(point.z, -point.x);
+      const thetaNorm = theta < 0 ? theta + 2 * Math.PI : theta;
+      const lng = thetaNorm * 180 / Math.PI - 180;
       return findNearestCountry(lat, lng);
     }
     return null;
@@ -2224,15 +2222,22 @@ function initGlobe() {
   function setCountryHighlight(country) {
     if (!country || country === hoveredCountry) return;
     hoveredCountry = country;
-    const pts = generateOutlinePoints(country, 32);
-    highlightLine.geometry.dispose();
-    highlightLine.geometry = new THREE.BufferGeometry().setFromPoints(pts);
-    highlightLine.visible = true;
+    // 移除旧高亮
+    if (highlightLine) { globeScene.remove(highlightLine); highlightLine.geometry.dispose(); }
+    const pts = generateOutlinePoints(country, 36);
+    // 使用 TubeGeometry 替代 Line（WebGL 不支持线宽 > 1px）
+    const curve = new THREE.CatmullRomCurve3(pts, true);
+    const tubeGeo = new THREE.TubeGeometry(curve, pts.length, 0.015, 8, true);
+    const tubeMat = new THREE.MeshBasicMaterial({ color: 0xffdd44, transparent: true, opacity: 0.9, depthTest: true });
+    highlightLine = new THREE.Mesh(tubeGeo, tubeMat);
+    highlightLine.renderOrder = 1;
+    highlightLine.material.depthTest = true;
+    globeScene.add(highlightLine);
   }
 
   function clearCountryHighlight() {
     hoveredCountry = null;
-    highlightLine.visible = false;
+    if (highlightLine) { globeScene.remove(highlightLine); highlightLine.geometry.dispose(); highlightLine = null; }
   }
 
   // 桌面悬停检测
