@@ -166,6 +166,23 @@ body{
 	.globe-info .sn{font-size:13px;opacity:.7;margin-top:4px}
 	.globe-hint-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:48;color:rgba(255,255,255,.5);font-size:15px;letter-spacing:2px;pointer-events:none;transition:opacity .6s;text-align:center}
 	.globe-danmaku{position:fixed;pointer-events:none;z-index:55;font-weight:bold;white-space:nowrap;text-shadow:0 2px 8px rgba(0,0,0,.5);will-change:transform,opacity;font-family:"Comic Sans MS","KaiTi","Microsoft YaHei",cursive,sans-serif}
+	/* 今日运势 - 像素风 */
+	.fortune-overlay{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+	.fortune-overlay.active{opacity:1;pointer-events:auto}
+	.fortune-box{background:#1a1a2e;border:4px solid #ffd740;image-rendering:pixelated;padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:14px;max-width:420px;width:92vw;position:relative;box-shadow:0 0 30px rgba(255,215,64,.25),inset 0 0 30px rgba(0,0,0,.5)}
+	.fortune-title{font-size:18px;color:#ffd740;font-weight:bold;letter-spacing:4px;text-shadow:2px 2px 0 #333}
+	#fortuneCanvas{image-rendering:pixelated;image-rendering:crisp-edges;width:240px;height:200px}
+	.fortune-slip{background:#faf3e0;color:#3e2723;padding:14px 18px;font-size:14px;letter-spacing:2px;text-align:center;line-height:1.8;border:3px solid #8d6e63;image-rendering:pixelated;max-width:340px;width:100%;display:none;animation:fpIn .5s steps(6)}
+	.fortune-slip.show{display:block}
+	.fortune-slip .lv{font-size:28px;font-weight:bold;color:#c62828}
+	.fortune-slip .txt{font-size:13px;color:#5d4037;margin-top:6px}
+	.fortune-slip .cat{font-size:11px;color:#8d6e63;margin-top:4px}
+	@keyframes fpIn{0%{transform:scale(0)rotate(-15deg);opacity:0}60%{transform:scale(1.1)rotate(2deg);opacity:1}100%{transform:scale(1)rotate(0);opacity:1}}
+	.fortune-btn{padding:10px 28px;background:#ffd740;color:#1a1a2e;border:none;font-size:14px;font-weight:bold;cursor:pointer;letter-spacing:2px;font-family:inherit;image-rendering:pixelated;box-shadow:4px 4px 0 #8d6e63;transition:all .1s}
+	.fortune-btn:active{box-shadow:2px 2px 0 #8d6e63;transform:translate(2px,2px)}
+	.fortune-close{position:absolute;top:8px;right:12px;background:none;border:none;color:#ffd740;font-size:18px;cursor:pointer}
+	.fortune-shake-hint{color:#8d6e63;font-size:11px;letter-spacing:2px;text-align:center}
+	@media(max-width:768px){#fortuneCanvas{width:180px;height:150px}.fortune-title{font-size:15px}.fortune-slip .lv{font-size:22px}.fortune-slip .txt{font-size:11px}}
 	.globe-entry-btn{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:28;width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#1a237e,#4fc3f7,#1a237e);background-size:200% 200%;animation:gp 3s ease-in-out infinite;border:none;cursor:pointer;font-size:36px;box-shadow:0 6px 30px rgba(79,195,247,.5);transition:transform .2s}
 	.globe-entry-btn:hover{transform:translateX(-50%) scale(1.1)}
 	.globe-entry-btn:active{transform:translateX(-50%) scale(.9)}
@@ -206,6 +223,7 @@ body{
     <button class="btn-album" id="feedBtn" onclick="spawnFoodNearFish()">🍥 饲料</button>
     <button class="btn-album" id="musicBtn" onclick="toggleMusic()">🔇 音乐关</button>
     <button class="btn-album" onclick="openGlobe()">🌍 地球仪</button>
+	    <button class="btn-album" style="background:#1a1a2e;color:#ffd740;border-color:#ffd740" onclick="openFortune()">🐉 运势</button>
   </div>
   <div class="game-entry">
     <button class="entry-btn" onclick="enterGame('tictactoe')">🎮 井字棋</button>
@@ -305,6 +323,22 @@ body{
   </div>
 </div>
 <button class="globe-entry-btn" id="globeEntryBtn" onclick="openGlobe()" title="🌍 地球仪">🌍</button>
+
+<!-- 今日运势 -->
+<div class="fortune-overlay" id="fortuneOverlay">
+  <div class="fortune-box">
+    <button class="fortune-close" onclick="closeFortune()">✕</button>
+    <div class="fortune-title">🐉 今 日 运 势 🐉</div>
+    <canvas id="fortuneCanvas" width="120" height="100"></canvas>
+    <button class="fortune-btn" id="fortuneBtn" onclick="drawFortune()">🎴 抽 取 签 文</button>
+    <p class="fortune-shake-hint">📱 摇一摇手机也可抽签</p>
+    <div class="fortune-slip" id="fortuneSlip">
+      <div class="lv" id="fortuneLevel"></div>
+      <div class="txt" id="fortuneText"></div>
+      <div class="cat" id="fortuneCat"></div>
+    </div>
+  </div>
+</div>
 
 <script>
 // ========== 数据存储（Supabase + localStorage 双写互通） ==========
@@ -1056,7 +1090,7 @@ fishWrapper.addEventListener('click', async (e) => {
 // ========== 点击空白处投喂饲料 ==========
 document.addEventListener('click', (e) => {
   // 排除交互元素：按钮、链接、鱼、侧边图、kitty、各种弹窗
-  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
+  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
   spawnFoodAt(e.clientX, e.clientY);
 });
 
@@ -1449,6 +1483,240 @@ async function updateAffectionBar() {
 }
 
 // feedFish 已替换为 spawnFoodAt / spawnFoodNearFish + eatFood 系统
+
+// ========== 今日运势（像素风神兽抽签） ==========
+const fortuneCanvas = document.getElementById('fortuneCanvas');
+const fctx = fortuneCanvas.getContext('2d');
+fctx.imageSmoothingEnabled = false;
+
+const FORTUNES = [
+  {lv:'大吉 🎉',txt:'祥云瑞气绕身来\n万象更新好运开\n贵人相助事事顺\n春风得意马蹄快',cat:'综合运势'},
+  {lv:'大吉 🎉',txt:'桃花朵朵笑春风\n心有灵犀一点通\n有缘千里来相会\n白首同心乐融融',cat:'爱情运势'},
+  {lv:'大吉 🎉',txt:'财源滚滚似江流\n金玉满堂不用愁\n投资理财皆有获\n日进斗金乐悠悠',cat:'财运运势'},
+  {lv:'吉 ✨',txt:'天时地利助人行\n步步高升路渐明\n努力耕耘终有获\n拨云见日喜相迎',cat:'事业运势'},
+  {lv:'吉 ✨',txt:'身强体健精神爽\n百病不侵福寿长\n早睡早起勤锻炼\n元气满满每一天',cat:'健康运势'},
+  {lv:'吉 ✨',txt:'好友相聚暖人心\n贵人指点解迷津\n真诚相待情谊重\n互帮互助共前行',cat:'人际运势'},
+  {lv:'中吉 🌤️',txt:'清风徐来水波平\n且待时机莫急行\n稳扎稳打根基固\n静待花开听鸟鸣',cat:'综合运势'},
+  {lv:'中吉 🌤️',txt:'缘分未到莫强求\n顺其自然心自由\n提升自我多修炼\n良缘自会上门楼',cat:'爱情运势'},
+  {lv:'中吉 🌤️',txt:'财运平平宜守旧\n大笔开支需考量\n细水长流积少多\n来日方长不用慌',cat:'财运运势'},
+  {lv:'小吉 🍀',txt:'前路虽有小波澜\n稳住心态不畏难\n一步一脚踏实走\n柳暗花明又一山',cat:'综合运势'},
+  {lv:'小吉 🍀',txt:'偶有小吵不足惧\n磨合方知情意趣\n相互包容多理解\n平淡之中见真玉',cat:'爱情运势'},
+  {lv:'末吉 🌙',txt:'今日宜静不宜动\n养精蓄锐待春风\n烦恼皆是浮云过\n明日朝阳依旧红',cat:'综合运势'},
+];
+
+let fortuneUsedToday = false;
+let fortuneAnimId = null;
+let fortuneFrame = 0;
+let fortuneState = 'idle'; // idle | dancing | spitting | done
+let fortuneDanceStart = 0;
+
+// 像素龙绘制 (28x20 格, 每格4px → 112x80)
+function drawPixelDragon(ox, oy, frame) {
+  const s = 4; // pixel size
+  const shake = fortuneState === 'dancing' ? Math.sin(frame * 0.8) * 5 : 0;
+  const bounce = fortuneState === 'idle' ? Math.sin(frame * 0.06) * 2 : 0;
+  const sx = ox + shake;
+  const sy = oy + bounce;
+
+  // 颜色
+  const c = {
+    b:'#1a1a2e',  // bg
+    g1:'#2e7d32', // 深绿
+    g2:'#43a047', // 中绿
+    g3:'#66bb6a', // 浅绿（腹）
+    y:'#ffd740',  // 金（角/爪）
+    r:'#e53935',  // 红（嘴/火）
+    w:'#fff',     // 白（眼）
+    k:'#1b5e20',  // 深色（轮廓）
+  };
+
+  const dragon = [
+    // 0:bg, 1:g1, 2:g2, 3:g3, 4:y, 5:r, 6:w, 7:k
+    // y=0-5: 龙角 + 头部上半部分
+    [0,0,0,0, 0,0,4,4,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0],
+    [0,0,0,0, 0,4,4,1,7,7, 0,0,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0],
+    [0,0,0,0, 0,4,1,1,2,7, 0,0,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0],
+    [0,0,0,0, 7,7,1,2,2,7, 0,0,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0],
+    [0,0,0,0, 7,1,1,2,6,6, 7,6,0,0,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0],
+    [0,0,0,0, 7,2,1,1,2,2, 7,6,6,6,0,0, 0,0,0,0,0,0, 0,0,0,0,0,0],
+    // y=6-11: 身体前段 + 前腿
+    [0,0,0,7, 7,2,2,1,2,3, 2,7,6,6,6,7, 7,0,0,0,0,0, 0,0,0,0,0,0],
+    [0,0,0,7, 7,1,1,1,2,3, 2,1,2,2,7,6, 6,6,7,0,0,0, 0,0,0,0,0,0],
+    [0,7,7,1, 2,2,1,2,3,3, 2,2,1,1,2,2, 7,6,6,7,0,0, 0,0,0,0,0,0],
+    [0,7,1,1, 1,2,2,2,3,2, 1,1,7,2,2,1, 2,7,6,7,0,0, 0,0,0,0,0,0],
+    [7,7,1,1, 2,2,2,2,3,2, 1,1,7,7,2,2, 1,2,7,7,0,0, 0,0,0,0,0,0],
+    [7,1,1,1, 2,2,2,2,3,3, 1,1,7,7,7,2, 1,1,2,7,7,0, 0,0,0,0,0,0],
+    // y=12-17: 身体 + 后腿 + 尾巴开始
+    [0,7,7,1, 1,2,2,2,3,3, 2,2,7,7,7,7, 1,1,2,7,7,0, 0,0,0,0,0,0],
+    [0,7,1,1, 1,2,2,2,2,3, 2,2,2,7,7,7, 1,2,1,2,7,0, 0,0,0,0,0,0],
+    [0,7,1,1, 1,2,2,2,2,2, 3,3,2,2,1,2, 1,2,2,1,2,7, 7,0,0,0,0,0],
+    [0,7,7,1, 1,2,2,2,2,2, 2,2,3,2,2,1, 1,2,2,1,2,7, 7,7,0,0,0,0],
+    [0,0,7,7, 1,1,2,2,2,2, 2,2,2,2,2,1, 1,2,2,1,1,2, 7,7,7,0,0,0],
+    [0,0,0,0, 7,7,1,1,1,1, 2,2,2,2,1,2, 1,2,2,1,7,7, 2,7,7,7,0,0],
+    // y=18-20: 尾巴
+    [0,0,0,0, 0,0,0,7,7,7, 1,1,1,1,1,2, 1,2,1,7,7,2, 2,7,7,7,0,0],
+    [0,0,0,0, 0,0,0,0,0,0, 0,7,7,7,7,7, 7,7,7,7,2,2, 2,7,7,0,0,0],
+  ];
+
+  // 龙嘴张开的帧（spitting 状态）
+  const mouthOpen = fortuneState === 'spitting';
+  // 飘出的火焰粒子
+  const fireParticles = [];
+  if (fortuneState === 'spitting' || fortuneState === 'done') {
+    const t = frame - fortuneDanceStart;
+    for (let i = 0; i < 5; i++) {
+      fireParticles.push({
+        x: 16 + t * 0.5 + i * 3,
+        y: 8 + Math.sin(t * 0.3 + i) * 3,
+        s: 1 + Math.random() * 2,
+        life: Math.max(0, 1 - (frame - fortuneDanceStart - 30) / 40),
+      });
+    }
+  }
+
+  for (let row = 0; row < dragon.length; row++) {
+    for (let col = 0; col < dragon[row].length; col++) {
+      const colorIdx = dragon[row][col];
+      if (colorIdx === 0) continue;
+      const colorKeys = ['b','g1','g2','g3','y','r','w','k'];
+      const color = c[colorKeys[colorIdx]];
+      fctx.fillStyle = color;
+      // 张嘴时修改嘴部（row 4-5, col 9-10 附近）
+      if (mouthOpen && row === 5 && col === 9) {
+        fctx.fillStyle = c.r;
+        fctx.fillRect(sx + col * s, sy + row * s, s * 2, s * 2);
+      } else {
+        fctx.fillRect(sx + col * s, sy + row * s, s, s);
+      }
+    }
+  }
+
+  // 火焰粒子
+  if (fireParticles.length > 0) {
+    for (const fp of fireParticles) {
+      if (fp.life <= 0) continue;
+      fctx.fillStyle = `rgba(255,152,0,${fp.life})`;
+      fctx.fillRect(sx + fp.x, sy + fp.y, fp.s, fp.s);
+      fctx.fillStyle = `rgba(255,235,59,${fp.life * 0.7})`;
+      fctx.fillRect(sx + fp.x - 1, sy + fp.y - 1, fp.s, fp.s);
+    }
+  }
+}
+
+// 像素签文纸片
+function drawFortuneSlip(x, y, scale) {
+  fctx.fillStyle = '#faf3e0';
+  fctx.fillRect(x, y, 30, 20);
+  fctx.fillStyle = '#8d6e63';
+  fctx.fillRect(x, y, 30, 2); // 顶部边框
+  fctx.fillRect(x, y + 18, 30, 2); // 底部边框
+  fctx.fillRect(x, y, 2, 20); // 左边框
+  fctx.fillRect(x + 28, y, 2, 20); // 右边框
+  // 签文内容 - 像素文字
+  fctx.fillStyle = '#3e2723';
+  fctx.fillRect(x + 6, y + 5, 4, 4); // 大
+  fctx.fillRect(x + 12, y + 5, 4, 4); // 吉
+  fctx.fillRect(x + 20, y + 5, 4, 4); // ！
+}
+
+function renderFortuneFrame(ts) {
+  if (fortuneState === 'idle' && !document.getElementById('fortuneOverlay').classList.contains('active')) {
+    fortuneFrame = 0;
+    return;
+  }
+  fortuneFrame++;
+  const w = fortuneCanvas.width, h = fortuneCanvas.height;
+  fctx.fillStyle = '#1a1a2e';
+  fctx.fillRect(0, 0, w, h);
+
+  // 像素网格背景
+  fctx.fillStyle = 'rgba(255,255,255,.03)';
+  for (let gx = 0; gx < w; gx += 8) {
+    for (let gy = 0; gy < h; gy += 8) {
+      fctx.fillRect(gx, gy, 7, 7);
+    }
+  }
+
+  // 绘制神兽
+  if (fortuneState === 'spitting' || fortuneState === 'done') {
+    const slipProgress = Math.min(1, (fortuneFrame - fortuneDanceStart - 20) / 15);
+    // 签文从龙嘴中飞出
+    const slipX = 16 * 4 + slipProgress * 20;
+    const slipY = 5 * 4 - slipProgress * 10;
+    if (slipProgress > 0) drawFortuneSlip(Math.max(16 * 4, slipX), Math.max(0, slipY), slipProgress);
+    drawPixelDragon(12, 10, fortuneFrame);
+    if (fortuneState === 'spitting' && fortuneFrame - fortuneDanceStart > 40) {
+      fortuneState = 'done';
+      showFortuneResult();
+    }
+  } else {
+    drawPixelDragon(12, 10, fortuneFrame);
+  }
+
+  fortuneAnimId = requestAnimationFrame(renderFortuneFrame);
+}
+
+function showFortuneResult() {
+  const f = FORTUNES[Math.floor(Math.random() * FORTUNES.length)];
+  document.getElementById('fortuneLevel').textContent = f.lv;
+  document.getElementById('fortuneText').textContent = f.txt;
+  document.getElementById('fortuneCat').textContent = '—— ' + f.cat + ' ——';
+  document.getElementById('fortuneSlip').classList.add('show');
+  document.getElementById('fortuneBtn').textContent = '🔄 再抽一次';
+  document.getElementById('fortuneBtn').disabled = false;
+}
+
+function drawFortune() {
+  if (fortuneState === 'dancing' || fortuneState === 'spitting') return;
+  document.getElementById('fortuneSlip').classList.remove('show');
+  document.getElementById('fortuneBtn').textContent = '🐉 神兽起舞中...';
+  document.getElementById('fortuneBtn').disabled = true;
+  fortuneState = 'dancing';
+  fortuneDanceStart = fortuneFrame;
+  // 舞蹈 1.5 秒后吐签
+  setTimeout(() => {
+    fortuneState = 'spitting';
+    fortuneDanceStart = fortuneFrame;
+  }, 1600);
+}
+
+window.openFortune = function() {
+  document.getElementById('fortuneOverlay').classList.add('active');
+  document.getElementById('fortuneSlip').classList.remove('show');
+  document.getElementById('fortuneBtn').textContent = '🎴 抽 取 签 文';
+  document.getElementById('fortuneBtn').disabled = false;
+  fortuneState = 'idle';
+  fortuneUsedToday = false;
+  if (!fortuneAnimId) renderFortuneFrame();
+};
+
+window.closeFortune = function() {
+  document.getElementById('fortuneOverlay').classList.remove('active');
+  fortuneState = 'idle';
+};
+
+// 手机摇一摇
+let shakeLastTime = 0;
+window.addEventListener('devicemotion', (e) => {
+  if (!document.getElementById('fortuneOverlay').classList.contains('active')) return;
+  if (fortuneState === 'dancing' || fortuneState === 'spitting') return;
+  const acc = e.accelerationIncludingGravity;
+  if (!acc) return;
+  const m = Math.sqrt(acc.x * acc.x + acc.y * acc.y + acc.z * acc.z);
+  const now = Date.now();
+  if (m > 20 && now - shakeLastTime > 2000) {
+    shakeLastTime = now;
+    drawFortune();
+  }
+});
+
+// 如果设备不支持 DeviceMotion，隐藏摇一摇提示
+if (!window.DeviceMotionEvent) {
+  document.querySelector('.fortune-shake-hint').style.display = 'none';
+}
+
+// 预渲染第一帧
+renderFortuneFrame();
 
 // ========== 场景初始化 ==========
 (function initScene() {
