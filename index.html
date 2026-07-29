@@ -1545,11 +1545,12 @@ const FORTUNES = [
   {lv:'末吉 🌙',txt:'今日宜静不宜动\n养精蓄锐待春风\n烦恼皆是浮云过\n明日朝阳依旧红',cat:'综合运势'},
 ];
 
-let fortuneUsedToday = false;
 let fortuneAnimId = null;
 let fortuneFrame = 0;
 let fortuneState = 'idle'; // idle | dancing | spitting | done
 let fortuneDanceStart = 0;
+let fortuneDrawnToday = false;
+let fortunePendingResult = null;
 
 // 像素龙绘制 (28x20 格, 每格4px → 112x80)
 function drawPixelDragon(ox, oy, frame) {
@@ -1698,23 +1699,31 @@ function renderFortuneFrame(ts) {
 }
 
 function showFortuneResult() {
-  const f = FORTUNES[Math.floor(Math.random() * FORTUNES.length)];
+  const f = fortunePendingResult;
+  if (!f) return;
   document.getElementById('fortuneLevel').textContent = f.lv;
   document.getElementById('fortuneText').textContent = f.txt;
   document.getElementById('fortuneCat').textContent = '—— ' + f.cat + ' ——';
   document.getElementById('fortuneSlip').classList.add('show');
-  document.getElementById('fortuneBtn').textContent = '🔄 再抽一次';
-  document.getElementById('fortuneBtn').disabled = false;
+  document.getElementById('fortuneBtn').textContent = '✅ 今日已抽签';
+  document.getElementById('fortuneBtn').disabled = true;
 }
 
 function drawFortune() {
   if (fortuneState === 'dancing' || fortuneState === 'spitting') return;
+  if (fortuneDrawnToday) return;
   document.getElementById('fortuneSlip').classList.remove('show');
   document.getElementById('fortuneBtn').textContent = '🐉 神兽起舞中...';
   document.getElementById('fortuneBtn').disabled = true;
+  // 提前生成签文并保存
+  fortunePendingResult = FORTUNES[Math.floor(Math.random() * FORTUNES.length)];
+  const today = getToday();
+  STATE.fortune_date = today;
+  STATE.fortune_result = fortunePendingResult;
+  saveState({ fortune_date: today, fortune_result: fortunePendingResult });
+  fortuneDrawnToday = true;
   fortuneState = 'dancing';
   fortuneDanceStart = fortuneFrame;
-  // 舞蹈 1.5 秒后吐签
   setTimeout(() => {
     fortuneState = 'spitting';
     fortuneDanceStart = fortuneFrame;
@@ -1722,12 +1731,36 @@ function drawFortune() {
 }
 
 window.openFortune = function() {
+  const today = getToday();
+  const savedResult = STATE.fortune_result;
+  fortuneDrawnToday = (STATE.fortune_date === today && savedResult);
+  fortunePendingResult = savedResult || null;
+
   document.getElementById('fortuneOverlay').classList.add('active');
-  document.getElementById('fortuneSlip').classList.remove('show');
-  document.getElementById('fortuneBtn').textContent = '🎴 抽 取 签 文';
-  document.getElementById('fortuneBtn').disabled = false;
-  fortuneState = 'idle';
-  fortuneUsedToday = false;
+  if (fortuneDrawnToday && fortunePendingResult) {
+    // 今天已抽过，直接显示保存的结果
+    document.getElementById('fortuneSlip').classList.remove('show');
+    document.getElementById('fortuneBtn').textContent = '✅ 今日已抽签';
+    document.getElementById('fortuneBtn').disabled = true;
+    fortuneState = 'idle';
+    // 让龙先跳个舞再吐签
+    setTimeout(() => {
+      document.getElementById('fortuneSlip').classList.remove('show');
+      document.getElementById('fortuneBtn').textContent = '🐉 神兽起舞中...';
+      document.getElementById('fortuneBtn').disabled = true;
+      fortuneState = 'dancing';
+      fortuneDanceStart = fortuneFrame;
+      setTimeout(() => {
+        fortuneState = 'spitting';
+        fortuneDanceStart = fortuneFrame;
+      }, 1000);
+    }, 400);
+  } else {
+    document.getElementById('fortuneSlip').classList.remove('show');
+    document.getElementById('fortuneBtn').textContent = '🎴 抽 取 签 文';
+    document.getElementById('fortuneBtn').disabled = false;
+    fortuneState = 'idle';
+  }
   if (!fortuneAnimId) renderFortuneFrame();
 };
 
@@ -1745,7 +1778,7 @@ window.addEventListener('devicemotion', (e) => {
   if (!acc) return;
   const m = Math.sqrt(acc.x * acc.x + acc.y * acc.y + acc.z * acc.z);
   const now = Date.now();
-  if (m > 20 && now - shakeLastTime > 2000) {
+  if (m > 20 && now - shakeLastTime > 2000 && !fortuneDrawnToday) {
     shakeLastTime = now;
     drawFortune();
   }
