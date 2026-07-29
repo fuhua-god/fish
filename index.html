@@ -3010,28 +3010,39 @@ function updateDandePhysics() {
     return bDiff - aDiff; // 夹角小的优先
   });
 
-  // 累积值达到阈值才吹散一颗种子（越往后阈值越高，形成阻力感）
-  const baseThreshold = 3.0;
+  // 累积值达到阈值吹散种子（一次可吹落多根，风力越大吹落越多）
+  const baseThreshold = 2.5;
   const blownCount = dandeBlownSeeds.size;
-  const threshold = baseThreshold + blownCount * 0.6; // 越吹越难
+  const threshold = baseThreshold + blownCount * 0.5;
 
   if (dandeWindAccum > threshold && unattached.length > 0) {
     dandeWindAccum = 0;
-    // 从迎风面取种子（优先顶部20度范围内的）
-    const frontFacing = unattached.filter(s => Math.cos(s.angle - dandeWindDir) > 0.3);
-    const pool = frontFacing.length > 0 ? frontFacing : unattached;
-    // 加一点随机性：不是每次取最正面的
-    const idx = Math.min(Math.floor(Math.random() * pool.length * 0.5), pool.length - 1);
-    const s = pool[idx];
-    s.blown = true;
-    dandeBlownSeeds.add(s.id);
-    s.x = cx + Math.cos(s.angle) * s.dist;
-    s.y = cy + Math.sin(s.angle) * s.dist;
-    // 风速越大初速度越快，方向随风向 + 随机偏移
-    const blowAngle = dandeWindDir + (Math.random() - 0.5) * 0.8;
-    const blowSpeed = windForce * (0.4 + Math.random() * 0.6) + 1;
-    s.vx = Math.cos(blowAngle) * blowSpeed;
-    s.vy = Math.sin(blowAngle) * blowSpeed;
+    // 风力决定一次吹落几根（1~6根）
+    const count = Math.min(unattached.length, 1 + Math.floor(dandeSmoothVol * 7));
+    // 从迎风面取种子
+    const frontFacing = unattached.filter(s => Math.cos(s.angle - dandeWindDir) > 0.2);
+    const pool = frontFacing.length >= count ? frontFacing : unattached;
+    // 取迎风面最靠前的 N 颗，加随机打乱
+    const sorted = [...pool].sort((a, b) => {
+      return Math.abs(Math.cos(a.angle - dandeWindDir)) - Math.abs(Math.cos(b.angle - dandeWindDir));
+    });
+    const chosen = sorted.slice(0, Math.min(count, sorted.length));
+    // 随机打乱顺序（避免总是固定顺序吹落）
+    for (let i = chosen.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [chosen[i], chosen[j]] = [chosen[j], chosen[i]];
+    }
+    for (const s of chosen) {
+      s.blown = true;
+      dandeBlownSeeds.add(s.id);
+      s.x = cx + Math.cos(s.angle) * s.dist;
+      s.y = cy + Math.sin(s.angle) * s.dist;
+      // 每根绒毛的飞行方向略有不同，呈扇形散开
+      const spreadAngle = dandeWindDir + (Math.random() - 0.5) * 1.2;
+      const blowSpeed = windForce * (0.3 + Math.random() * 0.7) + 1.5;
+      s.vx = Math.cos(spreadAngle) * blowSpeed + (Math.random() - 0.5) * 2;
+      s.vy = Math.sin(spreadAngle) * blowSpeed + (Math.random() - 0.5) * 1.5;
+    }
   }
 
   // 更新已吹散的种子
