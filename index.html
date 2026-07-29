@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🐟 我是傻鱼 ~ ♪</title>
 <script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.157.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.157.0/examples/jsm/"}}</script>
+	<script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{
@@ -214,6 +215,19 @@ body{
 	@keyframes crPopIn{0%{transform:scale(.3);opacity:0}60%{transform:scale(1.05);opacity:1}100%{transform:scale(1);opacity:1}}
 	@keyframes crFadeIn{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
 	@media(max-width:768px){.color-reveal .cr-name{font-size:22px}.color-reveal .cr-mood{font-size:14px}.color-reveal .cr-hex{font-size:11px}}
+	/* 弹珠迷宫 */
+	.maze-overlay{position:fixed;inset:0;z-index:42;background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+	.maze-overlay.active{opacity:1;pointer-events:auto}
+	.maze-wrap{position:relative;border:3px solid #4fc3f7;border-radius:8px;overflow:hidden;box-shadow:0 0 30px rgba(79,195,247,.3)}
+	.maze-wrap canvas{display:block}
+	.maze-result{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.75);opacity:0;pointer-events:none;transition:opacity .5s;z-index:5}
+	.maze-result.show{opacity:1}
+	.maze-result .mr-icon{font-size:60px;animation:popIn .5s cubic-bezier(.175,.885,.32,1.275)}
+	.maze-result .mr-text{font-size:26px;font-weight:bold;color:#fff;letter-spacing:3px;margin-top:10px}
+	.maze-result .mr-sub{font-size:14px;color:rgba(255,255,255,.7);letter-spacing:2px;margin-top:8px}
+	.maze-result .mr-btn{padding:10px 28px;border-radius:25px;border:none;font-size:15px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;margin-top:20px;background:#4fc3f7;color:#1a1a2e}
+	.maze-close{position:absolute;top:10px;right:16px;z-index:10;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:16px;width:34px;height:34px;border-radius:50%;cursor:pointer}
+	.maze-hint{color:rgba(255,255,255,.5);font-size:12px;letter-spacing:2px;margin-top:10px}
 	.globe-entry-btn{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:28;width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#1a237e,#4fc3f7,#1a237e);background-size:200% 200%;animation:gp 3s ease-in-out infinite;border:none;cursor:pointer;font-size:36px;box-shadow:0 6px 30px rgba(79,195,247,.5);transition:transform .2s}
 	.globe-entry-btn:hover{transform:translateX(-50%) scale(1.1)}
 	.globe-entry-btn:active{transform:translateX(-50%) scale(.9)}
@@ -256,6 +270,7 @@ body{
     <button class="btn-album" onclick="openGlobe()">🌍 地球仪</button>
 	    <button class="btn-album" style="background:#1a1a2e;color:#ffd740;border-color:#ffd740" onclick="openFortune()">🐉 运势</button>
 	    <button class="btn-album" style="background:#37474f;color:#fff;border-color:#455a64" onclick="openBS()">📝 废话</button>
+	    <button class="btn-album" style="background:#1a237e;color:#4fc3f7;border-color:#283593" onclick="openMaze()">🔮 迷宫</button>
   </div>
   <div class="game-entry">
     <button class="entry-btn" onclick="enterGame('tictactoe')">🎮 井字棋</button>
@@ -355,6 +370,20 @@ body{
   </div>
 </div>
 <button class="globe-entry-btn" id="globeEntryBtn" onclick="openGlobe()" title="🌍 地球仪">🌍</button>
+
+<!-- 弹珠迷宫 -->
+<div class="maze-overlay" id="mazeOverlay">
+  <div class="maze-wrap" id="mazeWrap">
+    <div class="maze-result" id="mazeResult">
+      <div class="mr-icon" id="mrIcon"></div>
+      <div class="mr-text" id="mrText"></div>
+      <div class="mr-sub" id="mrSub"></div>
+      <button class="mr-btn" onclick="resetMaze()">🔄 再来一次</button>
+    </div>
+  </div>
+  <button class="maze-close" onclick="closeMaze()">✕</button>
+  <span class="maze-hint">📱 倾斜手机控制钢珠滚动</span>
+</div>
 
 <!-- 摇一摇命定颜色 -->
 <div class="color-reveal" id="colorReveal" onclick="dismissColor()">
@@ -1149,7 +1178,7 @@ fishWrapper.addEventListener('click', async (e) => {
 // ========== 点击空白处投喂饲料 ==========
 document.addEventListener('click', (e) => {
   // 排除交互元素：按钮、链接、鱼、侧边图、kitty、各种弹窗
-  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, .bs-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
+  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, .bs-overlay.active, .maze-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
   spawnFoodAt(e.clientX, e.clientY);
 });
 
@@ -1979,6 +2008,216 @@ window.addEventListener('devicemotion', (e) => {
 });
 
 console.log('🎨 摇一摇命定颜色已就绪 | 共' + COLOR_PALETTE.length + '种颜色');
+
+// ========== 弹珠迷宫 (Matter.js) ==========
+let mazeEngine, mazeRender, mazeRunner, mazeBall, mazeActive = false, mazeSolved = false;
+const MAZE_W = 360, MAZE_H = 560;
+const HOLE_R = 22;
+const holes = [
+  {x: 80, y: MAZE_H - 55, label:'今日好运', icon:'🍀', sub:'好运正在路上～'},
+  {x: MAZE_W - 80, y: MAZE_H - 55, label:'今日躺平', icon:'😴', sub:'休息是为了走更远的路'},
+];
+
+function buildMaze() {
+  const {Engine, Render, Runner, Bodies, Body, World, Events, Composite} = Matter;
+  mazeEngine = Engine.create({gravity:{x:0,y:0}});
+  const wallOpts = {isStatic:true, friction:0.3, render:{fillStyle:'#4fc3f7'}};
+  const walls = [];
+  const W = MAZE_W, H = MAZE_H, t = 10; // wall thickness
+
+  // 外框
+  walls.push(Bodies.rectangle(W/2, -5, W+20, t*2, wallOpts)); // 顶
+  walls.push(Bodies.rectangle(W/2, H+5, W+20, t*2, wallOpts)); // 底（留两个洞口）
+  walls.push(Bodies.rectangle(-5, H/2, t*2, H, wallOpts)); // 左
+  walls.push(Bodies.rectangle(W+5, H/2, t*2, H, wallOpts)); // 右
+
+  // 洞口底部：左右各留一段空缺
+  const bottomWallL = Bodies.rectangle(40, H - 5, 80 - HOLE_R, t*2, wallOpts);
+  const bottomWallM = Bodies.rectangle(W/2, H - 5, W - 160 - HOLE_R*2, t*2, wallOpts);
+  const bottomWallR = Bodies.rectangle(W - 40, H - 5, 80 - HOLE_R, t*2, wallOpts);
+  walls.push(bottomWallL, bottomWallM, bottomWallR);
+
+  // 内部迷宫墙
+  const mz = [
+    // [x, y, w, h] - 中心坐标 + 宽高
+    [W/2, 80, 100, t],       // 第一横
+    [W/2 - 80, 150, 80, t],  // 左横
+    [W/2 + 80, 150, 80, t],  // 右横
+    [W/4, 110, t, 80],       // 竖
+    [W*3/4, 110, t, 80],      // 竖
+    [W/2, 220, 120, t],       // 横
+    [W/4 + 30, 185, t, 80],  // 短竖
+    [W*3/4 - 30, 185, t, 80], // 短竖
+    [W/2 - 70, 290, 80, t],  // 左横
+    [W/2 + 70, 290, 80, t],  // 右横
+    [W/3, 260, t, 80],       // 竖
+    [W*2/3, 260, t, 80],     // 竖
+    [W/2, 360, 140, t],       // 横
+    [W/5, 330, t, 80],       // 左竖
+    [W*4/5, 330, t, 80],     // 右竖
+    [W/2 - 80, 430, 80, t],  // 左横
+    [W/2 + 80, 430, 80, t],  // 右横
+    [W/6, 400, t, 80],       // 左竖
+    [W*5/6, 400, t, 80],      // 右竖
+    [W/2, 500, W, t],         // 终点前横
+  ];
+  mz.forEach(([x,y,w,h]) => walls.push(Bodies.rectangle(x,y,w,h,wallOpts)));
+
+  // 钢珠
+  mazeBall = Bodies.circle(W/2, 30, 10, {
+    restitution:0.4, friction:0.05, density:0.002,
+    render:{fillStyle:'#e0e0e0', strokeStyle:'#999', lineWidth:2}
+  });
+  // 钢珠光泽（通过渲染）
+  Composite.add(mazeEngine.world, [...walls, mazeBall]);
+
+  // 渲染器
+  mazeRender = Render.create({
+    element: document.getElementById('mazeWrap'),
+    engine: mazeEngine,
+    options: {
+      width: MAZE_W, height: MAZE_H,
+      wireframes: false,
+      background: '#0d1b2a',
+      pixelRatio: Math.min(window.devicePixelRatio, 2),
+    }
+  });
+
+  // 自定义洞口渲染
+  Events.on(mazeRender, 'afterRender', () => {
+    const ctx = mazeRender.context;
+    holes.forEach(h => {
+      // 黑洞
+      ctx.beginPath();
+      ctx.arc(h.x, h.y, HOLE_R, 0, Math.PI*2);
+      ctx.fillStyle = '#0a0a15';
+      ctx.fill();
+      ctx.strokeStyle = '#4fc3f7';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      // 标签
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 14px "Microsoft YaHei","KaiTi",sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(h.label, h.x, h.y + HOLE_R + 20);
+      ctx.fillText(h.icon, h.x, h.y + HOLE_R + 40);
+    });
+    // 起始标记
+    ctx.fillStyle = 'rgba(255,255,255,.3)';
+    ctx.font = '11px "Microsoft YaHei","KaiTi",sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('▼ 起点', W/2, 18);
+  });
+
+  // 碰撞检测：钢珠落入洞口
+  Events.on(mazeEngine, 'beforeUpdate', () => {
+    if (mazeSolved) return;
+    const ballPos = mazeBall.position;
+    for (const h of holes) {
+      const dx = ballPos.x - h.x;
+      const dy = ballPos.y - h.y;
+      if (Math.sqrt(dx*dx + dy*dy) < HOLE_R - 8) {
+        mazeSolved = true;
+        // 移除钢珠
+        Composite.remove(mazeEngine.world, mazeBall);
+        setTimeout(() => showMazeResult(h), 200);
+        break;
+      }
+    }
+  });
+
+  Render.run(mazeRender);
+  mazeRunner = Runner.create();
+  Runner.run(mazeRunner, mazeEngine);
+}
+
+function showMazeResult(hole) {
+  document.getElementById('mrIcon').textContent = hole.icon;
+  document.getElementById('mrText').textContent = hole.label + '！';
+  document.getElementById('mrSub').textContent = hole.sub;
+  document.getElementById('mazeResult').classList.add('show');
+  mazeActive = false;
+}
+
+function resetMaze() {
+  const {World, Engine, Render, Runner, Composite} = Matter;
+  document.getElementById('mazeResult').classList.remove('show');
+  if (mazeRunner) { Runner.stop(mazeRunner); mazeRunner = null; }
+  if (mazeRender) { Render.stop(mazeRender); mazeRender = null; }
+  if (mazeEngine) { World.clear(mazeEngine.world); Engine.clear(mazeEngine); mazeEngine = null; }
+  mazeSolved = false;
+  mazeBall = null;
+  // 清空画布
+  const wrap = document.getElementById('mazeWrap');
+  wrap.querySelectorAll('canvas').forEach(c => c.remove());
+  buildMaze();
+}
+
+// 陀螺仪 → 重力
+let mazeOrientationHandler = null;
+function startMazeGyro() {
+  if (mazeOrientationHandler) return;
+  mazeOrientationHandler = (e) => {
+    if (!mazeActive || mazeSolved || !mazeEngine) return;
+    const gamma = e.gamma || 0;  // -90 ~ 90  左右
+    const beta = e.beta || 0;    // -180 ~ 180 前后
+    const gx = Math.max(-1, Math.min(1, gamma / 45));
+    const gy = Math.max(-1, Math.min(1, (beta - 45) / 45));
+    mazeEngine.gravity.x = gx * 2.5;
+    mazeEngine.gravity.y = gy * 2.5;
+  };
+  window.addEventListener('deviceorientation', mazeOrientationHandler);
+}
+
+// 桌面端用键盘模拟
+let mazeKbStarted = false;
+function startMazeKeyboard() {
+  if (mazeKbStarted) return;
+  mazeKbStarted = true;
+  const keys = {ArrowLeft:false,ArrowRight:false,ArrowUp:false,ArrowDown:false};
+  window.addEventListener('keydown', e => { if (e.key in keys) { keys[e.key]=true; e.preventDefault(); } });
+  window.addEventListener('keyup', e => { if (e.key in keys) keys[e.key]=false; });
+  const kbLoop = () => {
+    if (mazeActive && !mazeSolved && mazeEngine) {
+      mazeEngine.gravity.x = ((keys.ArrowRight?1:0) - (keys.ArrowLeft?1:0)) * 2.5;
+      mazeEngine.gravity.y = ((keys.ArrowDown?1:0) - (keys.ArrowUp?1:0)) * 2.5;
+    }
+    requestAnimationFrame(kbLoop);
+  };
+  kbLoop();
+}
+
+window.openMaze = function() {
+  document.getElementById('mazeOverlay').classList.add('active');
+  if (!mazeEngine) {
+    buildMaze();
+    startMazeGyro();
+    // 桌面端降级
+    if (!('DeviceOrientationEvent' in window) || !('ontouchstart' in window)) {
+      startMazeKeyboard();
+      document.querySelector('.maze-hint').textContent = '⌨ 方向键控制钢珠滚动';
+    } else if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+      // iOS 13+ 需要用户手势触发权限
+      document.querySelector('.maze-hint').textContent = '📱 点击屏幕启用陀螺仪';
+      document.getElementById('mazeWrap').addEventListener('click', function reqGyro() {
+        DeviceOrientationEvent.requestPermission().then(r => {
+          if (r === 'granted') {
+            document.querySelector('.maze-hint').textContent = '📱 倾斜手机控制钢珠滚动';
+          }
+        }).catch(() => {});
+      }, {once: true});
+    }
+  }
+  mazeActive = true;
+  mazeSolved = false;
+  document.getElementById('mazeResult').classList.remove('show');
+};
+
+window.closeMaze = function() {
+  mazeActive = false;
+  document.getElementById('mazeOverlay').classList.remove('active');
+};
+
 // ========== 场景初始化 ==========
 (function initScene() {
   const scene = document.getElementById('sceneBg');
