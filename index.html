@@ -166,11 +166,11 @@ body{
 	.globe-info .sn{font-size:13px;opacity:.7;margin-top:4px}
 	.globe-hint-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:48;color:rgba(255,255,255,.5);font-size:15px;letter-spacing:2px;pointer-events:none;transition:opacity .6s;text-align:center}
 	.globe-danmaku{position:fixed;pointer-events:none;z-index:55;font-weight:bold;white-space:nowrap;text-shadow:0 2px 8px rgba(0,0,0,.5);will-change:transform,opacity;font-family:"Comic Sans MS","KaiTi","Microsoft YaHei",cursive,sans-serif}
-	.globe-entry-btn{position:fixed;bottom:100px;right:24px;z-index:28;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1a237e,#4fc3f7,#1a237e);background-size:200% 200%;animation:gp 3s ease-in-out infinite;border:none;cursor:pointer;font-size:28px;box-shadow:0 4px 20px rgba(79,195,247,.4);transition:transform .2s}
-	.globe-entry-btn:hover{transform:scale(1.1)}
-	.globe-entry-btn:active{transform:scale(.9)}
-	@keyframes gp{0%,100%{background-position:0% 50%;box-shadow:0 4px 20px rgba(79,195,247,.4)}50%{background-position:100% 50%;box-shadow:0 4px 30px rgba(79,195,247,.7)}}
-	@media(max-width:768px){.globe-info{bottom:16px;padding:8px 14px;font-size:11px}.globe-info .cn{font-size:16px}.globe-info .sn{font-size:10px}.globe-entry-btn{bottom:75px;right:10px;width:44px;height:44px;font-size:22px}.globe-hint-text{font-size:11px;line-height:1.6;text-align:center;width:90%}.globe-close-btn{top:12px;right:12px;width:36px;height:36px;font-size:16px}.globe-danmaku{font-size:14px!important}}
+	.globe-entry-btn{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:28;width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#1a237e,#4fc3f7,#1a237e);background-size:200% 200%;animation:gp 3s ease-in-out infinite;border:none;cursor:pointer;font-size:36px;box-shadow:0 6px 30px rgba(79,195,247,.5);transition:transform .2s}
+	.globe-entry-btn:hover{transform:translateX(-50%) scale(1.1)}
+	.globe-entry-btn:active{transform:translateX(-50%) scale(.9)}
+	@keyframes gp{0%,100%{background-position:0% 50%;box-shadow:0 6px 30px rgba(79,195,247,.5)}50%{background-position:100% 50%;box-shadow:0 6px 40px rgba(79,195,247,.8)}}
+	@media(max-width:768px){.globe-info{bottom:16px;padding:8px 14px;font-size:11px}.globe-info .cn{font-size:16px}.globe-info .sn{font-size:10px}.globe-entry-btn{bottom:60px;width:60px;height:60px;font-size:28px}.globe-hint-text{font-size:11px;line-height:1.6;text-align:center;width:90%}.globe-close-btn{top:12px;right:12px;width:36px;height:36px;font-size:16px}.globe-danmaku{font-size:14px!important}}
 
 </style>
 </head>
