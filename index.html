@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🐟 我是傻鱼 ~ ♪</title>
 <script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.157.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.157.0/examples/jsm/"}}</script>
+	<script src="https://cdn.jsdelivr.net/npm/suncalc@1.9.0/suncalc.min.js"></script>
 	<style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{
@@ -251,12 +252,24 @@ body{
 	.dande-vol-bar{position:absolute;bottom:50px;left:50%;transform:translateX(-50%);width:120px;height:3px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden}
 	.dande-vol-fill{height:100%;background:#fff;border-radius:2px;width:0;transition:width .08s}
 	@media(max-width:768px){.dande-hint{font-size:13px;bottom:60px}}
+	/* 人生时钟 */
+	.life-overlay{position:fixed;inset:0;z-index:43;background:linear-gradient(180deg,#0d1b2a 0%,#1b2838 50%,#2c1b3d 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
+	.life-overlay.active{opacity:1;pointer-events:auto}
+	#lifeCanvas{display:block}
+	.life-info{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+	.life-age{font-size:56px;font-weight:bold;color:#fff;letter-spacing:2px;text-shadow:0 0 30px rgba(255,255,255,.3)}
+	.life-age span{font-size:20px;opacity:.6}
+	.life-advice{color:rgba(255,255,255,.8);font-size:16px;letter-spacing:3px;margin-top:8px;line-height:1.7}
+	.life-time{color:rgba(255,255,255,.4);font-size:12px;letter-spacing:2px;margin-top:6px}
+	.life-close{position:absolute;top:16px;right:20px;z-index:5;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:16px;width:36px;height:36px;border-radius:50%;cursor:pointer;font-family:inherit}
+	.life-loc{position:absolute;top:20px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.3);font-size:12px;letter-spacing:2px}
+	@media(max-width:768px){.life-age{font-size:42px}.life-advice{font-size:13px}}
 	/* 小游戏菜单 */
 	.games-overlay{position:fixed;inset:0;z-index:38;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s}
 	.games-overlay.active{opacity:1;pointer-events:auto}
 	.games-panel{background:linear-gradient(160deg,#1a1a2e,#16213e,#0f3460);border-radius:20px;padding:24px 20px 18px;box-shadow:0 20px 60px rgba(0,0,0,.5);display:flex;flex-direction:column;align-items:center;gap:16px;max-width:420px;width:93vw;max-height:88vh;overflow-y:auto;position:relative;border:2px solid rgba(255,255,255,.1)}
 	.games-panel .gp-title{font-size:22px;font-weight:bold;color:#fff;letter-spacing:4px;text-align:center}
-	.games-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+	.games-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;width:100%}
 	.games-grid .gm-card{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:14px;padding:16px 12px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
 	.games-grid .gm-card:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);transform:translateY(-2px)}
 	.games-grid .gm-card:active{transform:scale(.96)}
@@ -265,7 +278,7 @@ body{
 	.games-grid .gm-card .gm-desc{font-size:10px;color:rgba(255,255,255,.45);letter-spacing:1px}
 	.games-close{position:absolute;top:12px;right:16px;background:none;border:none;font-size:18px;cursor:pointer;color:rgba(255,255,255,.4)}
 	.games-close:hover{color:#fff}
-	@media(max-width:768px){.games-panel{padding:18px 12px 14px;gap:10px}.games-grid{gap:7px}.games-grid .gm-card{padding:12px 8px}.games-grid .gm-icon{font-size:26px}.games-grid .gm-name{font-size:12px}}
+	@media(max-width:768px){.games-panel{padding:18px 12px 14px;gap:10px}.games-grid{grid-template-columns:1fr 1fr;gap:7px}.games-grid .gm-card{padding:12px 8px}.games-grid .gm-icon{font-size:26px}.games-grid .gm-name{font-size:12px}}
 	.globe-entry-btn{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:28;width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#1a237e,#4fc3f7,#1a237e);background-size:200% 200%;animation:gp 3s ease-in-out infinite;border:none;cursor:pointer;font-size:36px;box-shadow:0 6px 30px rgba(79,195,247,.5);transition:transform .2s}
 	.globe-entry-btn:hover{transform:translateX(-50%) scale(1.1)}
 	.globe-entry-btn:active{transform:translateX(-50%) scale(.9)}
@@ -408,6 +421,18 @@ body{
     <button class="games-close" onclick="closeGames()">✕</button>
     <div class="gp-title">🎮 小 游 戏</div>
     <div class="games-grid" id="gamesGrid"></div>
+  </div>
+</div>
+
+<!-- 人生时钟 -->
+<div class="life-overlay" id="lifeOverlay">
+  <canvas id="lifeCanvas" width="340" height="340"></canvas>
+  <button class="life-close" onclick="closeLife()">✕</button>
+  <div class="life-loc" id="lifeLoc"></div>
+  <div class="life-info">
+    <div class="life-age" id="lifeAge"></div>
+    <div class="life-advice" id="lifeAdvice"></div>
+    <div class="life-time" id="lifeTime"></div>
   </div>
 </div>
 
@@ -1247,7 +1272,7 @@ fishWrapper.addEventListener('click', async (e) => {
 // ========== 点击空白处投喂饲料 ==========
 document.addEventListener('click', (e) => {
   // 排除交互元素：按钮、链接、鱼、侧边图、kitty、各种弹窗
-  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, .bs-overlay.active, .stress-overlay.active, .zoom-overlay.active, .battery-overlay.active, .dande-overlay.active, .games-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
+  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, .bs-overlay.active, .stress-overlay.active, .zoom-overlay.active, .battery-overlay.active, .dande-overlay.active, .life-overlay.active, .games-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
   spawnFoodAt(e.clientX, e.clientY);
 });
 
@@ -2297,6 +2322,7 @@ const GAMES_LIST = [
   {icon:'🔭',name:'缩放世界',desc:'双指缩放 · 探索尺度',fn:()=>{closeGames();setTimeout(openZoom,300);}},
   {icon:'🔋',name:'电量算命',desc:'读取电量 · 人生建议',fn:()=>{closeGames();setTimeout(openBattery,300);}},
   {icon:'🌬️',name:'吹蒲公英',desc:'麦克风吹气 · 绒毛飘散',fn:()=>{closeGames();setTimeout(openDande,300);}},
+  {icon:'⏳',name:'人生时钟',desc:'日出日落 · 人生刻度',fn:()=>{closeGames();setTimeout(openLife,300);}},
   {icon:'🎮',name:'井字棋',desc:'鱼姐 vs 你',fn:()=>{closeGames();enterGame('tictactoe');}},
   {icon:'♟️',name:'五子棋',desc:'先五连者胜',fn:()=>{closeGames();enterGame('gomoku');}},
   {icon:'⚠️',name:'千万别点',desc:'像素闯关大冒险',fn:()=>{closeGames();location.href='game.html';}},
@@ -3155,6 +3181,179 @@ window.closeDande = function() {
   dandeVol = 0;
   dandeSmoothVol = 0;
   document.getElementById('dandeOverlay').classList.remove('active');
+};
+
+// ========== 人生时钟 ==========
+const LIFE_STAGES = [
+  {min:0,max:6,label:'童年 · 晨曦',advice:'世界是崭新的\n尽情探索每一个角落\n好奇心是你最好的老师\n摔倒了就笑着爬起来',color:'#ffb74d'},
+  {min:7,max:12,label:'少年 · 朝阳',advice:'像海绵一样吸收知识\n培养一个终身爱好\n交几个真心的朋友\n童年的阳光最温暖',color:'#ffcc80'},
+  {min:13,max:18,label:'青春期 · 破晓',advice:'认识自己，接纳自己\n勇敢尝试，不怕犯错\n每一个迷茫的夜晚\n都是成长的养料',color:'#ffab40'},
+  {min:19,max:25,label:'青年 · 晨光',advice:'选择你的方向\n然后全力以赴\n世界很大，时间很长\n现在就是最好的起点',color:'#ffe57f'},
+  {min:26,max:35,label:'壮年 · 上午',advice:'深耕你的专业领域\n建立自己的价值壁垒\n爱情和事业可以兼得\n但要学会平衡',color:'#fff176'},
+  {min:36,max:45,label:'中年 · 正午',advice:'你是家庭的顶梁柱\n也是自己人生的主角\n偶尔停下来喘口气\n健康比什么都重要',color:'#ffd740'},
+  {min:46,max:55,label:'盛年 · 午后',advice:'经验是你的财富\n分享出去会更有价值\n培养下一代的力量\n让影响力超越时间',color:'#ffca28'},
+  {min:56,max:65,label:'熟年 · 下午',advice:'放慢脚步，享受成果\n做那些一直想做但没时间做的事\n人生的下半场\n由你自己定义',color:'#ffc107'},
+  {min:66,max:75,label:'老年 · 黄昏',advice:'回首来路，从容一笑\n每个选择都成就了今天的你\n把智慧传给后辈\n享受天伦之乐',color:'#ff9800'},
+  {min:76,max:85,label:'暮年 · 晚霞',advice:'时光慢下来了\n正好品味生活的细节\n一杯茶、一本书、一个午后\n都是最好的时光',color:'#f57c00'},
+  {min:86,max:100,label:'晚年 · 星空',advice:'一生很长也很短\n你留下的回忆和爱\n会像星星一样\n永远闪耀在爱你的人心里',color:'#e65100'},
+];
+
+let lifeAge = 0, lifeSunData = null;
+
+function drawLifeClock() {
+  const canvas = document.getElementById('lifeCanvas');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height, cx = w / 2, cy = h / 2, r = 140;
+  ctx.clearRect(0, 0, w, h);
+
+  // 外圈刻度
+  for (let i = 0; i < 100; i++) {
+    const angle = (i / 100) * Math.PI * 2 - Math.PI / 2;
+    const inner = i % 10 === 0 ? r - 18 : (i % 5 === 0 ? r - 12 : r - 7);
+    ctx.strokeStyle = i % 10 === 0 ? 'rgba(255,255,255,.5)' : 'rgba(255,255,255,.2)';
+    ctx.lineWidth = i % 10 === 0 ? 1.5 : 0.5;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(angle) * inner, cy + Math.sin(angle) * inner);
+    ctx.lineTo(cx + Math.cos(angle) * r, cy + Math.sin(angle) * r);
+    ctx.stroke();
+  }
+
+  // 日出日落弧
+  if (lifeSunData) {
+    const {sunrise, sunset} = lifeSunData;
+    const dayStart = sunrise.getHours() * 60 + sunrise.getMinutes();
+    const dayEnd = sunset.getHours() * 60 + sunset.getMinutes();
+    const dayLen = dayEnd - dayStart;
+
+    // 白天弧（金色）
+    const startAngle = (dayStart / 1440) * Math.PI * 2 - Math.PI / 2;
+    const endAngle = (dayEnd / 1440) * Math.PI * 2 - Math.PI / 2;
+    ctx.strokeStyle = 'rgba(255,215,64,.3)';
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r + 12, startAngle, endAngle);
+    ctx.stroke();
+
+    // 夜晚弧（深蓝）
+    ctx.strokeStyle = 'rgba(100,150,255,.2)';
+    ctx.beginPath();
+    ctx.arc(cx, cy, r + 12, endAngle, startAngle);
+    ctx.stroke();
+
+    // 太阳标记（日出位置）
+    const sunRiseX = cx + Math.cos(startAngle) * (r + 12);
+    const sunRiseY = cy + Math.sin(startAngle) * (r + 12);
+    ctx.fillStyle = '#ffb74d';
+    ctx.beginPath();
+    ctx.arc(sunRiseX, sunRiseY, 6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = '9px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('🌅', sunRiseX, sunRiseY - 12);
+
+    // 太阳标记（日落位置）
+    const sunSetX = cx + Math.cos(endAngle) * (r + 12);
+    const sunSetY = cy + Math.sin(endAngle) * (r + 12);
+    ctx.fillStyle = '#ff7043';
+    ctx.beginPath();
+    ctx.arc(sunSetX, sunSetY, 6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillText('🌇', sunSetX, sunSetY - 12);
+  }
+
+  // 当前年龄指针
+  const pointerAngle = (lifeAge / 100) * Math.PI * 2 - Math.PI / 2;
+  const pointerLen = r - 25;
+  const px = cx + Math.cos(pointerAngle) * pointerLen;
+  const py = cy + Math.sin(pointerAngle) * pointerLen;
+
+  // 指针光晕
+  const glow = ctx.createRadialGradient(cx, cy, 0, px, py, 25);
+  glow.addColorStop(0, 'rgba(255,255,255,.15)');
+  glow.addColorStop(1, 'transparent');
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r - 20, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 指针线
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(px, py);
+  ctx.stroke();
+
+  // 指针端点
+  ctx.fillStyle = '#fff';
+  ctx.beginPath();
+  ctx.arc(px, py, 7, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#4fc3f7';
+  ctx.beginPath();
+  ctx.arc(px, py, 4, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 中心
+  ctx.fillStyle = '#1a237e';
+  ctx.beginPath();
+  ctx.arc(cx, cy, 18, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.beginPath();
+  ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+async function calcLifeAge() {
+  try {
+    // 获取位置
+    const pos = await new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, {timeout: 5000, maximumAge: 600000});
+    });
+    const lat = pos.coords.latitude;
+    const lng = pos.coords.longitude;
+    document.getElementById('lifeLoc').textContent = `📍 ${lat.toFixed(1)}°, ${lng.toFixed(1)}°`;
+
+    // 计算日出日落
+    const now = new Date();
+    const times = SunCalc.getTimes(now, lat, lng);
+    lifeSunData = {sunrise: times.sunrise, sunset: times.sunset, solarNoon: times.solarNoon};
+
+    const dayLen = times.sunset - times.sunrise; // ms
+    const elapsed = now - times.sunrise;
+    const ratio = Math.max(0, Math.min(1, elapsed / dayLen));
+    lifeAge = Math.round(ratio * 100);
+  } catch(e) {
+    // 降级：用北京时间 6:00-18:00 估算
+    document.getElementById('lifeLoc').textContent = '📍 默认位置（无GPS）';
+    const now = new Date();
+    const dayStart = 6 * 60; // 6:00
+    const dayEnd = 18 * 60; // 18:00
+    const dayLen = dayEnd - dayStart;
+    const currentMin = now.getHours() * 60 + now.getMinutes();
+    const elapsed = Math.max(0, Math.min(dayLen, currentMin - dayStart));
+    lifeAge = Math.round((elapsed / dayLen) * 100);
+  }
+
+  // 匹配人生阶段
+  const stage = LIFE_STAGES.find(s => lifeAge >= s.min && lifeAge <= s.max) || LIFE_STAGES[5];
+  document.getElementById('lifeAge').innerHTML = lifeAge + '<span> 岁</span>';
+  document.getElementById('lifeAdvice').textContent = stage.advice;
+  const now = new Date();
+  document.getElementById('lifeTime').textContent = now.toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'}) + ' · ' + stage.label;
+  document.getElementById('lifeAdvice').style.color = stage.color;
+  drawLifeClock();
+}
+
+window.openLife = async function() {
+  document.getElementById('lifeOverlay').classList.add('active');
+  await calcLifeAge();
+};
+
+window.closeLife = function() {
+  document.getElementById('lifeOverlay').classList.remove('active');
 };
 
 // ========== 场景初始化 ==========
