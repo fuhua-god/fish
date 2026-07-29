@@ -204,6 +204,16 @@ body{
 	.bs-close{position:absolute;top:12px;right:16px;background:none;border:none;font-size:18px;cursor:pointer;color:#b0bec5}
 	.bs-close:hover{color:#78909c}
 	@media(max-width:768px){.bs-card{padding:22px 14px 14px;gap:10px}.bs-card .bs-output{font-size:15px;padding:14px 12px;min-height:60px}.bs-card .bs-btn{padding:8px 14px;font-size:11px}}
+	/* 摇一摇命定颜色 */
+	.color-reveal{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .6s}
+	.color-reveal.active{opacity:1;pointer-events:auto}
+	.color-reveal .cr-name{font-size:28px;font-weight:bold;color:#fff;letter-spacing:4px;text-shadow:0 4px 20px rgba(0,0,0,.4);text-align:center;padding:0 20px;animation:crPopIn .8s cubic-bezier(.175,.885,.32,1.275)}
+	.color-reveal .cr-mood{font-size:16px;color:rgba(255,255,255,.85);letter-spacing:3px;text-align:center;margin-top:16px;padding:0 20px;animation:crFadeIn 1s .3s both}
+	.color-reveal .cr-hex{font-size:13px;color:rgba(255,255,255,.55);letter-spacing:2px;margin-top:12px;animation:crFadeIn 1s .5s both}
+	.color-reveal .cr-hint{position:absolute;bottom:40px;font-size:13px;color:rgba(255,255,255,.5);letter-spacing:2px;animation:crFadeIn 1s .8s both;cursor:pointer}
+	@keyframes crPopIn{0%{transform:scale(.3);opacity:0}60%{transform:scale(1.05);opacity:1}100%{transform:scale(1);opacity:1}}
+	@keyframes crFadeIn{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+	@media(max-width:768px){.color-reveal .cr-name{font-size:22px}.color-reveal .cr-mood{font-size:14px}.color-reveal .cr-hex{font-size:11px}}
 	.globe-entry-btn{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:28;width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#1a237e,#4fc3f7,#1a237e);background-size:200% 200%;animation:gp 3s ease-in-out infinite;border:none;cursor:pointer;font-size:36px;box-shadow:0 6px 30px rgba(79,195,247,.5);transition:transform .2s}
 	.globe-entry-btn:hover{transform:translateX(-50%) scale(1.1)}
 	.globe-entry-btn:active{transform:translateX(-50%) scale(.9)}
@@ -345,6 +355,14 @@ body{
   </div>
 </div>
 <button class="globe-entry-btn" id="globeEntryBtn" onclick="openGlobe()" title="🌍 地球仪">🌍</button>
+
+<!-- 摇一摇命定颜色 -->
+<div class="color-reveal" id="colorReveal" onclick="dismissColor()">
+  <div class="cr-name" id="crName"></div>
+  <div class="cr-mood" id="crMood"></div>
+  <div class="cr-hex" id="crHex"></div>
+  <span class="cr-hint">轻触任意处关闭</span>
+</div>
 
 <!-- 废话连篇生成器 -->
 <div class="bs-overlay" id="bsOverlay">
@@ -1888,6 +1906,79 @@ window.closeBS = function() {
   document.getElementById('bsOverlay').classList.remove('active');
 };
 
+// ========== 摇一摇命定颜色 ==========
+const COLOR_PALETTE = [
+  {name:'富士山初雪白',mood:'世界安静得像一场未完的梦',hex:'#f0ebe3',grad:'linear-gradient(135deg,#f0ebe3,#e8e0d5,#f5f0e8)'},
+  {name:'前任后悔蓝',mood:'有些颜色只适合远观，有些人也是',hex:'#2c3e6b',grad:'linear-gradient(135deg,#2c3e6b,#1a2a50,#3d5a99)'},
+  {name:'工资到账绿',mood:'数字跳动的瞬间，世界都明亮了',hex:'#27ae60',grad:'linear-gradient(135deg,#27ae60,#1e8449,#52be80)'},
+  {name:'深夜emo紫',mood:'月亮不睡你不睡，你是秃头小宝贝',hex:'#6c3483',grad:'linear-gradient(135deg,#6c3483,#512e6b,#8e44ad)'},
+  {name:'奶茶三分配比棕',mood:'三分糖刚好，多了是负担少了是遗憾',hex:'#a0714f',grad:'linear-gradient(135deg,#a0714f,#8b5e3c,#c49a6c)'},
+  {name:'地铁早高峰灰',mood:'人潮拥挤，每个人都在奔赴各自的人生',hex:'#7f8c8d',grad:'linear-gradient(135deg,#7f8c8d,#6c7a7b,#95a5a6)'},
+  {name:'夕阳无限好橘',mood:'今天的烦恼就留给今天，明天又是新的一天',hex:'#e67e22',grad:'linear-gradient(135deg,#e67e22,#d35400,#f39c12)'},
+  {name:'海边落日粉',mood:'想把这一刻的美好装进瓶子寄给你',hex:'#f5b7b1',grad:'linear-gradient(135deg,#f5b7b1,#f1948a,#fadbd8)'},
+  {name:'雨后青草绿',mood:'空气里有泥土的味道，那是新的开始',hex:'#7dcea0',grad:'linear-gradient(135deg,#7dcea0,#58d68d,#a9dfbf)'},
+  {name:'信用卡透支红',mood:'花出去的钱才叫钱，存着的只是数字',hex:'#c0392b',grad:'linear-gradient(135deg,#c0392b,#a93226,#e74c3c)'},
+  {name:'星期五下班金',mood:'自由的味道，比任何香水都好闻',hex:'#f1c40f',grad:'linear-gradient(135deg,#f1c40f,#d4ac0d,#f9e54b)'},
+  {name:'凌晨三点失眠黑',mood:'全世界都睡了，只有你和你的心事醒着',hex:'#1c1c2e',grad:'linear-gradient(135deg,#1c1c2e,#0a0a15,#2d2d44)'},
+  {name:'初吻心跳粉',mood:'像春天的第一朵花，柔软又让人期待',hex:'#ffb6c1',grad:'linear-gradient(135deg,#ffb6c1,#ff9aab,#ffccd5)'},
+  {name:'冰山美人蓝',mood:'冷艳只是保护色，内心其实住着春天',hex:'#85c1e9',grad:'linear-gradient(135deg,#85c1e9,#5dade2,#aed6f1)'},
+  {name:'沙漠孤狼棕',mood:'孤独是强者的特权，弱者才需要抱团取暖',hex:'#c4a265',grad:'linear-gradient(135deg,#c4a265,#b8934e,#d4b87a)'},
+  {name:'朋友圈点赞红',mood:'数字越大越空虚，但谁又舍得拒绝呢',hex:'#e74c3c',grad:'linear-gradient(135deg,#e74c3c,#c0392b,#f0625a)'},
+  {name:'佛系养生青',mood:'枸杞配保温杯，人生不过一场修行',hex:'#a3c9a8',grad:'linear-gradient(135deg,#a3c9a8,#82b58a,#c8e6c9)'},
+  {name:'霸道总裁黑',mood:'所有的温柔，都留给那个值得的人',hex:'#2c3e50',grad:'linear-gradient(135deg,#2c3e50,#1a252f,#3d566e)'},
+  {name:'樱花树下粉白',mood:'花开花落自有时，你来你走皆是缘',hex:'#fde2e4',grad:'linear-gradient(135deg,#fde2e4,#fcd5ce,#ffe5e8)'},
+  {name:'暴富梦金黄',mood:'何以解忧，唯有暴富。实在不行，小富也行',hex:'#f9a825',grad:'linear-gradient(135deg,#f9a825,#f57f17,#fbc02d)'},
+];
+
+let colorRevealActive = false;
+let colorRevealTimer = null;
+
+function triggerColorReveal() {
+  if (colorRevealActive) return;
+  // 排除各种弹窗打开时触发
+  if (document.querySelector('.game-overlay.active,.gacha-overlay.active,.album-overlay.active,.days-overlay.active,.wheel-overlay.active,.globe-overlay.active,.fortune-overlay.active,.bs-overlay.active')) return;
+
+  colorRevealActive = true;
+  const c = COLOR_PALETTE[Math.floor(Math.random() * COLOR_PALETTE.length)];
+  const overlay = document.getElementById('colorReveal');
+  overlay.style.background = c.grad;
+  document.getElementById('crName').textContent = c.name;
+  document.getElementById('crMood').textContent = c.mood;
+  document.getElementById('crHex').textContent = c.hex;
+  overlay.classList.add('active');
+
+  // 6秒后自动消失
+  clearTimeout(colorRevealTimer);
+  colorRevealTimer = setTimeout(dismissColor, 6000);
+}
+
+window.dismissColor = function() {
+  document.getElementById('colorReveal').classList.remove('active');
+  clearTimeout(colorRevealTimer);
+  setTimeout(() => { colorRevealActive = false; }, 600);
+};
+
+// 全局摇一摇监听
+let crLastShake = 0;
+let crShakeSamples = [];
+window.addEventListener('devicemotion', (e) => {
+  const acc = e.accelerationIncludingGravity;
+  if (!acc) return;
+  const m = Math.sqrt(acc.x * acc.x + acc.y * acc.y + acc.z * acc.z);
+  const now = Date.now();
+  // 记录最近 500ms 的加速度样本
+  crShakeSamples.push({t: now, m});
+  crShakeSamples = crShakeSamples.filter(s => now - s.t < 500);
+  // 检测抖动：500ms 内加速度超过阈值两次以上
+  const spikes = crShakeSamples.filter(s => s.m > 22);
+  if (spikes.length >= 2 && now - crLastShake > 3000) {
+    crLastShake = now;
+    crShakeSamples = [];
+    triggerColorReveal();
+  }
+});
+
+console.log('🎨 摇一摇命定颜色已就绪 | 共' + COLOR_PALETTE.length + '种颜色');
 // ========== 场景初始化 ==========
 (function initScene() {
   const scene = document.getElementById('sceneBg');
