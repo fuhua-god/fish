@@ -2865,7 +2865,9 @@ let dandeSeeds = []; // 种子粒子
 let dandeStars = []; // 飞到边缘变星星
 let dandeVol = 0, dandeSmoothVol = 0;
 let dandeAudioCtx = null, dandeAnalyser = null, dandeMicData = null;
-let dandeBlownSeeds = new Set(); // 已吹散的种子索引
+let dandeBlownSeeds = new Set();
+let dandeWindAccum = 0; // 风力累积值
+let dandeWindDir = -Math.PI / 2; // 风向（默认向上）
 
 function resizeDandeCanvas() {
   dandeCanvas.width = window.innerWidth;
@@ -2879,6 +2881,7 @@ function initDandeSeeds() {
   dandeSeeds = [];
   dandeStars = [];
   dandeBlownSeeds = new Set();
+  dandeWindAccum = 0;
   const cx = dandeCanvas.width / 2, cy = dandeCanvas.height * 0.45;
   for (let i = 0; i < 60; i++) {
     const angle = (i / 60) * Math.PI * 2 + (Math.random() - 0.5) * 0.3;
@@ -2946,9 +2949,10 @@ function drawDande() {
       dctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
       dctx.fill();
     } else {
-      // 附着的种子
-      const sx = cx + Math.cos(s.angle) * s.dist;
-      const sy = cy + Math.sin(s.angle) * s.dist;
+      // 附着的种子（随风微微摆动）
+      const sway = dandeSmoothVol * Math.sin(Date.now() * 0.02 + s.angle) * 4;
+      const sx = cx + Math.cos(s.angle) * (s.dist + sway);
+      const sy = cy + Math.sin(s.angle) * (s.dist + sway);
       // 绒毛茎
       dctx.strokeStyle = 'rgba(255,255,255,0.6)';
       dctx.lineWidth = 0.5;
@@ -2990,37 +2994,75 @@ function updateDandePhysics() {
   const cx = w / 2, cy = h * 0.45;
   const windForce = dandeSmoothVol * 8;
 
+  // 风力累积：持续吹气才能吹散更多种子
+  if (dandeSmoothVol > 0.12) {
+    dandeWindAccum += dandeSmoothVol * 0.6; // 累积速度
+  } else {
+    dandeWindAccum *= 0.95; // 风停时缓慢衰减
+  }
+
+  // 按角度排序未吹散的种子（迎着风向的先被吹走）
+  const unattached = dandeSeeds.filter(s => !s.blown && !s.isStar && !dandeBlownSeeds.has(s.id));
+  // 按与风向的夹角排序：正对风的先吹
+  unattached.sort((a, b) => {
+    const aDiff = Math.abs(Math.cos(a.angle - dandeWindDir));
+    const bDiff = Math.abs(Math.cos(b.angle - dandeWindDir));
+    return bDiff - aDiff; // 夹角小的优先
+  });
+
+  // 累积值达到阈值才吹散一颗种子（越往后阈值越高，形成阻力感）
+  const baseThreshold = 3.0;
+  const blownCount = dandeBlownSeeds.size;
+  const threshold = baseThreshold + blownCount * 0.6; // 越吹越难
+
+  if (dandeWindAccum > threshold && unattached.length > 0) {
+    dandeWindAccum = 0;
+    // 从迎风面取种子（优先顶部20度范围内的）
+    const frontFacing = unattached.filter(s => Math.cos(s.angle - dandeWindDir) > 0.3);
+    const pool = frontFacing.length > 0 ? frontFacing : unattached;
+    // 加一点随机性：不是每次取最正面的
+    const idx = Math.min(Math.floor(Math.random() * pool.length * 0.5), pool.length - 1);
+    const s = pool[idx];
+    s.blown = true;
+    dandeBlownSeeds.add(s.id);
+    s.x = cx + Math.cos(s.angle) * s.dist;
+    s.y = cy + Math.sin(s.angle) * s.dist;
+    // 风速越大初速度越快，方向随风向 + 随机偏移
+    const blowAngle = dandeWindDir + (Math.random() - 0.5) * 0.8;
+    const blowSpeed = windForce * (0.4 + Math.random() * 0.6) + 1;
+    s.vx = Math.cos(blowAngle) * blowSpeed;
+    s.vy = Math.sin(blowAngle) * blowSpeed;
+  }
+
+  // 更新已吹散的种子
   for (const s of dandeSeeds) {
-    if (s.isStar) continue;
-    if (s.blown) {
-      // 风中飘散
-      s.vy -= windForce * (0.8 + Math.random() * 0.4);
-      s.vx += (Math.random() - 0.5) * windForce * 0.6;
-      s.vx *= 0.99;
-      s.vy *= 0.99;
-      s.x += s.vx;
-      s.y += s.vy;
-      s.life -= 0.003;
-      // 飘到边缘 → 变成星星
-      if (s.y < -20 || s.y > h + 20 || s.x < -20 || s.x > w + 20) {
-        s.isStar = true;
-        dandeStars.push({
-          x: Math.max(10, Math.min(w - 10, s.x)),
-          y: Math.max(10, Math.min(h - 10, s.y)),
-          vx: (Math.random() - 0.5) * 3,
-          vy: -1 - Math.random() * 3,
-          life: 1,
-          size: 10 + Math.random() * 14,
-        });
-      }
-    } else if (dandeSmoothVol > 0.15 && !dandeBlownSeeds.has(s.id)) {
-      // 风力足够 → 吹散这颗种子
-      s.blown = true;
-      dandeBlownSeeds.add(s.id);
-      s.x = cx + Math.cos(s.angle) * s.dist;
-      s.y = cy + Math.sin(s.angle) * s.dist;
-      s.vx = (Math.random() - 0.5) * 2;
-      s.vy = -windForce * (0.5 + Math.random());
+    if (s.isStar || !s.blown) continue;
+    // 风力和湍流
+    const turbX = (Math.random() - 0.5) * windForce * 0.5;
+    const turbY = -windForce * (0.5 + Math.random() * 0.4);
+    s.vx += turbX * 0.15;
+    s.vy += turbY * 0.15;
+    // 空气阻力
+    s.vx *= 0.985;
+    s.vy *= 0.985;
+    // 绒毛浮力（模拟降落伞效果）
+    s.vy -= 0.02;
+    // 水平漂移
+    s.vx += (Math.random() - 0.5) * 0.04;
+    s.x += s.vx;
+    s.y += s.vy;
+    s.life -= 0.002;
+    // 飘到边缘 → 变成星星
+    if (s.y < -30 || s.y > h + 30 || s.x < -30 || s.x > w + 30) {
+      s.isStar = true;
+      dandeStars.push({
+        x: Math.max(10, Math.min(w - 10, s.x)),
+        y: Math.max(10, Math.min(h - 10, s.y)),
+        vx: (Math.random() - 0.5) * 2,
+        vy: -1.5 - Math.random() * 2.5,
+        life: 1,
+        size: 10 + Math.random() * 14,
+      });
     }
   }
 
