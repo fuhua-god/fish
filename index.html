@@ -545,18 +545,35 @@ function updateFishPos(ts) {
     const hasFood = nearestFood.pellet && !nearestFood.pellet.eaten;
     const speedScale = fishSize.w / 240;
     const baseMax = 3.5 * speedScale;
-    if (hasFood && fishEatCooldown <= 0 && nearestFood.dist > 25) {
+    if (hasFood && fishEatCooldown <= 0) {
+      // 先移动再判断吃食：统一在寻食状态
       const mouth = getFishMouth();
-      const dx = nearestFood.pellet.x + 16 - mouth.x;
-      const dy = nearestFood.pellet.y + 16 - mouth.y;
-      const dist = Math.max(nearestFood.dist, 1);
-      const seekSpd = baseMax * Math.max(fishCurSpd, 1.0) * 1.8;
-      fishVX += (dx / dist * seekSpd * 0.7 - fishVX) * 0.08;
-      fishVY += (dy / dist * seekSpd * 0.7 - fishVY) * 0.08;
-      let spd = Math.sqrt(fishVX * fishVX + fishVY * fishVY);
-      if (spd > seekSpd) { fishVX = (fishVX / spd) * seekSpd; fishVY = (fishVY / spd) * seekSpd; }
-      fishTargetSpd = Math.max(fishTargetSpd, 1.6);
+      const fx = nearestFood.pellet.x + 16;
+      const fy = nearestFood.pellet.y + 16;
+      const dx = fx - mouth.x;
+      const dy = fy - mouth.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < FOOD_EAT_DIST) {
+        // 够近了，吃掉！
+        fishEatCooldown = 25;
+        eatFood(nearestFood.pellet);
+        // 吃到后这帧做随机游动
+        if (Math.random() < 0.01) { fishVX += (Math.random() - 0.5) * 1.0; fishVY += (Math.random() - 0.5) * 1.0; }
+        const maxSpd = baseMax * fishCurSpd;
+        let spd = Math.sqrt(fishVX * fishVX + fishVY * fishVY);
+        if (spd > maxSpd) { fishVX = (fishVX / spd) * maxSpd; fishVY = (fishVY / spd) * maxSpd; }
+      } else {
+        // 还没够到：全力游向食物
+        const seekSpd = baseMax * Math.max(fishCurSpd, 1.0) * 2.0;
+        const factor = 0.1; // 转向力度
+        fishVX += (dx / dist * seekSpd * 0.8 - fishVX) * factor;
+        fishVY += (dy / dist * seekSpd * 0.8 - fishVY) * factor;
+        let spd = Math.sqrt(fishVX * fishVX + fishVY * fishVY);
+        if (spd > seekSpd) { fishVX = (fishVX / spd) * seekSpd; fishVY = (fishVY / spd) * seekSpd; }
+        fishTargetSpd = Math.max(fishTargetSpd, 1.8);
+      }
     } else {
+      // 无食物或冷却中：正常随机游动
       if (Math.random() < 0.01) { fishVX += (Math.random() - 0.5) * 1.0; fishVY += (Math.random() - 0.5) * 1.0; }
       const baseMin = 0.3 * speedScale;
       const minSpd = baseMin * fishCurSpd * 0.3;
@@ -573,18 +590,6 @@ function updateFishPos(ts) {
     if (fishY > window.innerHeight - fh - pad) { fishY = window.innerHeight - fh - pad; fishVY = -Math.abs(fishVY); }
     const newDir = fishVX >= 0 ? 1 : -1;
     if (newDir !== fishDir) { fishDir = newDir; }
-    // 检查是否吃到食物
-    if (hasFood && fishEatCooldown <= 0) {
-      const mouth = getFishMouth();
-      const fx = nearestFood.pellet.x + 16;
-      const fy = nearestFood.pellet.y + 16;
-      const dx = fx - mouth.x;
-      const dy = fy - mouth.y;
-      if (Math.sqrt(dx * dx + dy * dy) < FOOD_EAT_DIST) {
-        fishEatCooldown = 25;
-        eatFood(nearestFood.pellet);
-      }
-    }
     // 更新食物物理
     updateFoodPhysics();
   } catch(e) {
@@ -668,9 +673,9 @@ function spawnTrail(fx, fy, dir) {
 // ========== 饲料系统 ==========
 const foodContainer = document.getElementById('foodContainer');
 let foodPellets = [];
-const FOOD_GRAVITY = 0.15;
-const FOOD_BOUNCE = 0.3;
-const FOOD_TERMINAL_VY = 6;
+const FOOD_GRAVITY = 0.04;
+const FOOD_BOUNCE = 0.25;
+const FOOD_TERMINAL_VY = 2;
 const FOOD_EAT_DIST = 55;
 
 function getFoodGround() { return window.innerHeight - 130; }
