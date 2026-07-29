@@ -228,6 +228,21 @@ body{
 	.maze-result .mr-btn{padding:10px 28px;border-radius:25px;border:none;font-size:15px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;margin-top:20px;background:#4fc3f7;color:#1a1a2e}
 	.maze-close{position:absolute;top:10px;right:16px;z-index:10;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:16px;width:34px;height:34px;border-radius:50%;cursor:pointer}
 	.maze-hint{color:rgba(255,255,255,.5);font-size:12px;letter-spacing:2px;margin-top:10px}
+	/* 小游戏菜单 */
+	.games-overlay{position:fixed;inset:0;z-index:38;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s}
+	.games-overlay.active{opacity:1;pointer-events:auto}
+	.games-panel{background:linear-gradient(160deg,#1a1a2e,#16213e,#0f3460);border-radius:20px;padding:24px 20px 18px;box-shadow:0 20px 60px rgba(0,0,0,.5);display:flex;flex-direction:column;align-items:center;gap:16px;max-width:420px;width:93vw;max-height:88vh;overflow-y:auto;position:relative;border:2px solid rgba(255,255,255,.1)}
+	.games-panel .gp-title{font-size:22px;font-weight:bold;color:#fff;letter-spacing:4px;text-align:center}
+	.games-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+	.games-grid .gm-card{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:14px;padding:16px 12px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+	.games-grid .gm-card:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);transform:translateY(-2px)}
+	.games-grid .gm-card:active{transform:scale(.96)}
+	.games-grid .gm-card .gm-icon{font-size:32px}
+	.games-grid .gm-card .gm-name{font-size:14px;font-weight:bold;color:#fff;letter-spacing:2px}
+	.games-grid .gm-card .gm-desc{font-size:10px;color:rgba(255,255,255,.45);letter-spacing:1px}
+	.games-close{position:absolute;top:12px;right:16px;background:none;border:none;font-size:18px;cursor:pointer;color:rgba(255,255,255,.4)}
+	.games-close:hover{color:#fff}
+	@media(max-width:768px){.games-panel{padding:18px 12px 14px;gap:10px}.games-grid{gap:7px}.games-grid .gm-card{padding:12px 8px}.games-grid .gm-icon{font-size:26px}.games-grid .gm-name{font-size:12px}}
 	.globe-entry-btn{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:28;width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#1a237e,#4fc3f7,#1a237e);background-size:200% 200%;animation:gp 3s ease-in-out infinite;border:none;cursor:pointer;font-size:36px;box-shadow:0 6px 30px rgba(79,195,247,.5);transition:transform .2s}
 	.globe-entry-btn:hover{transform:translateX(-50%) scale(1.1)}
 	.globe-entry-btn:active{transform:translateX(-50%) scale(.9)}
@@ -267,15 +282,8 @@ body{
     <button class="btn-album" onclick="openAlbum()">📖 图鉴</button>
     <button class="btn-album" id="feedBtn" onclick="spawnFoodNearFish()">🍥 饲料</button>
     <button class="btn-album" id="musicBtn" onclick="toggleMusic()">🔇 音乐关</button>
-    <button class="btn-album" onclick="openGlobe()">🌍 地球仪</button>
-	    <button class="btn-album" style="background:#1a1a2e;color:#ffd740;border-color:#ffd740" onclick="openFortune()">🐉 运势</button>
-	    <button class="btn-album" style="background:#37474f;color:#fff;border-color:#455a64" onclick="openBS()">📝 废话</button>
-	    <button class="btn-album" style="background:#1a237e;color:#4fc3f7;border-color:#283593" onclick="openMaze()">🔮 迷宫</button>
+    <button class="btn-album" style="background:linear-gradient(135deg,#4a148c,#7b1fa2);color:#fff;border-color:#6a1b9a" onclick="openGames()">🎮 小游戏</button>
   </div>
-  <div class="game-entry">
-    <button class="entry-btn" onclick="enterGame('tictactoe')">🎮 井字棋</button>
-    <button class="entry-btn" onclick="enterGame('gomoku')">♟️ 五子棋</button>
-    <button class="entry-btn" style="background:#ff5252;color:#fff;border-color:#ff1744;animation:pl 1.5s ease-in-out infinite" onclick="location.href='game.html'">⚠️ 千万别点</button>
   </div>
 </div>
 
@@ -370,6 +378,15 @@ body{
   </div>
 </div>
 <button class="globe-entry-btn" id="globeEntryBtn" onclick="openGlobe()" title="🌍 地球仪">🌍</button>
+
+<!-- 小游戏菜单 -->
+<div class="games-overlay" id="gamesOverlay">
+  <div class="games-panel">
+    <button class="games-close" onclick="closeGames()">✕</button>
+    <div class="gp-title">🎮 小 游 戏</div>
+    <div class="games-grid" id="gamesGrid"></div>
+  </div>
+</div>
 
 <!-- 弹珠迷宫 -->
 <div class="maze-overlay" id="mazeOverlay">
@@ -1178,7 +1195,7 @@ fishWrapper.addEventListener('click', async (e) => {
 // ========== 点击空白处投喂饲料 ==========
 document.addEventListener('click', (e) => {
   // 排除交互元素：按钮、链接、鱼、侧边图、kitty、各种弹窗
-  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, .bs-overlay.active, .maze-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
+  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, .bs-overlay.active, .maze-overlay.active, .games-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
   spawnFoodAt(e.clientX, e.clientY);
 });
 
@@ -2223,6 +2240,34 @@ window.openMaze = function() {
 window.closeMaze = function() {
   mazeActive = false;
   document.getElementById('mazeOverlay').classList.remove('active');
+};
+
+// ========== 小游戏菜单 ==========
+const GAMES_LIST = [
+  {icon:'🌍',name:'地球仪',desc:'点击国家 · 听环境音',fn:()=>{closeGames();setTimeout(openGlobe,300);}},
+  {icon:'🐉',name:'今日运势',desc:'像素神兽 · 每日抽签',fn:()=>{closeGames();setTimeout(openFortune,300);}},
+  {icon:'📝',name:'废话连篇',desc:'职场学术 · 一键生成',fn:()=>{closeGames();setTimeout(openBS,300);}},
+  {icon:'🔮',name:'弹珠迷宫',desc:'倾斜手机 · 物理迷宫',fn:()=>{closeGames();setTimeout(openMaze,300);}},
+  {icon:'🎮',name:'井字棋',desc:'鱼姐 vs 你',fn:()=>{closeGames();enterGame('tictactoe');}},
+  {icon:'♟️',name:'五子棋',desc:'先五连者胜',fn:()=>{closeGames();enterGame('gomoku');}},
+  {icon:'⚠️',name:'千万别点',desc:'像素闯关大冒险',fn:()=>{closeGames();location.href='game.html';}},
+];
+function buildGamesGrid() {
+  document.getElementById('gamesGrid').innerHTML = GAMES_LIST.map(g =>
+    `<div class="gm-card" onclick="(${g.fn.toString()})()">
+      <div class="gm-icon">${g.icon}</div>
+      <div class="gm-name">${g.name}</div>
+      <div class="gm-desc">${g.desc}</div>
+    </div>`
+  ).join('');
+}
+buildGamesGrid();
+
+window.openGames = function() {
+  document.getElementById('gamesOverlay').classList.add('active');
+};
+window.closeGames = function() {
+  document.getElementById('gamesOverlay').classList.remove('active');
 };
 
 // ========== 场景初始化 ==========
