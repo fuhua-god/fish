@@ -796,7 +796,8 @@ function updateFishPos(ts) {
   if (fishPaused) { fishAnimId = requestAnimationFrame(updateFishPos); return; }
 
   // 时快时慢：定时切换目标速度
-  if (!updateFishPos._lastTs) updateFishPos._lastTs = ts;
+  // 首帧跳过：当 ts 为 undefined 时只初始化时间戳，下一帧再开始计算
+  if (!updateFishPos._lastTs) { updateFishPos._lastTs = ts || performance.now(); fishAnimId = requestAnimationFrame(updateFishPos); return; }
   const dt = Math.min((ts - updateFishPos._lastTs) / 1000, 0.1); // 秒
   updateFishPos._lastTs = ts;
   fishMoodTimer += dt;
@@ -810,6 +811,8 @@ function updateFishPos(ts) {
     else fishTargetSpd = 1.8 + Math.random() * 1.2;               // 冲刺
   }
   // 平滑过渡
+  if (isNaN(fishCurSpd)) fishCurSpd = 1.0;
+  if (isNaN(fishTargetSpd)) fishTargetSpd = 1.0;
   fishCurSpd += (fishTargetSpd - fishCurSpd) * dt * 1.5;
 
   // 食物寻找：如果有未吃掉的食物，鱼主动游向最近的食物
