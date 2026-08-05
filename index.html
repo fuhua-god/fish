@@ -49,6 +49,16 @@ body{
 .fish-wrapper{position:fixed;z-index:5;cursor:pointer;transition:transform .12s ease;filter:drop-shadow(0 10px 25px rgba(0,0,0,.2));-webkit-tap-highlight-color:transparent;outline:none;will-change:left,top,transform}
 .fish-wrapper:active{transform:scale(.9)}
 .fish-float{width:100%;height:100%}
+/* 彩蛋：鱼刷牙 */
+.fish-wrapper.brushing{transition:transform .45s cubic-bezier(.34,1.56,.64,1)}
+.fish-wrapper.brushing .fish-float{animation:brushWiggle .35s ease-in-out infinite}
+@keyframes brushWiggle{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.fish-toothbrush{position:absolute;left:50%;top:14%;width:46%;height:30%;transform:translateX(-50%);transform-origin:bottom center;animation:brushScrub .25s ease-in-out infinite;pointer-events:none;z-index:2;filter:drop-shadow(0 3px 4px rgba(0,0,0,.25))}
+@keyframes brushScrub{0%,100%{transform:translateX(-50%) rotate(-12deg)}50%{transform:translateX(-50%) rotate(12deg)}}
+.brush-sparkle{position:absolute;font-size:14px;pointer-events:none;animation:brushSpark .6s ease-out forwards}
+@keyframes brushSpark{0%{opacity:0;transform:scale(.3) rotate(0)}40%{opacity:1;transform:scale(1.2) rotate(90deg)}100%{opacity:0;transform:scale(.6) translateY(-18px) rotate(180deg)}}
+.brush-bubble{position:absolute;border-radius:50%;background:rgba(255,255,255,.85);pointer-events:none;animation:brushBubble 1s ease-out forwards}
+@keyframes brushBubble{0%{opacity:.9;transform:scale(.4)}100%{opacity:0;transform:translateY(-40px) scale(1.6)}}
 .hint{color:#fff;font-size:17px;letter-spacing:3px;animation:pl 2s ease-in-out infinite;text-shadow:0 2px 6px rgba(0,0,0,.3)}
 @keyframes pl{0%,100%{opacity:.5;transform:scale(.98)}50%{opacity:1;transform:scale(1.03)}}
 .counter,.clock{color:#fff;font-size:15px;background:rgba(0,0,0,.35);padding:6px 16px;border-radius:20px;text-shadow:0 1px 2px rgba(0,0,0,.2)}
@@ -1263,6 +1273,100 @@ function playMeowSound() {
   audio.play().catch(() => {});
 }
 
+// ========== 彩蛋：刷牙音效（Web Audio 合成“沙沙”摩擦声）==========
+let _brushAudioCtx = null;
+function playBrushSound(duration = 3.2) {
+  try {
+    _brushAudioCtx = _brushAudioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = _brushAudioCtx;
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+    // 白噪声缓冲
+    const buf = ctx.createBuffer(1, ctx.sampleRate * duration, ctx.sampleRate);
+    const ch = buf.getChannelData(0);
+    for (let i = 0; i < ch.length; i++) ch[i] = Math.random() * 2 - 1;
+    const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+    // 带通滤波模拟牙刷摩擦
+    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2600; bp.Q.value = 1.2;
+    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 900;
+    // 包络：渐入渐出 + 节奏感（左右刷的强弱）
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.18, now + 0.15);
+    // 用 LFO 制造“唰、唰”的节奏起伏
+    const lfo = ctx.createOscillator(); lfo.type = 'square'; lfo.frequency.value = 4.2;
+    const lfoGain = ctx.createGain(); lfoGain.gain.value = 0.12;
+    lfo.connect(lfoGain); lfoGain.connect(gain.gain);
+    gain.gain.linearRampToValueAtTime(0.18, now + duration - 0.3);
+    gain.gain.linearRampToValueAtTime(0, now + duration);
+    src.connect(hp); hp.connect(bp); bp.connect(gain); gain.connect(ctx.destination);
+    src.start(now); lfo.start(now);
+    src.stop(now + duration); lfo.stop(now + duration);
+  } catch (e) { /* 静默失败 */ }
+}
+
+// ========== 彩蛋：鱼刷牙 ==========
+let fishBrushing = false;
+function triggerFishBrush() {
+  if (fishBrushing) return;
+  fishBrushing = true;
+  fishPaused = true;                 // 暂停游动
+  fishVX = 0; fishVY = 0;
+  // 鱼竖立头朝上：绕中心旋转 -90° (画布坐标 y朝下，-90 让鱼头指向上)
+  const cx = fishX + fishSize.w / 2, cy = fishY + fishSize.h / 2;
+  fishWrapper.classList.add('brushing');
+  fishWrapper.style.transformOrigin = `${cx - fishX}px ${cy - fishY}px`;
+  fishWrapper.style.transform = `scaleX(${fishDir}) rotate(-90deg)`;
+  // 挂上牙刷
+  const tb = document.createElement('div');
+  tb.className = 'fish-toothbrush';
+  tb.innerHTML = `<svg width="100%" height="100%" viewBox="0 0 100 60" preserveAspectRatio="xMidYMid meet">
+    <rect x="44" y="6" width="12" height="40" rx="4" fill="#42a5f5"/>
+    <rect x="42" y="40" width="16" height="14" rx="3" fill="#1e88e5"/>
+    <g fill="#fff" stroke="#bdbdbd" stroke-width=".6">
+      <rect x="40" y="2" width="3" height="9" rx="1.2"/><rect x="44" y="1" width="3" height="10" rx="1.2"/>
+      <rect x="48" y="1" width="3" height="10" rx="1.2"/><rect x="52" y="1" width="3" height="10" rx="1.2"/>
+      <rect x="56" y="2" width="3" height="9" rx="1.2"/>
+    </g>
+    <text x="50" y="52" font-size="9" text-anchor="middle" fill="#fff" opacity=".85">🦷✨</text>
+  </svg>`;
+  fishWrapper.appendChild(tb);
+  // 牙膏泡泡 + 闪光
+  const sparkTimer = setInterval(() => {
+    if (!fishBrushing) return;
+    const sp = document.createElement('span');
+    sp.className = 'brush-sparkle';
+    sp.textContent = ['✨','💨','🫧'][Math.floor(Math.random()*3)];
+    sp.style.left = (30 + Math.random()*40) + '%';
+    sp.style.top = (8 + Math.random()*16) + '%';
+    fishWrapper.appendChild(sp);
+    sp.addEventListener('animationend', () => sp.remove());
+    if (Math.random() < 0.5) {
+      const b = document.createElement('span');
+      b.className = 'brush-bubble';
+      const s = 4 + Math.random()*8;
+      b.style.width = b.style.height = s + 'px';
+      b.style.left = (35 + Math.random()*30) + '%';
+      b.style.top = (18 + Math.random()*18) + '%';
+      fishWrapper.appendChild(b);
+      b.addEventListener('animationend', () => b.remove());
+    }
+  }, 180);
+  fishSay('我在刷牙！🪥 不要偷看～');
+  playBrushSound(3.2);
+  const DURATION = 3200;
+  setTimeout(() => {
+    clearInterval(sparkTimer);
+    fishWrapper.classList.remove('brushing');
+    fishWrapper.style.transformOrigin = '';
+    tb.remove();
+    fishWrapper.querySelectorAll('.brush-sparkle,.brush-bubble').forEach(el => el.remove());
+    fishWrapper.style.transform = `scaleX(${fishDir})`;
+    fishPaused = false;
+    fishBrushing = false;
+  }, DURATION);
+}
+
 function spawnMeow(el) {
   const rect = el.getBoundingClientRect();
   const meow = document.createElement('span');
@@ -1304,6 +1408,11 @@ fishWrapper.addEventListener('click', async (e) => {
   setTimeout(() => { fishWrapper.style.transform = curScale + ' scale(1.08)';
     setTimeout(() => { fishWrapper.style.transform = curScale; fishBouncing = false; }, 180);
   }, 100);
+
+  // 彩蛋：0.4 概率触发刷牙（在弹跳动画后）
+  if (Math.random() < 0.4) {
+    setTimeout(triggerFishBrush, 420);
+  }
 
   // 彩蛋：50倍数
   if (STATE.click_count % 50 === 0) {
