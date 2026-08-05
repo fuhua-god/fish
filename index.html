@@ -49,11 +49,9 @@ body{
 .fish-wrapper{position:fixed;z-index:5;cursor:pointer;transition:transform .12s ease;filter:drop-shadow(0 10px 25px rgba(0,0,0,.2));-webkit-tap-highlight-color:transparent;outline:none;will-change:left,top,transform}
 .fish-wrapper:active{transform:scale(.9)}
 .fish-float{width:100%;height:100%}
-/* 彩蛋：鱼刷牙 —— 用 class 驱动旋转，!important 防止 JS 每帧 inline transform 覆盖 */
-.fish-wrapper.brushing{transition:transform .45s cubic-bezier(.34,1.56,.64,1);transform-origin:center center !important}
-.fish-wrapper.brushing{transform:rotate(-90deg) !important}
-.fish-wrapper.brushing.face-left{transform:scaleX(-1) rotate(-90deg) !important}
-.fish-wrapper.brushing .fish-float{animation:brushWiggle .35s ease-in-out infinite}
+/* 彩蛋：鱼刷牙 —— 旋转用 JS inline 设到 mainFishSvg（带前缀的 CSS 选择器在此环境对 fish-float 的 transform 不生效，已验证）*/
+.fish-wrapper.brushing .fish-float{transform-origin:center center}
+.fish-wrapper.brushing .fish-float svg{animation:brushWiggle .35s ease-in-out infinite}
 @keyframes brushWiggle{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
 .fish-toothbrush{position:absolute;left:50%;top:14%;width:46%;height:30%;transform:translateX(-50%);transform-origin:bottom center;animation:brushScrub .25s ease-in-out infinite;pointer-events:none;z-index:2;filter:drop-shadow(0 3px 4px rgba(0,0,0,.25))}
 @keyframes brushScrub{0%,100%{transform:translateX(-50%) rotate(-12deg)}50%{transform:translateX(-50%) rotate(12deg)}}
@@ -1428,10 +1426,13 @@ function triggerFishBrush() {
   fishBrushing = true;
   fishPaused = true;                 // 暂停游动
   fishVX = 0; fishVY = 0;
-  // 鱼竖立头朝上：靠 CSS class 驱动 (!important 优先级高于 JS 每帧设的 inline transform)
-  fishWrapper.classList.add('brushing');
-  if (fishDir < 0) fishWrapper.classList.add('face-left');
-  // 挂上牙刷
+  // 鱼竖立头朝上：直接给 mainFishSvg 设 inline transform（该元素不被 updateFishPos 干扰）
+  // 鱼竖立头朝上：JS 直接给 mainFishSvg 设 inline transform（已验证在此环境可靠生效）
+  const fishSvg = document.getElementById('mainFishSvg');
+  fishSvg.style.transformOrigin = 'center center';
+  fishSvg.style.transform = fishDir < 0 ? 'scaleX(-1) rotate(-90deg)' : 'rotate(-90deg)';
+  fishWrapper.classList.add('brushing');   // 触发牙刷摇晃等子动画
+  // 挂上牙刷（挂在 fishSvg 内，跟随旋转）
   const tb = document.createElement('div');
   tb.className = 'fish-toothbrush';
   tb.innerHTML = `<svg width="100%" height="100%" viewBox="0 0 100 60" preserveAspectRatio="xMidYMid meet">
@@ -1444,8 +1445,8 @@ function triggerFishBrush() {
     </g>
     <text x="50" y="52" font-size="9" text-anchor="middle" fill="#fff" opacity=".85">🦷✨</text>
   </svg>`;
-  fishWrapper.appendChild(tb);
-  // 牙膏泡泡 + 闪光
+  fishSvg.appendChild(tb);
+  // 牙膏泡泡 + 闪光（挂在 fishSvg 内，跟随旋转）
   const sparkTimer = setInterval(() => {
     if (!fishBrushing) return;
     const sp = document.createElement('span');
@@ -1453,7 +1454,7 @@ function triggerFishBrush() {
     sp.textContent = ['✨','💨','🫧'][Math.floor(Math.random()*3)];
     sp.style.left = (30 + Math.random()*40) + '%';
     sp.style.top = (8 + Math.random()*16) + '%';
-    fishWrapper.appendChild(sp);
+    fishSvg.appendChild(sp);
     sp.addEventListener('animationend', () => sp.remove());
     if (Math.random() < 0.5) {
       const b = document.createElement('span');
@@ -1462,7 +1463,7 @@ function triggerFishBrush() {
       b.style.width = b.style.height = s + 'px';
       b.style.left = (35 + Math.random()*30) + '%';
       b.style.top = (18 + Math.random()*18) + '%';
-      fishWrapper.appendChild(b);
+      fishSvg.appendChild(b);
       b.addEventListener('animationend', () => b.remove());
     }
   }, 180);
@@ -1472,14 +1473,15 @@ function triggerFishBrush() {
   setTimeout(() => {
     clearInterval(sparkTimer);
     fishWrapper.classList.remove('brushing','face-left');
+    // 平滑转回水平
+    fishSvg.style.transform = fishDir < 0 ? 'scaleX(-1)' : '';
     tb.remove();
-    fishWrapper.querySelectorAll('.brush-sparkle,.brush-bubble').forEach(el => el.remove());
+    fishSvg.querySelectorAll('.brush-sparkle,.brush-bubble').forEach(el => el.remove());
+    setTimeout(() => { fishSvg.style.transition=''; fishSvg.style.transformOrigin=''; }, 500);
     fishPaused = false;
     fishBrushing = false;
   }, DURATION);
 }
-// 测试钩子（验证后删除）
-if (location.search.includes('brushtest')) { window.triggerFishBrush = triggerFishBrush; setTimeout(triggerFishBrush, 1800); }
 
 function spawnMeow(el) {
   const rect = el.getBoundingClientRect();
