@@ -86,6 +86,28 @@ body{
 @media(max-width:768px){.school-countdown{width:94vw;padding:12px 13px}.sc-num{font-size:24px}.sc-title{font-size:14px}}
 @media(max-width:380px){.sc-num{font-size:20px}.sc-lbl{font-size:9px}.sc-grid{gap:5px}.sc-cell{padding:6px 2px 4px}}
 .school-countdown.ended .sc-grid{grid-template-columns:1fr}.school-countdown.ended .sc-cell{padding:12px 4px}.school-countdown.ended .sc-num{font-size:30px}
+/* 每日新闻（手机优先） */
+.daily-news{width:92vw;max-width:380px;background:linear-gradient(135deg,#fff 0%,#f3e5f5 100%);border:2px solid #ce93d8;border-radius:22px;padding:14px 16px;box-shadow:0 8px 26px rgba(156,39,176,.18);display:flex;flex-direction:column;gap:10px}
+.dn-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dn-title{display:flex;align-items:center;gap:6px;font-size:15px;font-weight:bold;color:#8e24aa;letter-spacing:1px}
+.dn-title .dn-icon{font-size:20px;animation:dnSpin 4s linear infinite}
+@keyframes dnSpin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+.dn-date{font-size:11px;color:#7b4a8e;background:#f3e5f5;padding:3px 10px;border-radius:12px;letter-spacing:.5px;white-space:nowrap}
+.dn-list{display:flex;flex-direction:column;gap:7px;max-height:260px;overflow-y:auto;padding-right:4px}
+.dn-list::-webkit-scrollbar{width:4px}.dn-list::-webkit-scrollbar-thumb{background:#ce93d8;border-radius:2px}
+.dn-item{display:flex;gap:9px;align-items:flex-start;padding:9px 10px;background:rgba(255,255,255,.7);border-radius:13px;cursor:pointer;transition:all .18s;text-decoration:none;color:#4a3a4f;-webkit-tap-highlight-color:transparent}
+.dn-item:hover,.dn-item:active{background:#fff;transform:translateX(3px);box-shadow:0 3px 10px rgba(156,39,176,.12)}
+.dn-item .dn-thumb{width:48px;height:48px;border-radius:10px;object-fit:cover;flex-shrink:0;background:#f3e5f5}
+.dn-item .dn-thumb.placeholder{display:flex;align-items:center;justify-content:center;font-size:22px}
+.dn-body{flex:1;min-width:0}
+.dn-item .dn-h{font-size:13px;font-weight:bold;line-height:1.4;color:#4a1f5e;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:3px}
+.dn-item .dn-src{font-size:10px;color:#9c6db4;letter-spacing:.5px}
+.dn-status{font-size:12px;color:#9c6db4;text-align:center;padding:14px;letter-spacing:1px}
+.dn-refresh{align-self:center;font-size:11px;color:#8e24aa;background:rgba(142,36,170,.1);border:none;padding:5px 16px;border-radius:12px;cursor:pointer;font-family:inherit;letter-spacing:1px;-webkit-tap-highlight-color:transparent}
+.dn-refresh:active{background:rgba(142,36,170,.2)}
+.dn-loading{display:inline-block;width:12px;height:12px;border:2px solid #ce93d8;border-top-color:transparent;border-radius:50%;animation:dnSpin .8s linear infinite;vertical-align:middle;margin-right:5px}
+@media(max-width:768px){.daily-news{width:94vw;padding:12px 13px}.dn-title{font-size:14px}.dn-item .dn-h{font-size:12px}.dn-item .dn-thumb{width:42px;height:42px}}
+@media(max-width:380px){.dn-item{padding:7px 8px;gap:7px}.dn-item .dn-thumb{width:38px;height:38px}}
 .game-entry{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
 .entry-btn{background:rgba(255,255,255,.85);border:2px solid #f8bbd0;color:#ec407a;padding:10px 24px;border-radius:25px;font-size:16px;font-weight:bold;cursor:pointer;letter-spacing:1px;font-family:inherit;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
 .entry-btn:hover{background:#fce4ec}
@@ -386,6 +408,14 @@ body{
     <div class="sc-expanded">
       <div class="sc-extra" id="scExtra"></div>
     </div>
+  </div>
+  <div class="daily-news" id="dailyNews">
+    <div class="dn-head">
+      <div class="dn-title"><span class="dn-icon">📰</span><span>每日新鲜事</span></div>
+      <span class="dn-date" id="dnDate">加载中</span>
+    </div>
+    <div class="dn-list" id="dnList"><div class="dn-status"><span class="dn-loading"></span>正在 fetching 今日趣闻…</div></div>
+    <button class="dn-refresh" id="dnRefresh">🔄 换一批</button>
   </div>
   <div class="main-btns">
     <button class="btn-album" onclick="openAlbum()">📖 图鉴</button>
@@ -1268,6 +1298,117 @@ updateClock(); setInterval(updateClock, 1000);
   }
   tick();
   setInterval(tick,1000);
+})();
+
+// ========== 每日新闻（每天早上5点更新，多源趣味资讯）==========
+(function dailyNews(){
+  const el=document.getElementById('dailyNews');
+  if(!el) return;
+  const listEl=document.getElementById('dnList'),dateEl=document.getElementById('dnDate'),refreshBtn=document.getElementById('dnRefresh');
+  const CACHE_KEY='fish_daily_news';
+  const SOURCES=[
+    {rss:'https://sspai.com/feed',                    src:'少数派',   cat:'📲'},
+    {rss:'https://www.ruanyifeng.com/blog/atom.xml',  src:'阮一峰',   cat:'💡'},
+    {rss:'https://feeds.bbci.co.uk/news/technology/rss.xml', src:'BBC科技', cat:'🔬', zh:false},
+    {rss:'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml', src:'BBC科学', cat:'🧪', zh:false},
+  ];
+  const PROXY='https://api.rss2json.com/v1/api.json?rss_url=';
+
+  // 计算"下一个早上5点"的时间戳
+  function nextFiveAM(){
+    const n=new Date();
+    const t=new Date(n.getFullYear(),n.getMonth(),n.getDate(),5,0,0);
+    if(n.getTime()>=t.getTime()) t.setDate(t.getDate()+1); // 今天5点已过，取明天
+    return t.getTime();
+  }
+  // 今天的"新闻日期"标签
+  function todayLabel(){
+    const n=new Date();
+    const h=n.getHours();
+    // 5点前显示"昨日"
+    const d=h<5?new Date(n.getTime()-86400000):n;
+    return `${d.getMonth()+1}月${d.getDate()}日刊`;
+  }
+  // HTML实体解码
+  function decode(s){const d=document.createElement('div');d.innerHTML=s;return (d.textContent||d.innerText||'').trim();}
+  // 简易英文→是否过滤（保留中文优先，英文条作为补充）
+  function pickAndShuffle(all,target){
+    const shuffled=all.sort(()=>Math.random()-0.5);
+    return shuffled.slice(0,target);
+  }
+
+  async function fetchOne(source){
+    try{
+      const url=PROXY+encodeURIComponent(source.rss);
+      const ctrl=new AbortController();
+      const to=setTimeout(()=>ctrl.abort(),8000);
+      const res=await fetch(url,{signal:ctrl.signal});
+      clearTimeout(to);
+      const data=await res.json();
+      if(data.status!=='ok'||!data.items) return [];
+      return data.items.slice(0,6).map(it=>({
+        title:decode(it.title||'').slice(0,80),
+        link:it.link||'#',
+        thumb:(it.thumbnail||''),
+        src:source.src, cat:source.cat, zh:source.zh!==false,
+        pub:it.pubDate||'',
+      })).filter(x=>x.title);
+    }catch(e){return [];}
+  }
+
+  function render(items){
+    if(!items||items.length===0){
+      listEl.innerHTML='<div class="dn-status">😴 今天还没抓到新闻，稍后再来看看吧～</div>';
+      return;
+    }
+    listEl.innerHTML=items.map(it=>{
+      const thumb=it.thumb
+        ? `<img class="dn-thumb" src="${it.thumb}" loading="lazy" onerror="this.outerHTML='<div class=&quot;dn-thumb placeholder&quot;>${it.cat}</div>'">`
+        : `<div class="dn-thumb placeholder">${it.cat}</div>`;
+      return `<a class="dn-item" href="${it.link}" target="_blank" rel="noopener">
+        ${thumb}
+        <div class="dn-body">
+          <div class="dn-h">${it.title}</div>
+          <div class="dn-src">${it.cat} ${it.src}</div>
+        </div>
+      </a>`;
+    }).join('');
+  }
+
+  async function refresh(force){
+    // 1. 先看缓存
+    let cached=null;
+    try{cached=JSON.parse(localStorage.getItem(CACHE_KEY)||'null');}catch(e){}
+    const now=Date.now();
+    if(!force&&cached&&cached.expire>now){
+      dateEl.textContent=todayLabel()+' · 已更新';
+      render(cached.items);
+      return;
+    }
+    // 2. 抓取
+    listEl.innerHTML='<div class="dn-status"><span class="dn-loading"></span>正在抓取今日趣闻…</div>';
+    dateEl.textContent=todayLabel();
+    const results=await Promise.all(SOURCES.map(fetchOne));
+    // 中文优先排序：中文源在前，英文在后，各自打乱
+    const zh=[],en=[];
+    results.flat().forEach(it=>{if(it.zh)zh.push(it);else en.push(it);});
+    const picked=pickAndShuffle(zh,6).concat(pickAndShuffle(en,3)).slice(0,8);
+    if(picked.length===0){
+      // 全失败：若有旧缓存，用它
+      if(cached&&cached.items){render(cached.items);dateEl.textContent=todayLabel()+' · 缓存';return;}
+      listEl.innerHTML='<div class="dn-status">😵 抓取失败，可能网络开小差了<br><span style="font-size:11px;color:#bbb">点"换一批"重试</span></div>';
+      return;
+    }
+    render(picked);
+    dateEl.textContent=todayLabel()+' · 已更新';
+    // 3. 写缓存，过期时间=下一个5点
+    try{localStorage.setItem(CACHE_KEY,JSON.stringify({items:picked,expire:nextFiveAM(),ts:now}));}catch(e){}
+  }
+
+  refreshBtn.addEventListener('click',()=>refresh(true));
+  // 页面可见时检查是否过期（应对长时间挂着跨过5点）
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refresh(false);});
+  refresh(false);
 })();
 
 function playBubbleSound() {
