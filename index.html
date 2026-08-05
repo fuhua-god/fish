@@ -2377,6 +2377,7 @@ const GAMES_LIST = [
   {icon:'🎮',name:'井字棋',desc:'鱼姐 vs 你',fn:()=>{closeGames();enterGame('tictactoe');}},
   {icon:'♟️',name:'五子棋',desc:'先五连者胜',fn:()=>{closeGames();enterGame('gomoku');}},
   {icon:'⚠️',name:'千万别点',desc:'像素闯关大冒险',fn:()=>{closeGames();location.href='game.html';}},
+  {icon:'⛏️',name:'傻鱼工艺',desc:'沙盒生存 · 挖掘建造',fn:()=>{closeGames();location.href='fishcraft.html';}},
   {icon:'🗡️',name:'像素RPG',desc:'传统RPG · 探索战斗',fn:()=>{closeGames();setTimeout(openRPG,300);}},
 ];
 function buildGamesGrid() {
@@ -4732,7 +4733,12 @@ function handleRPGTap(vx, vy) {
 }
 function rpgCanvasClick(e) {
   if (!RPG.active) return;
-  if (RPG.state === 'dialog') { advanceRPGDialog(); }
+  if (RPG.state === 'dialog') { advanceRPGDialog(); return; }
+  // 桌面端：战斗按钮点击（移动端走触摸路径）
+  if (RPG.state === 'battle') {
+    const v = rpgToVirtual(e.clientX, e.clientY);
+    rpgBattleTouch(v.vx, v.vy);
+  }
 }
 
 // ────────── 键盘 ──────────
@@ -5172,7 +5178,12 @@ function renderRPG() {
     // 敌人位置
     const ex = VW/2 - 20, ey = 80;
     ctx.fillStyle = e.clr; ctx.fillRect(ex, ey, 40, 40);
-    ctx.fillStyle = '#fff'; ctx.fillRect(ex+8, ey+8, 12, 12); ctx.fillStyle='#000'; ctx.fillRect(ex+12,ey+10,4,4);
+    ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(ex+2, ey+2, 36, 36);
+    // 怪物图标（emoji 需用系统字体+大字号，像素字体无法渲染）
+    ctx.font='28px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(e.icon, ex+20, ey+21);
+    ctx.textAlign='left'; ctx.textBaseline='alphabetic';
     ctx.fillStyle='#fff'; ctx.font='10px "Press Start 2P","Courier New",monospace';
     ctx.fillText(e.icon+' '+e.name, ex-20, ey-8);
     // 战斗面板
@@ -5184,7 +5195,7 @@ function renderRPG() {
     ctx.fillText('⚔️ '+e.name+(e.isBoss?' [BOSS]':''), 16, VH-108);
     // HP条
     drawHPBar(ctx, 16, VH-96, 200, 10, RPG.player.hp, RPG.player.maxHp);
-    ctx.fillStyle='#fff'; ctx.font='7px "Press Start 2P","Courier New",monospace';
+    ctx.fillStyle='#fff'; ctx.font='8px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';
     ctx.fillText('⚔️ 瑟蕾莉亚 '+RPG.player.hp+'/'+RPG.player.maxHp, 16, VH-92);
     drawHPBar(ctx, 250, VH-96, 200, 10, b.eHp, b.eMaxHp);
     ctx.fillText(e.icon+' '+b.eHp+'/'+b.eMaxHp, 250, VH-92);
