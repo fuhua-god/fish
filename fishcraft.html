@@ -51,6 +51,16 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
 /* 移动端触控 */
 #touch{position:fixed;inset:0;z-index:20;pointer-events:none;display:none}
 #touch.show{display:block}
+
+/* 横屏引导（仅触屏竖屏时显示） */
+#rotateHint{position:fixed;inset:0;z-index:60;background:linear-gradient(160deg,#311b52,#1a1a4e,#4a148c);display:none;align-items:center;justify-content:center;flex-direction:column;gap:22px;color:#fff;text-align:center;padding:30px}
+#rotateHint.show{display:flex}
+.rotate-phone{width:64px;height:104px;border:5px solid #f48fb1;border-radius:12px;position:relative;animation:rotSwing 2s ease-in-out infinite}
+.rotate-phone::before{content:'';position:absolute;top:-3px;left:50%;transform:translateX(-50%);width:22px;height:5px;background:#f48fb1;border-radius:3px 3px 0 0}
+@keyframes rotSwing{0%,100%{transform:rotate(-90deg)}45%,55%{transform:rotate(0deg)}}
+#rotateHint .rt-title{font-size:22px;font-weight:bold;letter-spacing:2px;color:#fff;text-shadow:0 2px 8px rgba(244,143,177,.5)}
+#rotateHint .rt-sub{font-size:14px;color:#e1bee7;letter-spacing:1px;line-height:1.8}
+#rotateHint .rt-fish{font-size:48px;animation:rotSwing 2s ease-in-out infinite}
 #joy{position:absolute;left:24px;bottom:90px;width:120px;height:120px;pointer-events:auto}
 #joyKnob{position:absolute;left:30px;top:30px;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.25);border:2px solid rgba(255,255,255,.4)}
 #joyBase{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.25);border:2px solid rgba(255,255,255,.2)}
@@ -81,6 +91,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a1a2e;font-family:
   <div class="tbtn" id="tBreak">⛏</div>
   <div class="tbtn" id="tPlace">▣</div>
   <div class="tbtn" id="tSlot">🔄</div>
+</div>
+
+<!-- 横屏引导（仅触屏竖屏时显示） -->
+<div id="rotateHint">
+  <div class="rt-fish">🐟</div>
+  <div class="rotate-phone"></div>
+  <div class="rt-title">请横屏游玩</div>
+  <div class="rt-sub">傻鱼工艺在横屏下体验更佳<br>请旋转你的设备 📱➡️</div>
 </div>
 
 <!-- 开始遮罩 -->
@@ -563,6 +581,18 @@ function pAABB(){return {minX:player.x-HW,maxX:player.x+HW,minY:player.y,maxY:pl
 function solidAt(x,y,z){return isSolid(get(Math.floor(x),Math.floor(y),Math.floor(z)));}
 
 function moveEntity(ent,hw,height,vx,vy,vz){
+  // 分步：把本帧位移拆成 ≤0.4 米的小步，防止高速穿透薄方块
+  const maxStep=0.4;
+  const dist=Math.max(Math.abs(vx),Math.abs(vy),Math.abs(vz));
+  const steps=Math.max(1,Math.ceil(dist/maxStep));
+  const sxv=vx/steps, syv=vy/steps, szv=vz/steps;
+  let onGround=false;
+  for(let s=0;s<steps;s++){
+    onGround=moveStep(ent,hw,height,sxv,syv,szv);
+  }
+  return onGround;
+}
+function moveStep(ent,hw,height,vx,vy,vz){
   // X
   ent.x+=vx;
   let a={minX:ent.x-hw,maxX:ent.x+hw,minY:ent.y,maxY:ent.y+height,minZ:ent.z-hw,maxZ:ent.z+hw};
@@ -663,7 +693,7 @@ function updateEnemies(dt){
     if(e.knock>0){e.knock-=dt; e.vel.x=e.knockDir.x*4; e.vel.z=e.knockDir.z*4;}
     else {e.vel.x=dx*spd; e.vel.z=dz*spd;}
     e.vel.y-=GRAVITY*dt;
-    const og=moveEntity(e,0.4,0.8,e.vel.x,e.vel.y,e.vel.z);
+    const og=moveEntity(e,0.4,0.8,e.vel.x*dt,e.vel.y*dt,e.vel.z*dt);
     if(og)e.vel.y=0;
     // 跳上障碍
     if(og && (Math.abs(e.vel.x)>0.1||Math.abs(e.vel.z)>0.1)){
@@ -833,7 +863,7 @@ function updatePlayer(dt){
   // 记录下落起点
   if(player.onGround)player.fallStart=player.y;
   const prevY=player.y;
-  player.onGround=moveEntity(player,HW,PH,player.vx,player.vy,player.vz);
+  player.onGround=moveEntity(player,HW,PH,player.vx*dt,player.vy*dt,player.vz*dt);
   if(player.onGround&&player.vy<=0){
     const fall=player.fallStart!=null?(player.fallStart-player.y):0;
     if(fall>5){damagePlayer(Math.floor(fall-4),0,0);}
@@ -865,6 +895,15 @@ const isTouch=('ontouchstart'in window)||navigator.maxTouchPoints>0;
 const touchInput={f:0,r:0,jump:false};
 if(isTouch){
   touchEl.classList.add('show');
+  // 横屏引导：竖屏时显示，横屏时隐藏
+  const rotHint=document.getElementById('rotateHint');
+  const updateOrientation=()=>{
+    const portrait=window.matchMedia('(orientation: portrait)').matches || innerHeight>innerWidth;
+    rotHint.classList.toggle('show', portrait);
+  };
+  updateOrientation();
+  window.addEventListener('resize',updateOrientation);
+  window.addEventListener('orientationchange',()=>setTimeout(updateOrientation,200));
   const joy=$('joy'),knob=$('joyKnob');
   let joyId=null,joyCx=0,joyCy=0;
   joy.addEventListener('touchstart',e=>{const t=e.changedTouches[0];joyId=t.identifier;const r=joy.getBoundingClientRect();joyCx=r.left+r.width/2;joyCy=r.top+r.height/2;e.preventDefault();},{passive:false});
