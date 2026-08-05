@@ -112,6 +112,55 @@ body{
 .entry-btn{background:rgba(255,255,255,.85);border:2px solid #f8bbd0;color:#ec407a;padding:10px 24px;border-radius:25px;font-size:16px;font-weight:bold;cursor:pointer;letter-spacing:1px;font-family:inherit;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
 .entry-btn:hover{background:#fce4ec}
 .main-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+/* 每日签到（手机优先） */
+.sign-overlay{position:fixed;inset:0;z-index:38;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .35s;backdrop-filter:blur(3px)}
+.sign-overlay.active{opacity:1;pointer-events:auto}
+.sign-panel{background:linear-gradient(160deg,#fff 0%,#fff8e1 60%,#fff3e0 100%);border-radius:24px;padding:20px 18px 16px;width:92vw;max-width:400px;max-height:92vh;overflow-y:auto;box-shadow:0 16px 50px rgba(0,0,0,.35);position:relative;display:flex;flex-direction:column;gap:14px}
+.sign-close{position:absolute;top:10px;right:14px;background:none;border:none;font-size:22px;color:#bbb;cursor:pointer;line-height:1;-webkit-tap-highlight-color:transparent}
+.sign-close:hover{color:#888}
+.sign-title{font-size:20px;font-weight:bold;color:#ff8f00;letter-spacing:2px;text-align:center}
+.sign-points{text-align:center;font-size:15px;color:#5d4037;background:rgba(255,143,0,.12);padding:7px 16px;border-radius:16px;align-self:center}
+.sign-points b{color:#ef6c00;font-size:18px}
+.sign-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.sc-day{text-align:center;padding:8px 2px;border-radius:11px;background:rgba(255,255,255,.6);border:2px solid #ffe0b2;display:flex;flex-direction:column;align-items:center;gap:2px;transition:all .2s;position:relative}
+.sc-day .sc-d-d{font-size:11px;color:#a1887f;letter-spacing:.5px}
+.sc-day .sc-d-p{font-size:14px;font-weight:bold;color:#5d4037}
+.sc-day.done{background:linear-gradient(135deg,#fff9c4,#ffe082);border-color:#ffb74d}
+.sc-day.done .sc-d-p{color:#e65100}
+.sc-day.today{border-color:#ff8f00;border-width:2.5px;box-shadow:0 0 0 2px rgba(255,143,0,.2)}
+.sc-day.today::after{content:'今';position:absolute;top:-7px;right:-3px;font-size:9px;background:#ff8f00;color:#fff;border-radius:7px;padding:1px 4px}
+.sc-day.future{opacity:.5}
+.sign-streak{text-align:center;font-size:12px;color:#8d6e63;letter-spacing:1px}
+.sign-streak b{color:#ef6c00}
+.sign-btn{padding:13px;border-radius:25px;font-size:17px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:3px;border:none;background:linear-gradient(135deg,#ffb74d,#ff8f00);color:#fff;box-shadow:0 5px 16px rgba(255,143,0,.4);transition:all .2s;-webkit-tap-highlight-color:transparent}
+.sign-btn:active{transform:scale(.96)}
+.sign-btn:disabled{background:#e0e0e0;color:#9e9e9e;box-shadow:none;cursor:default}
+.sign-section-title{font-size:14px;font-weight:bold;color:#6d4c41;letter-spacing:1px;margin-top:4px;display:flex;align-items:center;gap:6px}
+.sign-shop{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.shop-item{background:rgba(255,255,255,.75);border:2px solid #ffe0b2;border-radius:15px;padding:11px 9px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.shop-item .si-icon{font-size:30px}
+.shop-item .si-name{font-size:13px;font-weight:bold;color:#5d4037}
+.shop-item .si-desc{font-size:10px;color:#a1887f;line-height:1.4;min-height:24px}
+.shop-item .si-btn{font-size:12px;font-weight:bold;padding:6px 14px;border-radius:14px;border:none;cursor:pointer;font-family:inherit;background:#ff8f00;color:#fff;transition:all .18s;-webkit-tap-highlight-color:transparent;letter-spacing:.5px}
+.shop-item .si-btn:active{transform:scale(.93)}
+.shop-item .si-btn:disabled{background:#e0e0e0;color:#9e9e9e;cursor:default}
+.sign-toast{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);background:rgba(0,0,0,.78);color:#fff;padding:14px 26px;border-radius:18px;font-size:16px;font-weight:bold;z-index:50;opacity:0;pointer-events:none;transition:opacity .3s;letter-spacing:1px;text-align:center}
+.sign-toast.show{opacity:1}
+.sign-points-gain{position:fixed;left:50%;top:35%;transform:translateX(-50%);font-size:32px;font-weight:bold;color:#ff8f00;text-shadow:0 3px 10px rgba(255,143,0,.5);z-index:50;pointer-events:none;opacity:0;animation:ptsFloat 1.4s ease-out forwards}
+@keyframes ptsFloat{0%{opacity:0;transform:translateX(-50%) translateY(20px) scale(.5)}30%{opacity:1;transform:translateX(-50%) translateY(0) scale(1.2)}100%{opacity:0;transform:translateX(-50%) translateY(-60px) scale(1)}}
+.sign-badge-dot{display:inline-block;min-width:18px;height:18px;line-height:18px;background:#ff3d00;color:#fff;font-size:10px;border-radius:9px;text-align:center;vertical-align:top;margin-left:3px;animation:bdPulse 1.2s ease-in-out infinite}
+@keyframes bdPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+@media(max-width:768px){.sign-panel{padding:16px 13px 14px;gap:11px}.sign-title{font-size:18px}.sc-day{padding:6px 1px}.sc-day .sc-d-p{font-size:13px}.shop-item .si-icon{font-size:26px}}
+@media(max-width:360px){.sign-cal{gap:3px}.sc-day .sc-d-d{font-size:10px}.sign-shop{grid-template-columns:1fr}}
+.sc-dow{text-align:center;font-size:10px;color:#bcaaa4;letter-spacing:1px;padding-bottom:2px}
+.sc-day.miss{border-style:dashed;background:#fdecea}
+.sc-day.miss:hover{background:#ffcdd2}
+.sc-day.miss .sc-d-d{color:#c62828}
+.sc-day.miss .sc-d-p{color:#e53935}
+.sign-wishes{display:flex;flex-direction:column;gap:7px;margin-top:-4px}
+.sign-wish-item{display:flex;justify-content:space-between;align-items:center;gap:8px;background:rgba(255,255,255,.75);border:1px solid #ffe0b2;border-radius:12px;padding:8px 12px;font-size:13px;color:#5d4037;text-align:left}
+.sign-wish-item b{color:#ef6c00}
+.sign-wish-item i{font-style:normal;font-size:10px;color:#bcaaa4;white-space:nowrap}
 .btn-album{background:#fff;border:2px solid #f8bbd0;color:#ec407a;padding:8px 18px;border-radius:25px;font-size:14px;font-weight:bold;cursor:pointer;font-family:inherit;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
 .btn-album:hover{background:#fce4ec}
 @media(max-width:768px){.speech-text{font-size:26px}.entry-btn{padding:8px 18px;font-size:14px}}
@@ -420,6 +469,7 @@ body{
   <div class="main-btns">
     <button class="btn-album" onclick="openAlbum()">📖 图鉴</button>
     <button class="btn-album" id="feedBtn" onclick="spawnFoodNearFish()">🍥 饲料</button>
+    <button class="btn-album" id="signBtnEntry" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2);border-color:#ffb74d;color:#e65100" onclick="openSign()">📅 签到</button>
     <button class="btn-album" id="musicBtn" onclick="toggleMusic()">🔇 音乐关</button>
     <button class="btn-album" style="background:linear-gradient(135deg,#4a148c,#7b1fa2);color:#fff;border-color:#6a1b9a" onclick="openGames()">🎮 小游戏</button>
   </div>
@@ -488,6 +538,36 @@ body{
     <button class="days-close" onclick="closeFeed()">🐟 好的～</button>
   </div>
 </div>
+
+<!-- 每日签到 -->
+<div class="sign-overlay" id="signOverlay">
+  <div class="sign-panel">
+    <button class="sign-close" onclick="closeSign()">✕</button>
+    <div class="sign-title">📅 每日签到</div>
+    <div class="sign-points">💰 积分：<b id="signPoints">0</b></div>
+    <div class="sign-cal" id="signCal"></div>
+    <div class="sign-streak" id="signStreak"></div>
+    <button class="sign-btn" id="signBtn" onclick="doSignIn()">签到</button>
+    <div class="sign-section-title">🎁 积分兑换</div>
+    <div class="sign-shop">
+      <div class="shop-item">
+        <div class="si-icon">📝</div>
+        <div class="si-name">补签卡</div>
+        <div class="si-desc">补上漏签的一天<br>（当前持有 <b id="ownMakeup">0</b> 张）</div>
+        <button class="si-btn" id="buyMakeupBtn" onclick="buyMakeup()">100 积分兑换</button>
+      </div>
+      <div class="shop-item">
+        <div class="si-icon">🌟</div>
+        <div class="si-name">许个愿望</div>
+        <div class="si-desc">写下你的小愿望<br>傻鱼会替你记着～</div>
+        <button class="si-btn" id="buyWishBtn" onclick="buyWish()">1000 积分兑换</button>
+      </div>
+    </div>
+    <div class="sign-section-title" id="wishSectionTitle" style="display:none">🌟 我的愿望</div>
+    <div class="sign-wishes" id="signWishes"></div>
+  </div>
+</div>
+<div class="sign-toast" id="signToast"></div>
 
 <!-- 美食转盘 -->
 <div class="wheel-overlay" id="wheelOverlay">
@@ -1688,7 +1768,7 @@ fishWrapper.addEventListener('click', async (e) => {
 // ========== 点击空白处投喂饲料 ==========
 document.addEventListener('click', (e) => {
   // 排除交互元素：按钮、链接、鱼、侧边图、kitty、各种弹窗
-  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, .bs-overlay.active, .stress-overlay.active, .zoom-overlay.active, .battery-overlay.active, .dande-overlay.active, .life-overlay.active, .task-overlay.active, .games-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #gameBoard, .food-pellet')) return;
+  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, .bs-overlay.active, .stress-overlay.active, .zoom-overlay.active, .battery-overlay.active, .dande-overlay.active, .life-overlay.active, .task-overlay.active, .games-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #signOverlay.active, #gameBoard, .food-pellet')) return;
   spawnFoodAt(e.clientX, e.clientY);
 });
 
@@ -3989,6 +4069,225 @@ window.closeTask = function() {
   document.getElementById('marqueeInner').innerHTML = `<span class="marquee-text">${marqueeText}</span><span class="marquee-text">${marqueeText}</span>`;
 })();
 
+// ========== 每日签到 ==========
+const SIGN_COST = { makeup: 100, wish: 1000 };
+
+function signData() {
+  if (!STATE.sign_log || typeof STATE.sign_log !== 'object') STATE.sign_log = {};
+  if (!Array.isArray(STATE.sign_wishes)) STATE.sign_wishes = [];
+  if (STATE.sign_points == null) STATE.sign_points = 0;
+  if (STATE.sign_makeup == null) STATE.sign_makeup = 0;
+}
+
+function signDayShift(dateStr, delta) {
+  const p = dateStr.split('-').map(Number);
+  const d = new Date(p[0], p[1] - 1, p[2] + delta);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+function signReward(streakDay) { return streakDay <= 7 ? streakDay * 2 : 10; }
+
+// 当前连续签到天数（今天已签则含今天，否则截止到昨天）
+function signStreakDays() {
+  signData();
+  let s = 0, cursor = getToday();
+  if (!STATE.sign_log[cursor]) cursor = signDayShift(cursor, -1);
+  while (STATE.sign_log[cursor]) { s++; cursor = signDayShift(cursor, -1); }
+  return s;
+}
+
+// 今天签到可得积分
+function signTodayReward() {
+  signData();
+  const signed = !!STATE.sign_log[getToday()];
+  return signReward(signStreakDays() + (signed ? 0 : 1));
+}
+
+// 补签某天可得的积分（顺着这天往前数连续已签天数）
+function signMakeupReward(dateStr) {
+  let s = 0, cursor = signDayShift(dateStr, -1);
+  while (STATE.sign_log[cursor]) { s++; cursor = signDayShift(cursor, -1); }
+  return signReward(s + 1);
+}
+
+let signToastTimer = null;
+function signToast(msg) {
+  const el = document.getElementById('signToast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(signToastTimer);
+  signToastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+function signEsc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// 入口按钮：未签到时显示今日可得积分
+function updateSignEntry() {
+  signData();
+  const btn = document.getElementById('signBtnEntry');
+  if (!btn) return;
+  const signed = !!STATE.sign_log[getToday()];
+  btn.innerHTML = signed
+    ? '📅 签到 <span class="sign-badge-dot">✓</span>'
+    : '📅 签到 <span class="sign-badge-dot">+' + signTodayReward() + '</span>';
+}
+
+function renderSign() {
+  signData();
+  const today = getToday();
+  document.getElementById('signPoints').textContent = STATE.sign_points;
+  document.getElementById('ownMakeup').textContent = STATE.sign_makeup;
+
+  const streak = signStreakDays();
+  const streakEl = document.getElementById('signStreak');
+  streakEl.innerHTML = STATE.sign_log[today]
+    ? '🔥 已连续签到 <b>' + streak + '</b> 天'
+    : (streak > 0
+        ? '🔥 已连续签到 <b>' + streak + '</b> 天，今天续签可获 <b>' + signTodayReward() + '</b> 分'
+        : '✨ 今天签到可获得 <b>' + signTodayReward() + '</b> 分');
+
+  const btn = document.getElementById('signBtn');
+  if (STATE.sign_log[today] != null) {
+    btn.disabled = true;
+    btn.textContent = '✅ 今日已签到 +' + STATE.sign_log[today] + ' 分';
+  } else {
+    btn.disabled = false;
+    btn.textContent = '📅 签到 +' + signTodayReward() + ' 分';
+  }
+
+  document.getElementById('buyMakeupBtn').disabled = STATE.sign_points < SIGN_COST.makeup;
+  document.getElementById('buyWishBtn').disabled = STATE.sign_points < SIGN_COST.wish;
+
+  renderSignCal(today);
+
+  const wsTitle = document.getElementById('wishSectionTitle');
+  const wsList = document.getElementById('signWishes');
+  if (!STATE.sign_wishes.length) {
+    wsTitle.style.display = 'none';
+    wsList.innerHTML = '';
+  } else {
+    wsTitle.style.display = 'flex';
+    wsList.innerHTML = STATE.sign_wishes.slice(0, 30).map(w =>
+      '<div class="sign-wish-item"><b>🌟 ' + signEsc(w.text) + '</b><i>' + (w.date || '') + '</i></div>'
+    ).join('');
+  }
+}
+
+function renderSignCal(today) {
+  const wrap = document.getElementById('signCal');
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth();
+  const firstDow = (new Date(y, m, 1).getDay() + 6) % 7; // 周一开头
+  const daysInMonth = new Date(y, m + 1, 0).getDate();
+  const streak = signStreakDays();
+  const todaySigned = !!STATE.sign_log[today];
+  const weekLabels = ['一', '二', '三', '四', '五', '六', '日'];
+  let html = weekLabels.map(w => '<div class="sc-dow">' + w + '</div>').join('');
+  for (let i = 0; i < firstDow; i++) html += '<div></div>';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ds = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+    let cls = 'sc-day', dayHtml = '', pts = '';
+    if (STATE.sign_log[ds] != null) {
+      cls += ' done';
+      dayHtml = '✓ ' + d;
+      pts = '+' + STATE.sign_log[ds];
+    } else if (ds === today) {
+      dayHtml = d;
+      pts = '+' + signTodayReward();
+    } else if (ds > today) {
+      cls += ' future';
+      dayHtml = d;
+      pts = '+' + signReward(streak + (todaySigned ? 0 : 1) + (d - now.getDate()));
+    } else {
+      cls += ' miss';
+      dayHtml = d;
+      pts = STATE.sign_makeup > 0 ? '漏 +' + signMakeupReward(ds) : '漏';
+      html += '<div class="' + cls + '"' + (STATE.sign_makeup > 0 ? ' onclick="makeUpSign(\'' + ds + '\')" style="cursor:pointer" title="点我补签"' : '') + '>' +
+        '<span class="sc-d-d">' + dayHtml + '</span><span class="sc-d-p">' + pts + '</span></div>';
+      continue;
+    }
+    if (ds === today) cls += ' today';
+    html += '<div class="' + cls + '"><span class="sc-d-d">' + dayHtml + '</span><span class="sc-d-p">' + pts + '</span></div>';
+  }
+  wrap.innerHTML = html;
+}
+
+function openSign() {
+  signData();
+  renderSign();
+  document.getElementById('signOverlay').classList.add('active');
+}
+
+function closeSign() {
+  document.getElementById('signOverlay').classList.remove('active');
+  updateSignEntry();
+}
+
+async function doSignIn() {
+  signData();
+  const today = getToday();
+  if (STATE.sign_log[today] != null) { signToast('今天已经签过到啦～'); return; }
+  const reward = signTodayReward();
+  STATE.sign_log[today] = reward;
+  STATE.sign_points = (STATE.sign_points || 0) + reward;
+  await saveState({ sign_log: STATE.sign_log, sign_points: STATE.sign_points });
+  renderSign();
+  updateSignEntry();
+  const pts = document.createElement('div');
+  pts.className = 'sign-points-gain';
+  pts.textContent = '+' + reward + ' 积分';
+  document.body.appendChild(pts);
+  setTimeout(() => pts.remove(), 1500);
+  signToast('🎉 签到成功！+' + reward + ' 积分');
+}
+
+async function makeUpSign(dateStr) {
+  signData();
+  if (STATE.sign_log[dateStr] != null) return;
+  if (STATE.sign_makeup <= 0) { signToast('没有补签卡啦～先攒 100 积分换一张吧'); return; }
+  if (dateStr >= getToday()) return;
+  if (!confirm('使用 1 张补签卡补签 ' + dateStr + ' 吗？（可获得当天积分）')) return;
+  const reward = signMakeupReward(dateStr);
+  STATE.sign_makeup--;
+  STATE.sign_points += reward;
+  STATE.sign_log[dateStr] = reward;
+  await saveState({ sign_makeup: STATE.sign_makeup, sign_points: STATE.sign_points, sign_log: STATE.sign_log });
+  renderSign();
+  updateSignEntry();
+  signToast('📝 补签成功 +' + reward + ' 分');
+}
+
+async function buyMakeup() {
+  signData();
+  if (STATE.sign_points < SIGN_COST.makeup) {
+    signToast('积分不足，还差 ' + (SIGN_COST.makeup - STATE.sign_points) + ' 分～');
+    return;
+  }
+  STATE.sign_points -= SIGN_COST.makeup;
+  STATE.sign_makeup++;
+  await saveState({ sign_points: STATE.sign_points, sign_makeup: STATE.sign_makeup });
+  renderSign();
+  signToast('📝 补签卡 +1！点日历上标“漏”的日期就能补签');
+}
+
+async function buyWish() {
+  signData();
+  if (STATE.sign_points < SIGN_COST.wish) {
+    signToast('积分不足，还差 ' + (SIGN_COST.wish - STATE.sign_points) + ' 分～');
+    return;
+  }
+  const text = prompt('🌟 写下你的小愿望（傻鱼会替你记着～）');
+  const wish = (text || '').trim();
+  if (!wish) { signToast('愿望不能为空哦～'); return; }
+  STATE.sign_points -= SIGN_COST.wish;
+  STATE.sign_wishes.unshift({ text: wish, date: getToday() });
+  await saveState({ sign_points: STATE.sign_points, sign_wishes: STATE.sign_wishes });
+  renderSign();
+  signToast('🌟 愿望已记下！');
+}
 // ========== 启动 ==========
 (async function startup() {
   // 1. 加载数据（云端优先，本地兜底）
@@ -4006,6 +4305,7 @@ window.closeTask = function() {
   renderMainFish();
   counterEl.textContent = (STATE.click_count || 0) > 0 ? `这条呆鱼一共说了 ${STATE.click_count} 次 "我是傻鱼"～` : '';
   updateAffectionBar();
+  updateSignEntry();
   // 同步状态标识
   const syncBadge = document.getElementById('syncBadge');
   if (syncBadge) {
