@@ -49,8 +49,10 @@ body{
 .fish-wrapper{position:fixed;z-index:5;cursor:pointer;transition:transform .12s ease;filter:drop-shadow(0 10px 25px rgba(0,0,0,.2));-webkit-tap-highlight-color:transparent;outline:none;will-change:left,top,transform}
 .fish-wrapper:active{transform:scale(.9)}
 .fish-float{width:100%;height:100%}
-/* 彩蛋：鱼刷牙 */
-.fish-wrapper.brushing{transition:transform .45s cubic-bezier(.34,1.56,.64,1)}
+/* 彩蛋：鱼刷牙 —— 用 class 驱动旋转，!important 防止 JS 每帧 inline transform 覆盖 */
+.fish-wrapper.brushing{transition:transform .45s cubic-bezier(.34,1.56,.64,1);transform-origin:center center !important}
+.fish-wrapper.brushing{transform:rotate(-90deg) !important}
+.fish-wrapper.brushing.face-left{transform:scaleX(-1) rotate(-90deg) !important}
 .fish-wrapper.brushing .fish-float{animation:brushWiggle .35s ease-in-out infinite}
 @keyframes brushWiggle{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
 .fish-toothbrush{position:absolute;left:50%;top:14%;width:46%;height:30%;transform:translateX(-50%);transform-origin:bottom center;animation:brushScrub .25s ease-in-out infinite;pointer-events:none;z-index:2;filter:drop-shadow(0 3px 4px rgba(0,0,0,.25))}
@@ -64,6 +66,28 @@ body{
 .counter,.clock{color:#fff;font-size:15px;background:rgba(0,0,0,.35);padding:6px 16px;border-radius:20px;text-shadow:0 1px 2px rgba(0,0,0,.2)}
 .clock{font-size:14px;background:rgba(0,0,0,.3);padding:5px 16px;letter-spacing:1px}
 .ribbon-tag{display:inline-block;background:#f48fb1;color:#fff;padding:4px 14px;border-radius:20px;font-size:13px;letter-spacing:1px;box-shadow:0 3px 10px rgba(244,143,177,.35)}
+/* 开学倒计时（手机优先） */
+.school-countdown{width:92vw;max-width:380px;background:linear-gradient(135deg,#fff 0%,#fff0f5 100%);border:2px solid #f8bbd0;border-radius:22px;padding:14px 16px;box-shadow:0 8px 26px rgba(244,143,177,.25);display:flex;flex-direction:column;gap:10px;cursor:pointer;transition:transform .2s,box-shadow .2s;-webkit-tap-highlight-color:transparent;outline:none}
+.school-countdown:active{transform:scale(.97)}
+.sc-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sc-title{display:flex;align-items:center;gap:6px;font-size:15px;font-weight:bold;color:#ec407a;letter-spacing:1px}
+.sc-title .sc-icon{font-size:22px;animation:scBob 2.4s ease-in-out infinite}
+@keyframes scBob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-3px) rotate(4deg)}}
+.sc-date{font-size:11px;color:#ad7a99;background:#fce4ec;padding:3px 10px;border-radius:12px;letter-spacing:.5px;white-space:nowrap}
+.sc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.sc-cell{background:linear-gradient(160deg,#fce4ec,#f8bbd0);border-radius:14px;padding:8px 4px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:inset 0 -2px 0 rgba(236,64,122,.15)}
+.sc-num{font-size:26px;font-weight:bold;color:#ec407a;line-height:1;font-variant-numeric:tabular-nums;text-shadow:0 2px 6px rgba(236,64,122,.18);transition:transform .12s}
+.sc-num.tick{transform:scale(1.18)}
+.sc-lbl{font-size:10px;color:#880e4f;letter-spacing:1px;opacity:.85}
+.sc-msg{font-size:12px;color:#7b4a6e;text-align:center;letter-spacing:.5px;line-height:1.5}
+.sc-progress{height:6px;background:#fce4ec;border-radius:4px;overflow:hidden}
+.sc-progress-bar{height:100%;background:linear-gradient(90deg,#f48fb1,#ec407a);border-radius:4px;transition:width .6s ease}
+.sc-expanded{overflow:hidden;max-height:0;opacity:0;transition:max-height .4s ease,opacity .3s ease}
+.school-countdown.open .sc-expanded{max-height:120px;opacity:1;margin-top:2px}
+.sc-expanded .sc-extra{font-size:11px;color:#999;text-align:center;line-height:1.7;letter-spacing:.5px}
+@media(max-width:768px){.school-countdown{width:94vw;padding:12px 13px}.sc-num{font-size:24px}.sc-title{font-size:14px}}
+@media(max-width:380px){.sc-num{font-size:20px}.sc-lbl{font-size:9px}.sc-grid{gap:5px}.sc-cell{padding:6px 2px 4px}}
+.school-countdown.ended .sc-grid{grid-template-columns:1fr}.school-countdown.ended .sc-cell{padding:12px 4px}.school-countdown.ended .sc-num{font-size:30px}
 .game-entry{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
 .entry-btn{background:rgba(255,255,255,.85);border:2px solid #f8bbd0;color:#ec407a;padding:10px 24px;border-radius:25px;font-size:16px;font-weight:bold;cursor:pointer;letter-spacing:1px;font-family:inherit;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
 .entry-btn:hover{background:#fce4ec}
@@ -348,6 +372,23 @@ body{
   <p class="clock" id="clock"></p>
   <p class="counter" id="affectionBar" style="background:rgba(244,143,177,0.45)">💖 好感度 0</p>
   <p class="counter" id="syncBadge" style="background:rgba(129,199,132,0.4);font-size:12px;padding:3px 12px">🔄 数据加载中...</p>
+  <div class="school-countdown" id="schoolCountdown" role="button" tabindex="0" aria-label="开学倒计时">
+    <div class="sc-head">
+      <div class="sc-title"><span class="sc-icon">🎒</span><span id="scTitleText">开学倒计时</span></div>
+      <span class="sc-date" id="scDateText">8月23日</span>
+    </div>
+    <div class="sc-grid" id="scGrid">
+      <div class="sc-cell"><span class="sc-num" id="scDays">0</span><span class="sc-lbl">天</span></div>
+      <div class="sc-cell"><span class="sc-num" id="scHours">00</span><span class="sc-lbl">时</span></div>
+      <div class="sc-cell"><span class="sc-num" id="scMins">00</span><span class="sc-lbl">分</span></div>
+      <div class="sc-cell"><span class="sc-num" id="scSecs">00</span><span class="sc-lbl">秒</span></div>
+    </div>
+    <div class="sc-progress"><div class="sc-progress-bar" id="scBar" style="width:0%"></div></div>
+    <div class="sc-msg" id="scMsg">⏳ 加载中...</div>
+    <div class="sc-expanded">
+      <div class="sc-extra" id="scExtra"></div>
+    </div>
+  </div>
   <div class="main-btns">
     <button class="btn-album" onclick="openAlbum()">📖 图鉴</button>
     <button class="btn-album" id="feedBtn" onclick="spawnFoodNearFish()">🍥 饲料</button>
@@ -1156,6 +1197,81 @@ function updateClock() {
 }
 updateClock(); setInterval(updateClock, 1000);
 
+// ========== 开学倒计时（8月23日，自动取今年/明年）==========
+(function schoolCountdown(){
+  const el=document.getElementById('schoolCountdown');
+  if(!el) return;
+  const dEl=document.getElementById('scDays'),hEl=document.getElementById('scHours'),
+        mEl=document.getElementById('scMins'),sEl=document.getElementById('scSecs'),
+        msgEl=document.getElementById('scMsg'),barEl=document.getElementById('scBar'),
+        dateEl=document.getElementById('scDateText'),titleEl=document.getElementById('scTitleText'),
+        extraEl=document.getElementById('scExtra');
+  // 计算目标：今年8月23日 00:00；若已过则取明年
+  function getTarget(){
+    const now=new Date();
+    let y=now.getFullYear();
+    let t=new Date(y,7,23,0,0,0); // 月份0基: 7=8月
+    if(t.getTime()<=now.getTime()) t=new Date(y+1,7,23,0,0,0);
+    return t;
+  }
+  // 起点：用于进度条（暑假开始 ≈ 7月1日）
+  function getStart(target){
+    const y=target.getFullYear();
+    return new Date(y,6,1,0,0,0); // 6=7月
+  }
+  // 点击展开/收起
+  el.addEventListener('click',()=>el.classList.toggle('open'));
+  el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();el.classList.toggle('open');}});
+
+  let lastSec=-1;
+  function tick(){
+    const now=new Date();
+    const target=getTarget();
+    const start=getStart(target);
+    let diff=target.getTime()-now.getTime();
+    if(diff<0) diff=0;
+    const D=Math.floor(diff/86400000);
+    const H=Math.floor(diff%86400000/3600000);
+    const M=Math.floor(diff%3600000/60000);
+    const S=Math.floor(diff%60000/1000);
+    dEl.textContent=D;
+    hEl.textContent=String(H).padStart(2,'0');
+    mEl.textContent=String(M).padStart(2,'0');
+    // 秒数跳动动画
+    if(S!==lastSec){ sEl.textContent=String(S).padStart(2,'0'); sEl.classList.remove('tick'); void sEl.offsetWidth; sEl.classList.add('tick'); lastSec=S; }
+    // 日期文案
+    const md=target.toLocaleDateString('zh-CN',{month:'long',day:'numeric'});
+    dateEl.textContent=md;
+    // 进度条
+    const total=target.getTime()-start.getTime();
+    const passed=now.getTime()-start.getTime();
+    const pct=Math.max(0,Math.min(100,(passed/total)*100));
+    barEl.style.width=pct.toFixed(1)+'%';
+    // 文案
+    if(diff<=0){
+      el.classList.add('ended');
+      titleEl.textContent='开学啦！';
+      msgEl.innerHTML='🎉 <b>今天开学！</b> 新学期加油～ 📚✨';
+      extraEl.innerHTML='傻鱼祝你：<b>门门高分，天天开心！</b> 🐟💖';
+    }else{
+      // 根据剩余天数换文案
+      const msgs=[
+        {max:1,t:'马上开学！',m:'⏰ 最后冲刺！检查作业和书包～',e:'今晚早点睡，明天精神满满地迎接新学期！'},
+        {max:3,t:'开学倒计时',m:'🎒 还有几天啦！文具课本都备齐了吗？',e:'建议今晚整理好书包，免得开学手忙脚乱～'},
+        {max:7,t:'开学倒计时',m:'📅 一周以内开学！暑假作业完成了吗？',e:'趁现在把作业收尾，开学更轻松～'},
+        {max:14,t:'开学倒计时',m:'🌊 暑假余额不足！好好珍惜剩余日子～',e:'可以开始调整作息，慢慢进入学习状态啦～'},
+        {max:999,t:'开学倒计时',m:'🏖️ 还有好多天，慢慢享受暑假吧～',e:'记得劳逸结合，玩够了也要看看书哦～'},
+      ];
+      const c=msgs.find(x=>D<x.max)||msgs[msgs.length-1];
+      titleEl.textContent=c.t;
+      msgEl.innerHTML=c.m;
+      extraEl.innerHTML=c.e+`<br>📅 开学日期：<b>${md}</b> · 已过暑假 <b>${pct.toFixed(0)}%</b>`;
+    }
+  }
+  tick();
+  setInterval(tick,1000);
+})();
+
 function playBubbleSound() {
   const ctx = new (window.AudioContext || window.webkitAudioContext)();
   const o = ctx.createOscillator(), g = ctx.createGain();
@@ -1312,11 +1428,9 @@ function triggerFishBrush() {
   fishBrushing = true;
   fishPaused = true;                 // 暂停游动
   fishVX = 0; fishVY = 0;
-  // 鱼竖立头朝上：绕中心旋转 -90° (画布坐标 y朝下，-90 让鱼头指向上)
-  const cx = fishX + fishSize.w / 2, cy = fishY + fishSize.h / 2;
+  // 鱼竖立头朝上：靠 CSS class 驱动 (!important 优先级高于 JS 每帧设的 inline transform)
   fishWrapper.classList.add('brushing');
-  fishWrapper.style.transformOrigin = `${cx - fishX}px ${cy - fishY}px`;
-  fishWrapper.style.transform = `scaleX(${fishDir}) rotate(-90deg)`;
+  if (fishDir < 0) fishWrapper.classList.add('face-left');
   // 挂上牙刷
   const tb = document.createElement('div');
   tb.className = 'fish-toothbrush';
@@ -1357,15 +1471,15 @@ function triggerFishBrush() {
   const DURATION = 3200;
   setTimeout(() => {
     clearInterval(sparkTimer);
-    fishWrapper.classList.remove('brushing');
-    fishWrapper.style.transformOrigin = '';
+    fishWrapper.classList.remove('brushing','face-left');
     tb.remove();
     fishWrapper.querySelectorAll('.brush-sparkle,.brush-bubble').forEach(el => el.remove());
-    fishWrapper.style.transform = `scaleX(${fishDir})`;
     fishPaused = false;
     fishBrushing = false;
   }, DURATION);
 }
+// 测试钩子（验证后删除）
+if (location.search.includes('brushtest')) { window.triggerFishBrush = triggerFishBrush; setTimeout(triggerFishBrush, 1800); }
 
 function spawnMeow(el) {
   const rect = el.getBoundingClientRect();
