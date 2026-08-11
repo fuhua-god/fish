@@ -825,12 +825,19 @@ async function saveState(updates) {
   lsMerge(LS_STATE_KEY, updates);
   // 使用 UPSERT：行存在则更新，不存在则创建
   try {
-    await fetch(`${SB_URL}/shared_state`, {
+    const r = await fetch(`${SB_URL}/shared_state`, {
       method: 'POST', headers: { ...SB_HEAD, 'Prefer': 'resolution=merge-duplicates' },
       body: JSON.stringify({ id: 1, ...updates })
     });
-    markSynced();
-  } catch(e) {}
+    if (r.ok) {
+      markSynced();
+    } else {
+      // 4xx（比如表里缺 sign_* 列）说明云端结构没跟上，本地已存，先记日志不抛错
+      console.warn('☁️ 云端保存失败 HTTP ' + r.status + '，本次仅写入本地');
+    }
+  } catch(e) {
+    console.warn('☁️ 云端保存异常，本次仅写入本地');
+  }
 }
 
 async function loadUnlocked() {
@@ -882,7 +889,11 @@ async function switchDisplayFish(fishId) {
   await saveState({ display_fish_id: fishId });
 }
 
-function getToday() { return new Date().toISOString().split('T')[0]; }
+// 用本地日期作为「今天」，和日历渲染保持一致，避免 UTC+8 凌晨错位
+function getToday() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
 
 // ========== 鱼数据 ==========
 const RARITY = ['普通','优良','稀有','史诗','传说','隐藏','限量','终极'];
