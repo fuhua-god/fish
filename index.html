@@ -115,6 +115,38 @@ body{
 .dn-loading{display:inline-block;width:12px;height:12px;border:2px solid #ce93d8;border-top-color:transparent;border-radius:50%;animation:dnSpin .8s linear infinite;vertical-align:middle;margin-right:5px}
 @media(max-width:768px){.daily-news{width:94vw;padding:12px 13px}.dn-title{font-size:14px}.dn-item .dn-h{font-size:12px}.dn-item .dn-thumb{width:42px;height:42px}}
 @media(max-width:380px){.dn-item{padding:7px 8px;gap:7px}.dn-item .dn-thumb{width:38px;height:38px}}
+/* 每日一词（高考核心高频词） */
+.daily-word{width:92vw;max-width:380px;background:linear-gradient(135deg,#fff 0%,#e3f2fd 100%);border:2px solid #90caf9;border-radius:22px;padding:14px 16px;box-shadow:0 8px 26px rgba(33,150,243,.18);display:flex;flex-direction:column;gap:11px}
+.dw-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dw-title{display:flex;align-items:center;gap:6px;font-size:15px;font-weight:bold;color:#1565c0;letter-spacing:1px}
+.dw-title .dw-icon{font-size:20px;display:inline-block;animation:dwBob 3s ease-in-out infinite}
+@keyframes dwBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.dw-date{font-size:11px;color:#5b8db5;background:#e3f2fd;padding:3px 10px;border-radius:12px;letter-spacing:.5px;white-space:nowrap}
+.dw-main{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.dw-play{flex-shrink:0;width:42px;height:42px;border-radius:50%;border:none;background:linear-gradient(135deg,#42a5f5,#1e88e5);color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(30,136,229,.4);transition:transform .15s;-webkit-tap-highlight-color:transparent}
+.dw-play:active{transform:scale(.88)}
+.dw-play.playing{animation:dwPulse .7s ease-in-out infinite}
+@keyframes dwPulse{0%,100%{box-shadow:0 4px 12px rgba(30,136,229,.4)}50%{box-shadow:0 4px 22px rgba(30,136,229,.85)}}
+.dw-word{font-size:30px;font-weight:bold;color:#0d47a1;letter-spacing:.5px;cursor:pointer;line-height:1.1;font-family:Georgia,"Times New Roman",serif;transition:transform .12s;-webkit-tap-highlight-color:transparent}
+.dw-word:active{transform:scale(.94)}
+.dw-phon{font-size:15px;color:#1976d2;letter-spacing:.5px}
+.dw-posmean{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dw-pos{font-size:13px;color:#fff;background:#1e88e5;padding:2px 9px;border-radius:10px;font-weight:bold}
+.dw-meaning{font-size:14px;color:#37474f;line-height:1.5}
+.dw-usage{background:rgba(255,255,255,.75);border-left:3px solid #42a5f5;border-radius:0 10px 10px 0;padding:8px 12px;font-size:13px;line-height:1.55}
+.dw-usage .dw-en{color:#0d47a1;margin-bottom:2px}
+.dw-usage .dw-en b{color:#e91e63;background:#fce4ec;border-radius:4px;padding:0 3px}
+.dw-usage .dw-zh{color:#78909c;font-size:12px}
+.dw-section-label{font-size:11px;color:#5b8db5;letter-spacing:1px;margin-top:2px}
+.dw-forms{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px}
+.dw-form{font-size:12px;background:#e1f5fe;border:1px solid #81d4fa;border-radius:10px;padding:3px 10px;color:#01579b;line-height:1.4}
+.dw-form b{color:#0277bd;font-weight:bold}
+.dw-nav{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:2px}
+.dw-nav button{font-size:12px;color:#1565c0;background:rgba(33,150,243,.1);border:none;padding:6px 14px;border-radius:12px;cursor:pointer;font-family:inherit;letter-spacing:1px;-webkit-tap-highlight-color:transparent;transition:background .15s}
+.dw-nav button:active{background:rgba(33,150,243,.25)}
+.dw-counter{font-size:11px;color:#5b8db5;letter-spacing:1px;min-width:56px;text-align:center}
+@media(max-width:768px){.daily-word{width:94vw;padding:12px 13px;gap:9px}.dw-word{font-size:26px}.dw-play{width:38px;height:38px;font-size:18px}}
+@media(max-width:380px){.dw-word{font-size:23px}.dw-phon{font-size:13px}.dw-meaning{font-size:13px}}
 .game-entry{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
 .entry-btn{background:rgba(255,255,255,.85);border:2px solid #f8bbd0;color:#ec407a;padding:10px 24px;border-radius:25px;font-size:16px;font-weight:bold;cursor:pointer;letter-spacing:1px;font-family:inherit;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
 .entry-btn:hover{background:#fce4ec}
@@ -490,6 +522,31 @@ body{
     </div>
     <div class="dn-list" id="dnList"><div class="dn-status"><span class="dn-loading"></span>正在 fetching 今日趣闻…</div></div>
     <button class="dn-refresh" id="dnRefresh">🔄 换一批</button>
+  </div>
+  <div class="daily-word" id="dailyWord">
+    <div class="dw-head">
+      <div class="dw-title"><span class="dw-icon">📖</span><span>每日一词</span></div>
+      <span class="dw-date" id="dwDate">高考核心词汇</span>
+    </div>
+    <div class="dw-main">
+      <button class="dw-play" id="dwPlay" title="点击播放标准读音">🔊</button>
+      <span class="dw-word" id="dwWord" title="点我朗读">word</span>
+      <span class="dw-phon" id="dwPhon">/wɜːrd/</span>
+    </div>
+    <div class="dw-posmean">
+      <span class="dw-pos" id="dwPos">n.</span>
+      <span class="dw-meaning" id="dwMeaning">单词</span>
+    </div>
+    <div class="dw-usage" id="dwUsage"></div>
+    <div id="dwFormsWrap" style="display:none">
+      <div class="dw-section-label">🔁 常见变形</div>
+      <div class="dw-forms" id="dwForms"></div>
+    </div>
+    <div class="dw-nav">
+      <button id="dwPrev">◀ 上一个</button>
+      <span class="dw-counter" id="dwCounter">1 / 172</span>
+      <button id="dwNext">下一个 ▶</button>
+    </div>
   </div>
   <div class="main-btns">
     <button class="btn-album" onclick="openAlbum()">📖 图鉴</button>
@@ -4350,6 +4407,265 @@ window.closeTask = function() {
   document.getElementById('marqueeInner').innerHTML = `<span class="marquee-text">${marqueeText}</span><span class="marquee-text">${marqueeText}</span>`;
 })();
 
+// ========== 每日一词（高考核心高频词，每天自动轮换）==========
+(function dailyWord(){
+  const root=document.getElementById('dailyWord');
+  if(!root) return;
+  const WORDS=[
+{word:"accomplish",phonetic:"/əˈkɑːmplɪʃ/",pos:"vt.",meaning:"完成；实现",usageEn:"She accomplished her goal of becoming a doctor.",usageZh:"她实现了当医生的目标。",forms:[{form:"accomplishment",desc:"n. 成就"},{form:"accomplished",desc:"adj. 有造诣的"}]},
+{word:"achieve",phonetic:"/əˈtʃiːv/",pos:"vt.",meaning:"实现；取得",usageEn:"She worked hard to achieve her dream.",usageZh:"她努力实现了自己的梦想。",forms:[{form:"achievement",desc:"n. 成就"},{form:"achievable",desc:"adj. 可实现的"}]},
+{word:"adapt",phonetic:"/əˈdæpt/",pos:"v.",meaning:"适应；改编",usageEn:"The children adapted to the new school quickly.",usageZh:"孩子们很快适应了新学校。",forms:[{form:"adaptable",desc:"adj. 适应力强的"},{form:"adaptation",desc:"n. 改编"}]},
+{word:"advantage",phonetic:"/ədˈvæntɪdʒ/",pos:"n.",meaning:"优点；优势",usageEn:"Knowing English gives you an advantage in finding a job.",usageZh:"懂英语在找工作时是一种优势。",forms:[{form:"disadvantage",desc:"n. 劣势"},{form:"advantageous",desc:"adj. 有利的"}]},
+{word:"affect",phonetic:"/əˈfekt/",pos:"vt.",meaning:"影响；感动",usageEn:"The bad weather affected our travel plans.",usageZh:"糟糕的天气影响了我们的出行计划。",forms:[{form:"effect",desc:"n. 影响"},{form:"affection",desc:"n. 喜爱"}]},
+{word:"ancient",phonetic:"/ˈeɪnʃənt/",pos:"adj.",meaning:"古代的；古老的",usageEn:"We visited an ancient temple on the mountain.",usageZh:"我们参观了山上的一座古庙。",forms:[]},
+{word:"announce",phonetic:"/əˈnaʊns/",pos:"vt.",meaning:"宣布；通知",usageEn:"The principal announced the exam results.",usageZh:"校长宣布了考试结果。",forms:[{form:"announcement",desc:"n. 通告"},{form:"announcer",desc:"n. 播音员"}]},
+{word:"anxious",phonetic:"/ˈæŋkʃəs/",pos:"adj.",meaning:"焦虑的；渴望的",usageEn:"She felt anxious before the big exam.",usageZh:"大考前她感到焦虑不安。",forms:[{form:"anxiety",desc:"n. 焦虑"},{form:"anxiously",desc:"adv. 焦虑地"}]},
+{word:"apologize",phonetic:"/əˈpɑːlədʒaɪz/",pos:"vi.",meaning:"道歉",usageEn:"He apologized to her for being late.",usageZh:"他因迟到向她道歉。",forms:[{form:"apology",desc:"n. 道歉"},{form:"apologetic",desc:"adj. 歉疚的"}]},
+{word:"apply",phonetic:"/əˈplaɪ/",pos:"v.",meaning:"申请；应用",usageEn:"She decided to apply for the scholarship.",usageZh:"她决定申请这项奖学金。",forms:[{form:"application",desc:"n. 申请"},{form:"applicant",desc:"n. 申请人"}]},
+{word:"appreciate",phonetic:"/əˈpriːʃieɪt/",pos:"vt.",meaning:"感激；欣赏",usageEn:"I really appreciate your kind help.",usageZh:"我非常感谢你的热心帮助。",forms:[{form:"appreciation",desc:"n. 感激"},{form:"appreciative",desc:"adj. 感激的"}]},
+{word:"approach",phonetic:"/əˈproʊtʃ/",pos:"v./n.",meaning:"接近；方法",usageEn:"A new approach is needed to solve the problem.",usageZh:"解决这个问题需要一种新方法。",forms:[{form:"approachable",desc:"adj. 易接近的"}]},
+{word:"arrange",phonetic:"/əˈreɪndʒ/",pos:"v.",meaning:"安排；布置",usageEn:"They arranged a meeting for next Monday.",usageZh:"他们把会议安排在下周一。",forms:[{form:"arrangement",desc:"n. 安排"}]},
+{word:"assume",phonetic:"/əˈsuːm/",pos:"vt.",meaning:"假定；承担",usageEn:"Don't assume anything before you check.",usageZh:"核实之前不要做任何假定。",forms:[{form:"assumption",desc:"n. 假定"}]},
+{word:"attract",phonetic:"/əˈtrækt/",pos:"vt.",meaning:"吸引",usageEn:"The show attracted a large audience.",usageZh:"这场演出吸引了大批观众。",forms:[{form:"attraction",desc:"n. 吸引力"},{form:"attractive",desc:"adj. 迷人的"}]},
+{word:"balance",phonetic:"/ˈbæləns/",pos:"n./v.",meaning:"平衡",usageEn:"It's important to keep a balance between work and rest.",usageZh:"保持劳逸平衡很重要。",forms:[{form:"balanced",desc:"adj. 均衡的"}]},
+{word:"benefit",phonetic:"/ˈbenɪfɪt/",pos:"n./v.",meaning:"益处；受益",usageEn:"Reading every day will benefit your mind.",usageZh:"每天阅读会令你心智受益。",forms:[{form:"beneficial",desc:"adj. 有益的"}]},
+{word:"brilliant",phonetic:"/ˈbrɪliənt/",pos:"adj.",meaning:"杰出的；灿烂的",usageEn:"She came up with a brilliant idea.",usageZh:"她想到了一个绝妙的主意。",forms:[]},
+{word:"calculate",phonetic:"/ˈkælkjuleɪt/",pos:"v.",meaning:"计算；推算",usageEn:"Let's calculate the total cost together.",usageZh:"咱们一起算算总花费。",forms:[{form:"calculation",desc:"n. 计算"},{form:"calculator",desc:"n. 计算器"}]},
+{word:"capable",phonetic:"/ˈkeɪpəbl/",pos:"adj.",meaning:"有能力的",usageEn:"She is capable of doing the job well.",usageZh:"她有能力做好这份工作。",forms:[{form:"capability",desc:"n. 能力"},{form:"incapable",desc:"adj. 无能力的"}]},
+{word:"challenge",phonetic:"/ˈtʃælɪndʒ/",pos:"n./v.",meaning:"挑战",usageEn:"Learning a new language is a real challenge.",usageZh:"学习一门新语言是真正的挑战。",forms:[{form:"challenging",desc:"adj. 有挑战性的"}]},
+{word:"communicate",phonetic:"/kəˈmjuːnɪkeɪt/",pos:"v.",meaning:"交流；沟通",usageEn:"We communicate with friends through messages.",usageZh:"我们通过信息与朋友交流。",forms:[{form:"communication",desc:"n. 交流"},{form:"communicative",desc:"adj. 健谈的"}]},
+{word:"compare",phonetic:"/kəmˈper/",pos:"v.",meaning:"比较；对照",usageEn:"Don't compare yourself with others.",usageZh:"不要拿自己和别人比较。",forms:[{form:"comparison",desc:"n. 比较"},{form:"comparative",desc:"adj. 比较的"}]},
+{word:"compete",phonetic:"/kəmˈpiːt/",pos:"vi.",meaning:"竞争；比赛",usageEn:"They compete against each other for the prize.",usageZh:"他们为奖品相互竞争。",forms:[{form:"competition",desc:"n. 竞赛"},{form:"competitor",desc:"n. 竞争者"},{form:"competitive",desc:"adj. 有竞争力的"}]},
+{word:"complain",phonetic:"/kəmˈpleɪn/",pos:"v.",meaning:"抱怨；控诉",usageEn:"He always complains about the heavy homework.",usageZh:"他总是抱怨作业太多。",forms:[{form:"complaint",desc:"n. 抱怨；投诉"}]},
+{word:"complex",phonetic:"/kəmˈpleks/",pos:"adj.",meaning:"复杂的",usageEn:"This is a complex problem that needs time.",usageZh:"这是个需要时间来解决的复杂问题。",forms:[{form:"complexity",desc:"n. 复杂性"}]},
+{word:"confidence",phonetic:"/ˈkɑːnfɪdəns/",pos:"n.",meaning:"信心；信任",usageEn:"She has the confidence to speak in public.",usageZh:"她有当众发言的信心。",forms:[{form:"confident",desc:"adj. 自信的"},{form:"confide",desc:"v. 吐露"}]},
+{word:"consider",phonetic:"/kənˈsɪdər/",pos:"v.",meaning:"考虑；认为",usageEn:"Please consider my suggestion carefully.",usageZh:"请仔细考虑我的建议。",forms:[{form:"consideration",desc:"n. 考虑"},{form:"considerate",desc:"adj. 体贴的"}]},
+{word:"convince",phonetic:"/kənˈvɪns/",pos:"vt.",meaning:"使确信；说服",usageEn:"He convinced me that he was right.",usageZh:"他让我相信他是对的。",forms:[{form:"convincing",desc:"adj. 有说服力的"},{form:"conviction",desc:"n. 坚信"}]},
+{word:"create",phonetic:"/kriˈeɪt/",pos:"vt.",meaning:"创造；创作",usageEn:"Art helps children create and imagine.",usageZh:"艺术帮助孩子创造和想象。",forms:[{form:"creation",desc:"n. 创造"},{form:"creative",desc:"adj. 有创造力的"},{form:"creativity",desc:"n. 创造力"}]},
+{word:"decline",phonetic:"/dɪˈklaɪn/",pos:"v./n.",meaning:"下降；婉拒",usageEn:"The number of wild tigers has begun to decline.",usageZh:"野生老虎的数量已开始下降。",forms:[]},
+{word:"deliver",phonetic:"/dɪˈlɪvər/",pos:"v.",meaning:"递送；发表",usageEn:"The professor delivered an inspiring speech.",usageZh:"教授发表了一场鼓舞人心的演讲。",forms:[{form:"delivery",desc:"n. 投递"}]},
+{word:"demand",phonetic:"/dɪˈmænd/",pos:"n./v.",meaning:"要求；需求",usageEn:"Good teachers are in great demand.",usageZh:"优秀教师的需求量很大。",forms:[]},
+{word:"depend",phonetic:"/dɪˈpend/",pos:"vi.",meaning:"依靠；取决于",usageEn:"Whether we go depends on the weather.",usageZh:"我们去不去取决于天气。",forms:[{form:"dependence",desc:"n. 依靠"},{form:"independent",desc:"adj. 独立的"}]},
+{word:"describe",phonetic:"/dɪˈskraɪb/",pos:"vt.",meaning:"描述；形容",usageEn:"Words cannot describe how beautiful it is.",usageZh:"言语无法形容它有多美。",forms:[{form:"description",desc:"n. 描述"}]},
+{word:"destroy",phonetic:"/dɪˈstrɔɪ/",pos:"vt.",meaning:"破坏；毁灭",usageEn:"The fire destroyed the whole forest.",usageZh:"大火毁掉了整片森林。",forms:[{form:"destruction",desc:"n. 破坏"},{form:"destructive",desc:"adj. 破坏性的"}]},
+{word:"determine",phonetic:"/dɪˈtɜːrmɪn/",pos:"vt.",meaning:"决定；决心",usageEn:"Hard work determines your future.",usageZh:"努力决定你的未来。",forms:[{form:"determination",desc:"n. 决心"},{form:"determined",desc:"adj. 坚决的"}]},
+{word:"develop",phonetic:"/dɪˈveləp/",pos:"v.",meaning:"发展；养成",usageEn:"Reading helps develop your imagination.",usageZh:"阅读有助于培养想象力。",forms:[{form:"development",desc:"n. 发展"}]},
+{word:"discover",phonetic:"/dɪˈskʌvər/",pos:"vt.",meaning:"发现",usageEn:"Scientists discovered a new species.",usageZh:"科学家发现了一个新物种。",forms:[{form:"discovery",desc:"n. 发现"}]},
+{word:"economy",phonetic:"/ɪˈkɑːnəmi/",pos:"n.",meaning:"经济",usageEn:"The country's economy is growing fast.",usageZh:"这个国家的经济增长很快。",forms:[{form:"economic",desc:"adj. 经济的"},{form:"economist",desc:"n. 经济学家"}]},
+{word:"effect",phonetic:"/ɪˈfekt/",pos:"n.",meaning:"效果；影响",usageEn:"The medicine had a good effect on her.",usageZh:"这药对她效果很好。",forms:[{form:"effective",desc:"adj. 有效的"}]},
+{word:"effort",phonetic:"/ˈefərt/",pos:"n.",meaning:"努力",usageEn:"With a little effort, you can succeed.",usageZh:"稍加努力，你就能成功。",forms:[{form:"effortless",desc:"adj. 不费力的"}]},
+{word:"encourage",phonetic:"/ɪnˈkɜːrɪdʒ/",pos:"vt.",meaning:"鼓励",usageEn:"My parents always encourage me to try.",usageZh:"父母总是鼓励我去尝试。",forms:[{form:"encouragement",desc:"n. 鼓励"},{form:"courage",desc:"n. 勇气"}]},
+{word:"energy",phonetic:"/ˈenərdʒi/",pos:"n.",meaning:"精力；能源",usageEn:"Children seem to have endless energy.",usageZh:"孩子们似乎有使不完的精力。",forms:[{form:"energetic",desc:"adj. 精力充沛的"}]},
+{word:"enjoy",phonetic:"/ɪnˈdʒɔɪ/",pos:"vt.",meaning:"享受；喜欢",usageEn:"I enjoy listening to music after class.",usageZh:"课后我喜欢听听音乐。",forms:[{form:"enjoyment",desc:"n. 乐趣"},{form:"enjoyable",desc:"adj. 令人愉快的"}]},
+{word:"environment",phonetic:"/ɪnˈvaɪrənmənt/",pos:"n.",meaning:"环境",usageEn:"We must protect the environment.",usageZh:"我们必须保护环境。",forms:[{form:"environmental",desc:"adj. 环境的"}]},
+{word:"escape",phonetic:"/ɪˈskeɪp/",pos:"v./n.",meaning:"逃跑；逃避",usageEn:"The prisoner tried to escape at night.",usageZh:"囚犯试图在夜间逃跑。",forms:[]},
+{word:"essential",phonetic:"/ɪˈsenʃl/",pos:"adj.",meaning:"必不可少的",usageEn:"Water is essential to all living things.",usageZh:"水对所有生物都是必不可少的。",forms:[{form:"essence",desc:"n. 本质"}]},
+{word:"establish",phonetic:"/ɪˈstæblɪʃ/",pos:"vt.",meaning:"建立；创立",usageEn:"The school was established in 1950.",usageZh:"这所学校建于1950年。",forms:[]},
+{word:"experience",phonetic:"/ɪkˈspɪriəns/",pos:"n./vt.",meaning:"经验；经历",usageEn:"Travel gives you rich experience.",usageZh:"旅行能给你丰富的阅历。",forms:[{form:"experienced",desc:"adj. 有经验的"},{form:"inexperienced",desc:"adj. 无经验的"}]},
+{word:"experiment",phonetic:"/ɪkˈsperɪmənt/",pos:"n./v.",meaning:"实验",usageEn:"We did an interesting experiment in class.",usageZh:"我们在课上做了一个有趣的实验。",forms:[]},
+{word:"explain",phonetic:"/ɪkˈspleɪn/",pos:"v.",meaning:"解释；说明",usageEn:"Could you explain this sentence to me?",usageZh:"你能给我解释一下这个句子吗？",forms:[{form:"explanation",desc:"n. 解释"}]},
+{word:"explore",phonetic:"/ɪkˈsplɔːr/",pos:"v.",meaning:"探索；探险",usageEn:"They love to explore the unknown world.",usageZh:"他们热爱探索未知世界。",forms:[{form:"exploration",desc:"n. 探索"},{form:"explorer",desc:"n. 探险家"}]},
+{word:"familiar",phonetic:"/fəˈmɪliər/",pos:"adj.",meaning:"熟悉的",usageEn:"This song is familiar to everyone.",usageZh:"这首歌大家都熟悉。",forms:[{form:"unfamiliar",desc:"adj. 不熟悉的"}]},
+{word:"finally",phonetic:"/ˈfaɪnəli/",pos:"adv.",meaning:"最后；终于",usageEn:"Finally, the bus arrived at the stop.",usageZh:"公交车终于到站了。",forms:[{form:"final",desc:"adj. 最后的"}]},
+{word:"forgive",phonetic:"/fərˈɡɪv/",pos:"vt.",meaning:"原谅；宽恕",usageEn:"Please forgive me for my mistake.",usageZh:"请原谅我的错误。",forms:[{form:"forgiveness",desc:"n. 宽恕"}]},
+{word:"gradually",phonetic:"/ˈɡrædʒuəli/",pos:"adv.",meaning:"逐渐地",usageEn:"The weather gradually became warmer.",usageZh:"天气渐渐变暖了。",forms:[{form:"gradual",desc:"adj. 逐渐的"}]},
+{word:"grateful",phonetic:"/ˈɡreɪtfl/",pos:"adj.",meaning:"感激的",usageEn:"I'm grateful for everything you've done.",usageZh:"我感激你做的一切。",forms:[{form:"gratitude",desc:"n. 感激"}]},
+{word:"hesitate",phonetic:"/ˈhezɪteɪt/",pos:"vi.",meaning:"犹豫",usageEn:"Don't hesitate to ask if you need help.",usageZh:"需要帮忙时别犹豫，尽管问。",forms:[{form:"hesitation",desc:"n. 犹豫"}]},
+{word:"honest",phonetic:"/ˈɑːnɪst/",pos:"adj.",meaning:"诚实的",usageEn:"Be honest with yourself and others.",usageZh:"对自己和他人都要诚实。",forms:[{form:"honesty",desc:"n. 诚实"},{form:"dishonest",desc:"adj. 不诚实的"}]},
+{word:"imagine",phonetic:"/ɪˈmædʒɪn/",pos:"vt.",meaning:"想象",usageEn:"I can't imagine life without phones.",usageZh:"我无法想象没有手机的生活。",forms:[{form:"imagination",desc:"n. 想象力"},{form:"imaginative",desc:"adj. 富于想象的"}]},
+{word:"improve",phonetic:"/ɪmˈpruːv/",pos:"v.",meaning:"改善；提高",usageEn:"Practice will improve your English.",usageZh:"练习会提高你的英语。",forms:[{form:"improvement",desc:"n. 改进"}]},
+{word:"increase",phonetic:"/ɪnˈkriːs/",pos:"v./n.",meaning:"增加；增长",usageEn:"The city's population continues to increase.",usageZh:"这座城市的人口持续增长。",forms:[{form:"decrease",desc:"v. 减少(反义)"}]},
+{word:"independent",phonetic:"/ˌɪndɪˈpendənt/",pos:"adj.",meaning:"独立的",usageEn:"She became independent at sixteen.",usageZh:"她十六岁就独立了。",forms:[{form:"independence",desc:"n. 独立"},{form:"depend",desc:"v. 依靠"}]},
+{word:"influence",phonetic:"/ˈɪnfluəns/",pos:"n./vt.",meaning:"影响",usageEn:"Teachers have a great influence on students.",usageZh:"老师对学生有很大的影响。",forms:[]},
+{word:"injure",phonetic:"/ˈɪndʒər/",pos:"vt.",meaning:"伤害；受伤",usageEn:"He injured his leg while playing football.",usageZh:"他踢球时伤了腿。",forms:[{form:"injury",desc:"n. 伤"},{form:"injured",desc:"adj. 受伤的"}]},
+{word:"insist",phonetic:"/ɪnˈsɪst/",pos:"v.",meaning:"坚持",usageEn:"She insisted on paying the bill.",usageZh:"她坚持要买单。",forms:[{form:"insistence",desc:"n. 坚持"}]},
+{word:"introduce",phonetic:"/ˌɪntrəˈduːs/",pos:"vt.",meaning:"介绍；引进",usageEn:"Let me introduce my friend to you.",usageZh:"让我把朋友介绍给你。",forms:[{form:"introduction",desc:"n. 介绍"}]},
+{word:"invent",phonetic:"/ɪnˈvent/",pos:"vt.",meaning:"发明",usageEn:"Bell invented the telephone in 1876.",usageZh:"贝尔于1876年发明了电话。",forms:[{form:"invention",desc:"n. 发明"},{form:"inventor",desc:"n. 发明家"}]},
+{word:"journey",phonetic:"/ˈdʒɜːrni/",pos:"n.",meaning:"旅程",usageEn:"Life is a long journey full of surprises.",usageZh:"人生是一段充满惊喜的漫长旅程。",forms:[]},
+{word:"knowledge",phonetic:"/ˈnɑːlɪdʒ/",pos:"n.",meaning:"知识；学问",usageEn:"Knowledge is power, but practice makes perfect.",usageZh:"知识就是力量，但熟能生巧。",forms:[]},
+{word:"lack",phonetic:"/læk/",pos:"n./v.",meaning:"缺乏；没有",usageEn:"The trip was cancelled for lack of money.",usageZh:"这次旅行因缺钱而取消了。",forms:[]},
+{word:"launch",phonetic:"/lɔːntʃ/",pos:"v./n.",meaning:"发射；发起",usageEn:"They will launch a new satellite next week.",usageZh:"他们下周将发射一颗新卫星。",forms:[]},
+{word:"lazy",phonetic:"/ˈleɪzi/",pos:"adj.",meaning:"懒惰的",usageEn:"Don't be lazy; finish your homework first.",usageZh:"别偷懒，先把作业写完。",forms:[{form:"lazily",desc:"adv. 懒惰地"},{form:"laziness",desc:"n. 懒惰"}]},
+{word:"legal",phonetic:"/ˈliːɡl/",pos:"adj.",meaning:"合法的；法律的",usageEn:"It is legal to drive at 18 in this country.",usageZh:"在这个国家18岁开车是合法的。",forms:[{form:"illegal",desc:"adj. 非法的"},{form:"legally",desc:"adv. 合法地"}]},
+{word:"liberate",phonetic:"/ˈlɪbəreɪt/",pos:"vt.",meaning:"解放；释放",usageEn:"The army liberated the city from the enemy.",usageZh:"军队把这座城市从敌人手中解放了出来。",forms:[{form:"liberation",desc:"n. 解放"},{form:"liberty",desc:"n. 自由"}]},
+{word:"limited",phonetic:"/ˈlɪmɪtɪd/",pos:"adj.",meaning:"有限的",usageEn:"Our time and money are both limited.",usageZh:"我们的时间和金钱都很有限。",forms:[{form:"limit",desc:"n./v. 限制"}]},
+{word:"literature",phonetic:"/ˈlɪtrətʃər/",pos:"n.",meaning:"文学；文献",usageEn:"She has a great interest in English literature.",usageZh:"她对英国文学很感兴趣。",forms:[]},
+{word:"lonely",phonetic:"/ˈloʊnli/",pos:"adj.",meaning:"孤独的；寂寞的",usageEn:"He felt lonely after his best friend moved away.",usageZh:"最好的朋友搬走后，他感到孤独。",forms:[{form:"loneliness",desc:"n. 孤独"}]},
+{word:"luggage",phonetic:"/ˈlʌɡɪdʒ/",pos:"n.",meaning:"行李",usageEn:"Please take care of your luggage at the station.",usageZh:"在车站请照看好您的行李。",forms:[]},
+{word:"machine",phonetic:"/məˈʃiːn/",pos:"n.",meaning:"机器；机械",usageEn:"This machine is used to print books.",usageZh:"这台机器用来印书。",forms:[{form:"machinery",desc:"n. 机械(总称)"}]},
+{word:"magazine",phonetic:"/ˈmæɡəziːn/",pos:"n.",meaning:"杂志",usageEn:"She reads a magazine on the train every morning.",usageZh:"她每天早上在火车上看杂志。",forms:[]},
+{word:"major",phonetic:"/ˈmeɪdʒər/",pos:"adj./n.",meaning:"主要的；专业",usageEn:"Reading is a major part of language learning.",usageZh:"阅读是语言学习的主要部分。",forms:[{form:"majority",desc:"n. 多数"}]},
+{word:"manage",phonetic:"/ˈmænɪdʒ/",pos:"v.",meaning:"管理；设法做到",usageEn:"She managed to finish the task on time.",usageZh:"她设法按时完成了任务。",forms:[{form:"management",desc:"n. 管理"},{form:"manager",desc:"n. 经理"}]},
+{word:"manner",phonetic:"/ˈmænər/",pos:"n.",meaning:"方式；举止",usageEn:"He spoke in a friendly manner to everyone.",usageZh:"他对每个人说话都很友好。",forms:[{form:"manners",desc:"n. 礼貌"}]},
+{word:"material",phonetic:"/məˈtɪriəl/",pos:"n.",meaning:"材料；资料",usageEn:"We need to collect more material for the report.",usageZh:"我们需要为报告收集更多资料。",forms:[]},
+{word:"mature",phonetic:"/məˈtʃʊr/",pos:"adj.",meaning:"成熟的",usageEn:"She is mature enough to make her own decisions.",usageZh:"她已足够成熟，能自己做决定。",forms:[{form:"maturity",desc:"n. 成熟"}]},
+{word:"meanwhile",phonetic:"/ˈmiːnwaɪl/",pos:"adv.",meaning:"同时；在此期间",usageEn:"I cooked dinner; meanwhile, he set the table.",usageZh:"我做了晚饭；与此同时，他摆好了餐桌。",forms:[]},
+{word:"measure",phonetic:"/ˈmeʒər/",pos:"v./n.",meaning:"测量；措施",usageEn:"We must take measures to protect the rivers.",usageZh:"我们必须采取措施保护河流。",forms:[{form:"measurement",desc:"n. 测量"}]},
+{word:"medical",phonetic:"/ˈmedɪkl/",pos:"adj.",meaning:"医疗的；医学的",usageEn:"He needs medical care at once.",usageZh:"他需要立即接受治疗。",forms:[{form:"medicine",desc:"n. 药；医学"}]},
+{word:"memory",phonetic:"/ˈmeməri/",pos:"n.",meaning:"记忆；回忆",usageEn:"This old photo brings back a sweet memory.",usageZh:"这张旧照片唤起一段甜蜜的回忆。",forms:[{form:"memorize",desc:"v. 记忆"},{form:"memorial",desc:"n. 纪念碑"}]},
+{word:"mention",phonetic:"/ˈmenʃn/",pos:"vt.",meaning:"提到；说起",usageEn:"Did she mention me in her letter?",usageZh:"她在信里提到我了吗？",forms:[]},
+{word:"method",phonetic:"/ˈmeθəd/",pos:"n.",meaning:"方法；办法",usageEn:"We need a new method to solve this problem.",usageZh:"我们需要一种新方法来解决这个问题。",forms:[]},
+{word:"military",phonetic:"/ˈmɪləteri/",pos:"adj.",meaning:"军事的；军队的",usageEn:"He served in the military for three years.",usageZh:"他在部队服役了三年。",forms:[]},
+{word:"modern",phonetic:"/ˈmɑːdərn/",pos:"adj.",meaning:"现代的；新式的",usageEn:"Modern technology has changed our lives.",usageZh:"现代科技改变了我们的生活。",forms:[{form:"modernize",desc:"v. 使现代化"}]},
+{word:"modest",phonetic:"/ˈmɑːdɪst/",pos:"adj.",meaning:"谦虚的；适度的",usageEn:"He is modest about his great achievements.",usageZh:"他对自己的伟大成就很谦虚。",forms:[{form:"modesty",desc:"n. 谦虚"}]},
+{word:"narrow",phonetic:"/ˈnæroʊ/",pos:"adj.",meaning:"狭窄的",usageEn:"The road was too narrow for two cars.",usageZh:"这条路太窄，两辆车过不去。",forms:[]},
+{word:"nation",phonetic:"/ˈneɪʃn/",pos:"n.",meaning:"国家；民族",usageEn:"The whole nation celebrated the victory.",usageZh:"全国上下都在庆祝胜利。",forms:[{form:"national",desc:"adj. 国家的"},{form:"nationality",desc:"n. 国籍"}]},
+{word:"native",phonetic:"/ˈneɪtɪv/",pos:"adj.",meaning:"出生地的；本地的",usageEn:"She is a native speaker of English.",usageZh:"她的母语是英语。",forms:[]},
+{word:"natural",phonetic:"/ˈnætʃrəl/",pos:"adj.",meaning:"自然的；天生的",usageEn:"It is natural to feel nervous before a test.",usageZh:"考前感到紧张是正常的。",forms:[{form:"nature",desc:"n. 自然"},{form:"naturally",desc:"adv. 自然地"}]},
+{word:"nearly",phonetic:"/ˈnɪrli/",pos:"adv.",meaning:"几乎；将近",usageEn:"It took nearly two hours to finish.",usageZh:"完成这件事花了将近两个小时。",forms:[]},
+{word:"necessary",phonetic:"/ˈnesəseri/",pos:"adj.",meaning:"必要的；必需的",usageEn:"Sleep is necessary for good health.",usageZh:"睡眠对健康是必不可少的。",forms:[{form:"necessarily",desc:"adv. 必要地"}]},
+{word:"negative",phonetic:"/ˈneɡətɪv/",pos:"adj.",meaning:"消极的；负面的",usageEn:"Don't let negative thoughts stop you.",usageZh:"别让消极的想法阻挡你。",forms:[{form:"positive",desc:"adj. 积极的(反义)"}]},
+{word:"neglect",phonetic:"/nɪˈɡlekt/",pos:"vt.",meaning:"忽视；忽略",usageEn:"Don't neglect your health while working hard.",usageZh:"努力工作的同时别忽视健康。",forms:[]},
+{word:"nervous",phonetic:"/ˈnɜːrvəs/",pos:"adj.",meaning:"紧张的",usageEn:"She was nervous about speaking in public.",usageZh:"她对当众发言感到紧张。",forms:[{form:"nervously",desc:"adv. 紧张地"}]},
+{word:"noble",phonetic:"/ˈnoʊbl/",pos:"adj.",meaning:"高贵的；崇高的",usageEn:"Helping others is a noble thing to do.",usageZh:"帮助别人是高尚的事。",forms:[{form:"nobility",desc:"n. 高贵"}]},
+{word:"normal",phonetic:"/ˈnɔːrml/",pos:"adj.",meaning:"正常的；标准的",usageEn:"It's normal to make mistakes when learning.",usageZh:"学习时犯错是正常的。",forms:[{form:"normally",desc:"adv. 正常地"},{form:"abnormal",desc:"adj. 反常的"}]},
+{word:"notice",phonetic:"/ˈnoʊtɪs/",pos:"v./n.",meaning:"注意；通知",usageEn:"Did you notice the sign on the door?",usageZh:"你注意到门上的标识了吗？",forms:[]},
+{word:"nowadays",phonetic:"/ˈnaʊədeɪz/",pos:"adv.",meaning:"现今；现在",usageEn:"Nowadays many students learn online.",usageZh:"现在很多学生在线学习。",forms:[]},
+{word:"numerous",phonetic:"/ˈnuːmərəs/",pos:"adj.",meaning:"许多的；众多的",usageEn:"There are numerous reasons to learn English.",usageZh:"学习英语的理由有很多。",forms:[{form:"number",desc:"n. 数字"}]},
+{word:"object",phonetic:"/əbˈdʒekt/",pos:"v./n.",meaning:"反对；物体",usageEn:"She objected to the unfair plan.",usageZh:"她反对这个不公平的计划。",forms:[{form:"objection",desc:"n. 反对"},{form:"objective",desc:"n. 目标"}]},
+{word:"obvious",phonetic:"/ˈɑːbviəs/",pos:"adj.",meaning:"明显的",usageEn:"It is obvious that he is lying.",usageZh:"很明显他在撒谎。",forms:[{form:"obviously",desc:"adv. 明显地"}]},
+{word:"occasion",phonetic:"/əˈkeɪʒn/",pos:"n.",meaning:"场合；时机",usageEn:"A birthday is a happy occasion for children.",usageZh:"生日对孩子们来说是个快乐的场合。",forms:[{form:"occasional",desc:"adj. 偶尔的"}]},
+{word:"occupy",phonetic:"/ˈɑːkjəpaɪ/",pos:"vt.",meaning:"占据；使忙碌",usageEn:"Sports occupy most of his free time.",usageZh:"运动占据了他大部分的空闲时间。",forms:[{form:"occupation",desc:"n. 职业；占领"}]},
+{word:"occur",phonetic:"/əˈkɜːr/",pos:"vi.",meaning:"发生；出现",usageEn:"Earthquakes often occur in this area.",usageZh:"这个地区经常发生地震。",forms:[{form:"occurrence",desc:"n. 发生"}]},
+{word:"offer",phonetic:"/ˈɔːfər/",pos:"v./n.",meaning:"提供；出价",usageEn:"He offered to help me with my bags.",usageZh:"他主动提出帮我拿包。",forms:[]},
+{word:"official",phonetic:"/əˈfɪʃl/",pos:"adj./n.",meaning:"官方的；官员",usageEn:"This is the official website of the school.",usageZh:"这是学校的官方网站。",forms:[{form:"officially",desc:"adv. 正式地"}]},
+{word:"opinion",phonetic:"/əˈpɪnjən/",pos:"n.",meaning:"观点；看法",usageEn:"In my opinion, reading is the best hobby.",usageZh:"在我看来，阅读是最好的爱好。",forms:[]},
+{word:"opportunity",phonetic:"/ˌɑːpərˈtuːnəti/",pos:"n.",meaning:"机会；时机",usageEn:"This job is a great opportunity for you.",usageZh:"这份工作对你是个好机会。",forms:[]},
+{word:"optimistic",phonetic:"/ˌɑːptɪˈmɪstɪk/",pos:"adj.",meaning:"乐观的",usageEn:"She is optimistic about her future.",usageZh:"她对未来很乐观。",forms:[{form:"optimism",desc:"n. 乐观"}]},
+{word:"ordinary",phonetic:"/ˈɔːrdneri/",pos:"adj.",meaning:"普通的；平凡的",usageEn:"He is just an ordinary student with a big dream.",usageZh:"他只是个怀有大梦想的普通学生。",forms:[]},
+{word:"organize",phonetic:"/ˈɔːrɡənaɪz/",pos:"vt.",meaning:"组织；筹备",usageEn:"They organized a charity event last weekend.",usageZh:"上周末他们组织了一场慈善活动。",forms:[{form:"organization",desc:"n. 组织"},{form:"organized",desc:"adj. 有条理的"}]},
+{word:"origin",phonetic:"/ˈɔːrɪdʒɪn/",pos:"n.",meaning:"起源；出身",usageEn:"No one knows the origin of this custom.",usageZh:"没人知道这个习俗的起源。",forms:[{form:"original",desc:"adj. 最初的"},{form:"originate",desc:"v. 起源"}]},
+{word:"outcome",phonetic:"/ˈaʊtkʌm/",pos:"n.",meaning:"结果；成果",usageEn:"We are happy with the outcome of the match.",usageZh:"我们对比赛的结果很满意。",forms:[]},
+{word:"overcome",phonetic:"/ˌoʊvərˈkʌm/",pos:"vt.",meaning:"克服；战胜",usageEn:"You must overcome your fear to succeed.",usageZh:"你必须克服恐惧才能成功。",forms:[]},
+{word:"painful",phonetic:"/ˈpeɪnfl/",pos:"adj.",meaning:"痛苦的；疼痛的",usageEn:"The wound was painful but not serious.",usageZh:"伤口很疼，但不严重。",forms:[{form:"pain",desc:"n. 疼痛"},{form:"painfully",desc:"adv. 痛苦地"}]},
+{word:"participate",phonetic:"/pɑːrˈtɪsɪpeɪt/",pos:"vi.",meaning:"参加；参与",usageEn:"All students are encouraged to participate.",usageZh:"鼓励所有学生都来参与。",forms:[{form:"participation",desc:"n. 参与"},{form:"participant",desc:"n. 参与者"}]},
+{word:"particular",phonetic:"/pərˈtɪkjələr/",pos:"adj.",meaning:"特别的；特定的",usageEn:"Is there any particular book you want?",usageZh:"你有特别想要的书吗？",forms:[{form:"particularly",desc:"adv. 特别地"}]},
+{word:"patient",phonetic:"/ˈpeɪʃnt/",pos:"adj./n.",meaning:"有耐心的；病人",usageEn:"Be patient; learning takes time.",usageZh:"耐心点，学习需要时间。",forms:[{form:"patience",desc:"n. 耐心"},{form:"impatient",desc:"adj. 没耐心的"}]},
+{word:"pattern",phonetic:"/ˈpætərn/",pos:"n.",meaning:"模式；图案",usageEn:"The cloth has a beautiful flower pattern.",usageZh:"这块布有漂亮的花纹。",forms:[]},
+{word:"pause",phonetic:"/pɔːz/",pos:"v./n.",meaning:"暂停；停顿",usageEn:"She paused for a moment before answering.",usageZh:"她回答前停顿了一下。",forms:[]},
+{word:"perform",phonetic:"/pərˈfɔːrm/",pos:"v.",meaning:"表演；执行",usageEn:"The band will perform tonight.",usageZh:"乐队今晚会表演。",forms:[{form:"performance",desc:"n. 表演"},{form:"performer",desc:"n. 表演者"}]},
+{word:"permanent",phonetic:"/ˈpɜːrmənənt/",pos:"adj.",meaning:"永久的",usageEn:"The damage to the forest is permanent.",usageZh:"森林受到的破坏是永久性的。",forms:[]},
+{word:"permit",phonetic:"/pərˈmɪt/",pos:"v./n.",meaning:"许可；许可证",usageEn:"Smoking is not permitted here.",usageZh:"这里禁止吸烟。",forms:[{form:"permission",desc:"n. 许可"},{form:"permissible",desc:"adj. 允许的"}]},
+{word:"persist",phonetic:"/pərˈsɪst/",pos:"vi.",meaning:"坚持；持续",usageEn:"She persisted in studying despite difficulties.",usageZh:"尽管困难重重，她仍坚持学习。",forms:[{form:"persistence",desc:"n. 坚持"},{form:"persistent",desc:"adj. 执着的"}]},
+{word:"personal",phonetic:"/ˈpɜːrsənl/",pos:"adj.",meaning:"个人的；私人的",usageEn:"This is a personal letter; don't open it.",usageZh:"这是私人信件，别拆。",forms:[{form:"personality",desc:"n. 个性"},{form:"personally",desc:"adv. 亲自"}]},
+{word:"persuade",phonetic:"/pərˈsweɪd/",pos:"vt.",meaning:"说服；劝服",usageEn:"She persuaded her father to buy the bike.",usageZh:"她说服爸爸买下那辆自行车。",forms:[{form:"persuasion",desc:"n. 说服"}]},
+{word:"physical",phonetic:"/ˈfɪzɪkl/",pos:"adj.",meaning:"身体的；物理的",usageEn:"Regular physical exercise keeps you fit.",usageZh:"经常进行体育锻炼能保持健康。",forms:[{form:"physically",desc:"adv. 身体上"},{form:"physician",desc:"n. 医生"}]},
+{word:"pioneer",phonetic:"/ˌpaɪəˈnɪr/",pos:"n.",meaning:"先驱；开拓者",usageEn:"She was a pioneer in computer science.",usageZh:"她是计算机科学的先驱。",forms:[]},
+{word:"pleasant",phonetic:"/ˈpleznt/",pos:"adj.",meaning:"令人愉快的",usageEn:"We had a pleasant trip to the mountains.",usageZh:"我们去山里的旅行很愉快。",forms:[{form:"please",desc:"v. 使高兴"},{form:"pleasure",desc:"n. 快乐"}]},
+{word:"policy",phonetic:"/ˈpɑːləsi/",pos:"n.",meaning:"政策；方针",usageEn:"The school has a strict no-phone policy.",usageZh:"学校有严格的禁带手机规定。",forms:[]},
+{word:"polite",phonetic:"/pəˈlaɪt/",pos:"adj.",meaning:"礼貌的",usageEn:"It's polite to say thank you.",usageZh:"说“谢谢”是有礼貌的表现。",forms:[{form:"politely",desc:"adv. 礼貌地"},{form:"impolite",desc:"adj. 不礼貌的"}]},
+{word:"political",phonetic:"/pəˈlɪtɪkl/",pos:"adj.",meaning:"政治的",usageEn:"He is not interested in political issues.",usageZh:"他对政治问题不感兴趣。",forms:[{form:"politics",desc:"n. 政治"},{form:"politician",desc:"n. 政客"}]},
+{word:"popular",phonetic:"/ˈpɑːpjələr/",pos:"adj.",meaning:"受欢迎的；流行的",usageEn:"This song is very popular among students.",usageZh:"这首歌在学生中很受欢迎。",forms:[{form:"popularity",desc:"n. 流行"},{form:"popularly",desc:"adv. 通俗地"}]},
+{word:"possess",phonetic:"/pəˈzes/",pos:"vt.",meaning:"拥有；具有",usageEn:"She possesses a great sense of humor.",usageZh:"她很有幽默感。",forms:[{form:"possession",desc:"n. 拥有；财产"}]},
+{word:"potential",phonetic:"/pəˈtenʃl/",pos:"adj./n.",meaning:"潜在的；潜力",usageEn:"Every child has great potential.",usageZh:"每个孩子都有巨大的潜力。",forms:[]},
+{word:"poverty",phonetic:"/ˈpɑːvərti/",pos:"n.",meaning:"贫穷；贫困",usageEn:"Many programs aim to reduce poverty.",usageZh:"许多项目旨在减少贫困。",forms:[{form:"poor",desc:"adj. 贫穷的"}]},
+{word:"practical",phonetic:"/ˈpræktɪkl/",pos:"adj.",meaning:"实际的；实用的",usageEn:"This book gives practical advice on study.",usageZh:"这本书给出了实用的学习建议。",forms:[{form:"practice",desc:"n. 实践"},{form:"practically",desc:"adv. 实际上"}]},
+{word:"praise",phonetic:"/preɪz/",pos:"v./n.",meaning:"赞扬；表扬",usageEn:"The teacher praised him for his hard work.",usageZh:"老师表扬了他的努力。",forms:[]},
+{word:"prefer",phonetic:"/prɪˈfɜːr/",pos:"vt.",meaning:"更喜欢；宁愿",usageEn:"I prefer tea to coffee.",usageZh:"比起咖啡我更喜欢茶。",forms:[{form:"preference",desc:"n. 偏爱"},{form:"preferable",desc:"adj. 更可取的"}]},
+{word:"prepare",phonetic:"/prɪˈper/",pos:"v.",meaning:"准备；筹备",usageEn:"She prepared carefully for the interview.",usageZh:"她为面试做了认真准备。",forms:[{form:"preparation",desc:"n. 准备"}]},
+{word:"present",phonetic:"/ˈpreznt/",pos:"adj./n./v.",meaning:"出席的；礼物；呈现",usageEn:"He gave her a present on her birthday.",usageZh:"他在她生日时送了她一份礼物。",forms:[{form:"presentation",desc:"n. 展示"},{form:"presence",desc:"n. 出席"}]},
+{word:"pressure",phonetic:"/ˈpreʃər/",pos:"n.",meaning:"压力；压强",usageEn:"Students today face a lot of pressure.",usageZh:"今天的学生面临很大压力。",forms:[{form:"press",desc:"v. 按；压"}]},
+{word:"pretend",phonetic:"/prɪˈtend/",pos:"v.",meaning:"假装；装作",usageEn:"He pretended not to hear the question.",usageZh:"他假装没听见这个问题。",forms:[]},
+{word:"prevent",phonetic:"/prɪˈvent/",pos:"vt.",meaning:"阻止；预防",usageEn:"Washing hands helps prevent disease.",usageZh:"洗手有助于预防疾病。",forms:[{form:"prevention",desc:"n. 预防"}]},
+{word:"previous",phonetic:"/ˈpriːviəs/",pos:"adj.",meaning:"以前的；先前的",usageEn:"She did better than in the previous test.",usageZh:"她比上一次考试考得好。",forms:[{form:"previously",desc:"adv. 以前"}]},
+{word:"principle",phonetic:"/ˈprɪnsəpl/",pos:"n.",meaning:"原则；原理",usageEn:"Honesty is one of his main principles.",usageZh:"诚实是他的主要原则之一。",forms:[]},
+{word:"private",phonetic:"/ˈpraɪvət/",pos:"adj.",meaning:"私人的；私有的",usageEn:"Please respect my private space.",usageZh:"请尊重我的私人空间。",forms:[{form:"privacy",desc:"n. 隐私"}]},
+{word:"process",phonetic:"/ˈprɑːses/",pos:"n./v.",meaning:"过程；处理",usageEn:"Learning is a long process.",usageZh:"学习是一个漫长的过程。",forms:[{form:"processor",desc:"n. 处理器"}]},
+{word:"produce",phonetic:"/prəˈduːs/",pos:"v.",meaning:"生产；制造",usageEn:"This factory produces many cars each year.",usageZh:"这家工厂每年生产很多汽车。",forms:[{form:"product",desc:"n. 产品"},{form:"production",desc:"n. 生产"}]},
+{word:"professional",phonetic:"/prəˈfeʃənl/",pos:"adj.",meaning:"专业的；职业的",usageEn:"She is a professional dancer.",usageZh:"她是一名专业舞者。",forms:[{form:"profession",desc:"n. 职业"},{form:"professor",desc:"n. 教授"}]},
+{word:"profit",phonetic:"/ˈprɑːfɪt/",pos:"n.",meaning:"利润；益处",usageEn:"The company made a big profit last year.",usageZh:"这家公司去年利润丰厚。",forms:[{form:"profitable",desc:"adj. 有利可图的"}]},
+{word:"project",phonetic:"/ˈprɑːdʒekt/",pos:"n.",meaning:"项目；工程",usageEn:"Our class is working on a science project.",usageZh:"我们班正在做一个科学项目。",forms:[]},
+{word:"promise",phonetic:"/ˈprɑːmɪs/",pos:"v./n.",meaning:"承诺；保证",usageEn:"He promised to help me with math.",usageZh:"他答应帮我学数学。",forms:[{form:"promising",desc:"adj. 有前途的"}]},
+{word:"promote",phonetic:"/prəˈmoʊt/",pos:"vt.",meaning:"促进；晋升",usageEn:"Exercise promotes good health.",usageZh:"锻炼促进健康。",forms:[{form:"promotion",desc:"n. 促进；晋升"}]},
+{word:"proper",phonetic:"/ˈprɑːpər/",pos:"adj.",meaning:"适当的；正确的",usageEn:"Use the proper tool for each job.",usageZh:"每项工作都要用合适的工具。",forms:[{form:"properly",desc:"adv. 适当地"}]},
+{word:"protect",phonetic:"/prəˈtekt/",pos:"vt.",meaning:"保护；防护",usageEn:"Parents protect their children from danger.",usageZh:"父母保护孩子免受危险。",forms:[{form:"protection",desc:"n. 保护"},{form:"protective",desc:"adj. 保护的"}]},
+{word:"prove",phonetic:"/pruːv/",pos:"v.",meaning:"证明；证实",usageEn:"The test will prove who is right.",usageZh:"这次测试会证明谁是对的。",forms:[{form:"proof",desc:"n. 证据"}]},
+{word:"provide",phonetic:"/prəˈvaɪd/",pos:"vt.",meaning:"提供；供给",usageEn:"Schools provide free lunch for students.",usageZh:"学校为学生提供免费午餐。",forms:[{form:"provision",desc:"n. 供应"}]},
+{word:"publish",phonetic:"/ˈpʌblɪʃ/",pos:"v.",meaning:"出版；发表",usageEn:"She published her first book at twenty.",usageZh:"她二十岁时出版了第一本书。",forms:[{form:"publication",desc:"n. 出版"},{form:"publisher",desc:"n. 出版商"}]},
+{word:"purpose",phonetic:"/ˈpɜːrpəs/",pos:"n.",meaning:"目的；意图",usageEn:"What is the purpose of your visit?",usageZh:"你来访的目的是什么？",forms:[{form:"purposeful",desc:"adj. 有目的的"}]},
+{word:"pursue",phonetic:"/pərˈsuː/",pos:"vt.",meaning:"追求；追逐",usageEn:"She decided to pursue her dream of acting.",usageZh:"她决定追求自己的表演梦想。",forms:[{form:"pursuit",desc:"n. 追求"}]}
+  ];
+
+  const elWord=document.getElementById('dwWord'),
+        elPhon=document.getElementById('dwPhon'),
+        elPlay=document.getElementById('dwPlay'),
+        elPos=document.getElementById('dwPos'),
+        elMeaning=document.getElementById('dwMeaning'),
+        elUsage=document.getElementById('dwUsage'),
+        elFormsWrap=document.getElementById('dwFormsWrap'),
+        elForms=document.getElementById('dwForms'),
+        elCounter=document.getElementById('dwCounter'),
+        elDate=document.getElementById('dwDate'),
+        btnPrev=document.getElementById('dwPrev'),
+        btnNext=document.getElementById('dwNext');
+
+  function todayIndex(){
+    const epoch=new Date(2024,0,1).getTime();
+    const now=new Date();
+    const days=Math.floor((new Date(now.getFullYear(),now.getMonth(),now.getDate()).getTime()-epoch)/86400000);
+    return ((days%WORDS.length)+WORDS.length)%WORDS.length;
+  }
+  let cur=todayIndex();
+
+  function dwEsc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+  function render(){
+    const w=WORDS[cur];
+    elWord.textContent=w.word;
+    elPhon.textContent=w.phonetic;
+    elPos.textContent=w.pos;
+    elMeaning.textContent=w.meaning;
+    const re=new RegExp('\\b'+w.word.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\w*\\b','gi');
+    const en=dwEsc(w.usageEn).replace(re,function(m){return '<b>'+m+'</b>';});
+    elUsage.innerHTML='<div class="dw-en">'+en+'</div><div class="dw-zh">'+dwEsc(w.usageZh)+'</div>';
+    if(w.forms&&w.forms.length){
+      elFormsWrap.style.display='block';
+      elForms.innerHTML=w.forms.map(function(f){return '<span class="dw-form"><b>'+dwEsc(f.form)+'</b> '+dwEsc(f.desc)+'</span>';}).join('');
+    }else{
+      elFormsWrap.style.display='none';
+      elForms.innerHTML='';
+    }
+    elCounter.textContent=(cur+1)+' / '+WORDS.length;
+    elDate.textContent=(cur===todayIndex())?('📅 '+getToday()+' · 今日词'):'📚 浏览中';
+  }
+
+  function pickEnVoice(){
+    if(!window.speechSynthesis) return null;
+    const vs=window.speechSynthesis.getVoices()||[];
+    return vs.find(function(v){return /en[-_]US/i.test(v.lang)&&/female|samantha|zira|aria|jenny|libby|catherine|emma/i.test(v.name);})
+        || vs.find(function(v){return /en[-_]US/i.test(v.lang);})
+        || vs.find(function(v){return /^en/i.test(v.lang);})
+        || null;
+  }
+  function speak(){
+    if(!window.speechSynthesis||typeof SpeechSynthesisUtterance==='undefined'){
+      if(typeof signToast==='function') signToast('🔇 当前设备暂不支持英语朗读'); return;
+    }
+    try{
+      window.speechSynthesis.cancel();
+      const u=new SpeechSynthesisUtterance(WORDS[cur].word);
+      const v=pickEnVoice();
+      if(v) u.voice=v;
+      u.lang=(v&&v.lang)||'en-US';
+      u.rate=0.88; u.pitch=1;
+      elPlay.classList.add('playing');
+      u.onend=function(){ elPlay.classList.remove('playing'); };
+      u.onerror=function(){ elPlay.classList.remove('playing'); };
+      window.speechSynthesis.speak(u);
+    }catch(e){
+      elPlay.classList.remove('playing');
+      if(typeof signToast==='function') signToast('🔇 当前设备暂不支持英语朗读');
+    }
+  }
+  if(window.speechSynthesis){ window.speechSynthesis.getVoices(); }
+
+  elPlay.addEventListener('click',function(e){e.stopPropagation();speak();});
+  elWord.addEventListener('click',speak);
+  btnPrev.addEventListener('click',function(){cur=(cur-1+WORDS.length)%WORDS.length;render();});
+  btnNext.addEventListener('click',function(){cur=(cur+1)%WORDS.length;render();});
+
+  render();
+})();
 // ========== 每日签到 ==========
 const SIGN_COST = { makeup: 100, wish: 1000 };
 
