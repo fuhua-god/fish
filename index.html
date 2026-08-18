@@ -282,6 +282,9 @@ body{
 .days-card .days-close{padding:10px 30px;border-radius:25px;font-size:15px;font-weight:bold;cursor:pointer;font-family:inherit;letter-spacing:2px;border:none;background:#f48fb1;color:#fff;transition:all .2s;-webkit-tap-highlight-color:transparent;outline:none}
 .days-card .days-close:hover{background:#ec407a;transform:scale(1.05)}
 
+/* 彩蛋：周末问候 */
+.weekend-card{background:linear-gradient(160deg,#e3f2fd,#e8eaf6);border:3px solid #90caf9}
+
 /* 彩蛋：生日蛋糕 */
 .birthday-card{background:linear-gradient(160deg,#fff0f6,#ffe0ec);border:3px solid #f8bbd0}
 .birthday-cake{position:relative;width:200px;height:185px;margin:4px auto 0;animation:popIn .6s cubic-bezier(.175,.885,.32,1.275) .15s both}
@@ -639,6 +642,16 @@ body{
       <div class="cake-plate"></div>
     </div>
     <button class="days-close" onclick="closeBirthday()">🎂 许个愿望吧</button>
+  </div>
+</div>
+
+<!-- 彩蛋：周末问候（每周五 12:00 ～ 周日 16:00 首次打开弹出） -->
+<div class="days-overlay" id="weekendOverlay">
+  <div class="days-card weekend-card">
+    <div class="days-emoji" style="font-size:46px">🎒</div>
+    <div class="days-num" style="font-size:34px;color:#1565c0">鱼姐上学辛苦了</div>
+    <div class="days-text">🌈 周末到啦，卸下疲惫，好好休息～</div>
+    <button class="days-close" onclick="closeWeekend()">🐟 收到，去摸鱼～</button>
   </div>
 </div>
 
@@ -1866,6 +1879,29 @@ function spawnConfetti(duration = 4000) {
 function showBirthdayPopup() {
   document.getElementById('birthdayOverlay').classList.add('active');
   spawnConfetti(5000);
+}
+
+// ========== 彩蛋：周末问候（每周五 12:00 ～ 周日 16:00，每个周末首次打开弹出）==========
+function getWeekendGreetKey() {
+  const d = new Date();
+  const day = d.getDay(); // 0=周日 … 5=周五 6=周六
+  let inWindow = false;
+  if (day === 5 && d.getHours() >= 12) inWindow = true;    // 周五 12:00 起
+  else if (day === 6) inWindow = true;                     // 周六全天
+  else if (day === 0 && d.getHours() < 16) inWindow = true; // 周日 16:00 前
+  if (!inWindow) return null;
+  // 以本周五的日期作为这个周末的标识（周五=0、周六=1、周日=2 天前）
+  const fri = new Date(d);
+  fri.setDate(d.getDate() - ((day + 7 - 5) % 7));
+  return fri.getFullYear() + '-' + String(fri.getMonth() + 1).padStart(2, '0') + '-' + String(fri.getDate()).padStart(2, '0');
+}
+
+function closeWeekend() {
+  document.getElementById('weekendOverlay').classList.remove('active');
+}
+
+function showWeekendPopup() {
+  document.getElementById('weekendOverlay').classList.add('active');
 }
 
 // ========== 彩蛋：刷牙音效（Web Audio 合成“沙沙”摩擦声）==========
@@ -4949,6 +4985,15 @@ async function buyWish() {
       }
     }
   } catch(e) { console.log('birthday check error:', e); }
+
+  // 4.55 周末问候彩蛋（每周五 12:00 ～ 周日 16:00，每个周末首次打开弹出一次）
+  try {
+    const weekendKey = getWeekendGreetKey();
+    if (weekendKey && STATE.weekend_greet_key !== weekendKey) {
+      showWeekendPopup();
+      await saveState({ weekend_greet_key: weekendKey });
+    }
+  } catch(e) { console.log('weekend greet check error:', e); }
 
   // 4.6 生日当天同步音乐按钮 UI（按钮文字/标题提示生日歌）
   try { if (isBirthdayToday()) updateMusicUI(); } catch(e) {}
