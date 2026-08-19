@@ -7164,17 +7164,17 @@ function runUpdate(dt) {
   RUN.powers = RUN.powers.filter(p => p.z > RUN.D - 170 && !p.got);
   RUN.decos = RUN.decos.filter(dd => dd.z > RUN.D - 170);
 
-  // 碰撞（z 轴扫掠防高速穿透）
+  // 碰撞（z 轴扫掠防高速穿透；横向阈值=障碍视觉半宽+鱼身半宽再留余量）
   const curH = RUN.slideT > 0 ? 16 : 36;
   for (const o of RUN.obstacles) {
-    const swept = o.z < RUN.D + 14 && o.z + o.depth > zPrev - 12;
+    const swept = o.z < RUN.D + 12 && o.z + o.depth > zPrev - 10;
     if (!swept) continue;
     if (o.type === 'beam') { if (RUN.py + curH > o.gap) runStumble(); continue; }
     if (o.type === 'pit') {
-      if (RUN.py < 3 && o.lanes.some(l => Math.abs(RUN_LX[l] - RUN.px) < 30)) { runGameOver('pit'); return; }
+      if (RUN.py < 3 && o.lanes.some(l => Math.abs(RUN_LX[l] - RUN.px) < 27)) { runGameOver('pit'); return; }
       continue;
     }
-    if (Math.abs(o.x - RUN.px) < 32) {
+    if (Math.abs(o.x - RUN.px) < (o.type === 'rock' ? 25 : 21)) {
       if (o.type === 'rock' && RUN.py > 24) continue;   // 已跳过石墩
       runStumble();
       if (RUN.state !== 'playing') return;
