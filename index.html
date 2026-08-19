@@ -433,6 +433,39 @@ body{
 	#rpgCanvas{image-rendering:pixelated;image-rendering:crisp-edges;-ms-interpolation-mode:nearest-neighbor;display:block;touch-action:manipulation}
 	.rpg-close{position:fixed;top:8px;right:14px;z-index:56;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:15px;width:32px;height:32px;border-radius:50%;cursor:pointer;font-family:inherit}
 	.rpg-close:hover{background:rgba(255,255,255,.2)}
+	/* 傻鱼快跑：神庙逃亡式跑酷（iOS 移动端优先） */
+	.run-overlay{position:fixed;inset:0;z-index:52;background:#032334;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s;font-family:inherit}
+	.run-overlay{-webkit-tap-highlight-color:transparent}
+	.run-overlay.active{opacity:1;pointer-events:auto}
+	#runCanvas{display:block;width:100%;height:100%;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+	.run-btn{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+	.run-close{position:fixed;top:calc(8px + env(safe-area-inset-top,0px));right:14px;z-index:57;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:15px;width:32px;height:32px;border-radius:50%;cursor:pointer;font-family:inherit}
+	.run-close:hover{background:rgba(255,255,255,.2)}
+	.run-hud{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));left:14px;right:56px;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.45)}
+	.run-score{font-size:26px;font-weight:800;letter-spacing:1px;line-height:1.1}
+	.run-best-inline{font-size:11px;opacity:.75;margin-top:2px}
+	.run-coin{font-size:16px;font-weight:700;background:rgba(0,0,0,.28);padding:4px 12px;border-radius:14px;white-space:nowrap}
+	.run-power{position:absolute;left:50%;transform:translateX(-50%);top:calc(58px + env(safe-area-inset-top,0px));display:flex;gap:6px;pointer-events:none}
+	.run-pw{background:rgba(0,0,0,.32);color:#fff;font-size:12px;padding:3px 10px;border-radius:12px;display:flex;align-items:center;gap:5px}
+	.run-pw .bar{width:44px;height:4px;background:rgba(255,255,255,.25);border-radius:2px;overflow:hidden}
+	.run-pw .bar i{display:block;height:100%;background:#ffd54f;border-radius:2px}
+	.run-panel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(86vw,340px);max-height:82vh;overflow-y:auto;background:rgba(6,42,60,.92);border:1px solid rgba(255,255,255,.14);border-radius:22px;padding:24px 20px;text-align:center;color:#fff;box-shadow:0 18px 50px rgba(0,0,0,.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+	.run-title{font-size:29px;font-weight:900;letter-spacing:2px;background:linear-gradient(135deg,#ffd54f,#ff8a65,#4dd0e1);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+	.run-sub{font-size:13px;color:#b2ebf2;opacity:.85;margin:6px 0 14px}
+	.run-gest{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+	.run-gest div{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px 4px;font-size:11px;color:#e0f7fa;line-height:1.5}
+	.run-gest b{display:block;font-size:19px;margin-bottom:4px}
+	.run-best{font-size:13px;color:#ffd54f;margin-bottom:14px}
+	.run-btn{display:block;width:100%;border:none;border-radius:14px;padding:13px;font-size:17px;font-weight:800;font-family:inherit;cursor:pointer;background:linear-gradient(135deg,#ffb74d,#ff7043);color:#4e2600;box-shadow:0 6px 18px rgba(255,112,67,.4)}
+	.run-btn:active{transform:scale(.97)}
+	.run-btn.ghost{background:rgba(255,255,255,.1);color:#e0f7fa;box-shadow:none;margin-top:9px;font-weight:600;font-size:14px;padding:10px}
+	.run-over-title{font-size:20px;font-weight:800;margin-bottom:2px}
+	.run-stats{display:flex;justify-content:center;gap:22px;margin:14px 0 10px}
+	.run-stats div b{display:block;font-size:24px;color:#ffd54f}
+	.run-stats div span{font-size:11px;color:#b2ebf2}
+	.run-newbest{display:inline-block;background:linear-gradient(135deg,#ffd54f,#ffa726);color:#5d4037;font-size:12px;font-weight:800;padding:3px 12px;border-radius:10px;margin-bottom:6px}
+	.run-pts{font-size:13px;color:#a5d6a7;margin:2px 0 12px;min-height:16px}
+	.run-tap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,20,30,.55);color:#fff;font-size:17px;letter-spacing:2px;text-align:center;line-height:1.7}
 	/* 今日三件事 */
 	.task-overlay{position:fixed;inset:0;z-index:43;background:rgba(0,0,0,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s}
 	.task-overlay.active{opacity:1;pointer-events:auto}
@@ -835,6 +868,45 @@ body{
 <div class="rpg-overlay" id="rpgOverlay">
   <button class="rpg-close" onclick="closeRPG()">✕</button>
   <canvas id="rpgCanvas"></canvas>
+</div>
+
+<!-- 傻鱼快跑：神庙逃亡式跑酷（iOS 移动端优先） -->
+<div class="run-overlay" id="runOverlay">
+  <canvas id="runCanvas"></canvas>
+  <button class="run-close" onclick="closeRun()">✕</button>
+  <div class="run-hud">
+    <div><div class="run-score" id="runScore">0</div><div class="run-best-inline" id="runBestInline"></div></div>
+    <div class="run-coin">🍥 <span id="runCoins">0</span></div>
+  </div>
+  <div class="run-power" id="runPower">
+    <div class="run-pw" id="pwMagnet" style="display:none">🧲<span class="bar"><i id="pwMagnetBar" style="width:100%"></i></span></div>
+    <div class="run-pw" id="pwShield" style="display:none">🛡️<span class="bar"><i id="pwShieldBar" style="width:100%"></i></span></div>
+  </div>
+  <div class="run-panel" id="runStart">
+    <div class="run-title">🏃 傻鱼快跑</div>
+    <div class="run-sub">海底神庙大逃亡 · 鲨鱼就在身后！</div>
+    <div class="run-gest">
+      <div><b>⬅️➡️</b>左右滑动<br>切换赛道</div>
+      <div><b>⬆️</b>上滑<br>跳跃</div>
+      <div><b>⬇️</b>下滑<br>滑铲</div>
+    </div>
+    <div class="run-best" id="runBestStart"></div>
+    <button class="run-btn" id="runStartBtn">🚀 开始逃亡</button>
+  </div>
+  <div class="run-panel" id="runOver" style="display:none">
+    <div class="run-over-title" id="runOverTitle">🦈 被鲨鱼追上了！</div>
+    <div class="run-sub" id="runOverSub"></div>
+    <div class="run-stats">
+      <div><b id="runFinalScore">0</b><span>本局得分</span></div>
+      <div><b id="runFinalCoins">0</b><span>鱼粮 🍥</span></div>
+      <div><b id="runFinalBest">0</b><span>最高纪录</span></div>
+    </div>
+    <div><span class="run-newbest" id="runNewBest" style="display:none">🎉 新纪录！</span></div>
+    <div class="run-pts" id="runPtsEarned"></div>
+    <button class="run-btn" id="runRetryBtn">🔁 再跑一次</button>
+    <button class="run-btn ghost" id="runQuitBtn">🏠 回主页</button>
+  </div>
+  <div class="run-tap" id="runPaused" style="display:none"><div>⏸ 已暂停<br><span style="font-size:12px;opacity:.7;letter-spacing:0">点击屏幕继续</span></div></div>
 </div>
 
 <script>
@@ -2142,7 +2214,7 @@ fishWrapper.addEventListener('click', async (e) => {
 // ========== 点击空白处投喂饲料 ==========
 document.addEventListener('click', (e) => {
   // 排除交互元素：按钮、链接、鱼、侧边图、kitty、各种弹窗
-  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, .bs-overlay.active, .stress-overlay.active, .zoom-overlay.active, .battery-overlay.active, .dande-overlay.active, .life-overlay.active, .task-overlay.active, .games-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #signOverlay.active, #gameBoard, .food-pellet')) return;
+  if (e.target.closest('button, a, input, .fish-wrapper, .side-img, .kitty-doll, .game-overlay.active, .gacha-overlay.active, .album-overlay.active, .days-overlay.active, .wheel-overlay.active, .globe-overlay.active, .fortune-overlay.active, .bs-overlay.active, .stress-overlay.active, .zoom-overlay.active, .battery-overlay.active, .dande-overlay.active, .life-overlay.active, .task-overlay.active, .games-overlay.active, .run-overlay.active, #musicBar, #playlistPopup, #feedOverlay.active, #easterOverlay.active, #signOverlay.active, #gameBoard, .food-pellet')) return;
   spawnFoodAt(e.clientX, e.clientY);
 });
 
@@ -2930,7 +3002,7 @@ let colorRevealTimer = null;
 function triggerColorReveal() {
   if (colorRevealActive) return;
   // 排除各种弹窗打开时触发
-  if (document.querySelector('.game-overlay.active,.gacha-overlay.active,.album-overlay.active,.days-overlay.active,.wheel-overlay.active,.globe-overlay.active,.fortune-overlay.active,.bs-overlay.active')) return;
+  if (document.querySelector('.game-overlay.active,.gacha-overlay.active,.album-overlay.active,.days-overlay.active,.wheel-overlay.active,.globe-overlay.active,.fortune-overlay.active,.bs-overlay.active,.run-overlay.active')) return;
 
   colorRevealActive = true;
   const c = COLOR_PALETTE[Math.floor(Math.random() * COLOR_PALETTE.length)];
@@ -3199,6 +3271,7 @@ const GAMES_LIST = [
   {icon:'⚠️',name:'千万别点',desc:'像素闯关大冒险',fn:()=>{closeGames();location.href='game.html';}},
   {icon:'⛏️',name:'傻鱼工艺',desc:'沙盒生存 · 挖掘建造',fn:()=>{closeGames();location.href='fishcraft.html';}},
   {icon:'🗡️',name:'像素RPG',desc:'传统RPG · 探索战斗',fn:()=>{closeGames();setTimeout(openRPG,300);}},
+  {icon:'🏃',name:'傻鱼快跑',desc:'神庙逃亡 · 跑酷逃生',fn:()=>{closeGames();setTimeout(openRun,300);}},
 ];
 function buildGamesGrid() {
   document.getElementById('gamesGrid').innerHTML = GAMES_LIST.map(g =>
@@ -6714,6 +6787,888 @@ window.closeRPG = function() {
 
 // 窗口缩放
 window.addEventListener('resize', () => { if (RPG.active) rpgResize(); });
+
+// ==========================================================
+// ========== 傻鱼快跑：神庙逃亡式跑酷（iOS 移动端优先） ==========
+// ==========================================================
+const RUN = {
+  active:false, state:'ready',           // ready | playing | paused | over
+  canvas:null, ctx:null, W:0, H:0, Wg:0, offX:0, F:0, horizon:0,
+  D:0, speed:0, time:0, lastT:0, animId:0,
+  lane:1, px:0, camX:0, py:0, vy:0, grounded:true, slideT:0, slideQ:false,
+  shield:0, magnet:0, invuln:0, stumbleT:0, shark:0, shake:0, flash:0,
+  obstacles:[], coins:[], powers:[], decos:[], bubbles:[], toasts:[],
+  nextSpawn:0, nextDeco:0, curve:0, curveTarget:0, curveAt:0,
+  coinsGot:0, score:0, best:0, lastMilestone:0, overReason:'',
+  fishHue:10, touch:null, ac:null,
+};
+window.__RUN = RUN;   // 调试钩子
+const RUN_LX = [-46, 0, 46];   // 三赛道中心
+const RUN_ROAD = 78;           // 路面半宽
+const RUN_CAMH = 62;           // 相机高度
+const RUN_CAMD = 95;           // 相机在玩家身后的距离
+const RUN_FOG = 950;           // 远景雾距离
+const RUN_FONT = '-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif';
+
+function runResize() {
+  if (!RUN.canvas) return;
+  const w = window.innerWidth, h = window.innerHeight;
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  RUN.W = w; RUN.H = h;
+  RUN.canvas.width = Math.round(w * dpr);
+  RUN.canvas.height = Math.round(h * dpr);
+  RUN.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  RUN.Wg = Math.min(w, Math.round(h * 0.62));   // 竖屏游戏列宽（桌面端居中收窄）
+  RUN.offX = (w - RUN.Wg) / 2;
+  RUN.F = RUN.Wg * 0.85;
+  RUN.horizon = h * 0.33;
+  const ctx = RUN.ctx;
+  RUN.skyGrad = ctx.createLinearGradient(0, 0, 0, RUN.horizon);
+  RUN.skyGrad.addColorStop(0, '#0e4c70');
+  RUN.skyGrad.addColorStop(1, '#0a3550');
+  RUN.groundGrad = ctx.createLinearGradient(0, RUN.horizon, 0, h);
+  RUN.groundGrad.addColorStop(0, '#1c4f57');
+  RUN.groundGrad.addColorStop(1, '#2c6b6c');
+  RUN.vg = ctx.createRadialGradient(w / 2, h * 0.55, RUN.Wg * 0.5, w / 2, h * 0.55, RUN.Wg * 1.15);
+  RUN.vg.addColorStop(0, 'rgba(0,0,0,0)');
+  RUN.vg.addColorStop(1, 'rgba(0,8,14,.32)');
+}
+
+// 世界 → 屏幕：x 横向 / y 高度 / z 玩家前方距离
+function runProj(x, y, z) {
+  const s = RUN.F / (z + RUN_CAMD);
+  const bend = RUN.curve * (z / 420) * (z / 420) * 26;
+  return { x: RUN.offX + RUN.Wg / 2 + (x - RUN.camX * 0.55 + bend) * s, y: RUN.horizon + (RUN_CAMH - y) * s, s };
+}
+// 屏幕 y → 路面 z（逐行画路面用）
+function runZAt(y) { return RUN_CAMH * RUN.F / Math.max(1, y - RUN.horizon) - RUN_CAMD; }
+function runQuadFill(ctx, x1, y1, x2, y2, x3, y3, x4, y4) {
+  ctx.beginPath();
+  ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.lineTo(x3, y3); ctx.lineTo(x4, y4);
+  ctx.closePath(); ctx.fill();
+}
+function runRoundRect(ctx, x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath(); ctx.fill();
+}
+function runShadowEl(ctx, x, y, rx, ry) {
+  ctx.fillStyle = 'rgba(0,10,16,.28)';
+  ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, 6.2832); ctx.fill();
+}
+
+function runInit() {
+  RUN.canvas = document.getElementById('runCanvas');
+  RUN.ctx = RUN.canvas.getContext('2d');
+  runResize();
+  for (let i = 0; i < 26; i++) RUN.bubbles.push({ x: Math.random(), y: Math.random(), r: 1.5 + Math.random() * 4, v: 12 + Math.random() * 26, a: 0.08 + Math.random() * 0.18 });
+  const ov = document.getElementById('runOverlay');
+  ov.addEventListener('touchstart', runTouchStart, { passive: false });
+  ov.addEventListener('touchmove', runTouchMove, { passive: false });
+  ov.addEventListener('touchend', runTouchEnd);
+  ov.addEventListener('touchcancel', runTouchEnd);
+  document.getElementById('runStartBtn').addEventListener('click', () => runStart());
+  document.getElementById('runRetryBtn').addEventListener('click', () => runStart());
+  document.getElementById('runQuitBtn').addEventListener('click', () => window.closeRun());
+  window.addEventListener('resize', () => { if (RUN.active) runResize(); });
+  window.addEventListener('orientationchange', () => { if (RUN.active) setTimeout(runResize, 300); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && RUN.active && RUN.state === 'playing') runPause(true);
+  });
+  document.addEventListener('keydown', runKeyDown);
+  RUN.best = parseInt((typeof lsGet === 'function' ? lsGet('fish_run_best') : 0) || 0) || 0;
+}
+
+// ────────── 输入：滑动 + 键盘 ──────────
+function runKeyDown(e) {
+  if (!RUN.active) return;
+  const k = e.key;
+  if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' '].includes(k)) e.preventDefault();
+  if (RUN.state === 'ready' && (k === 'Enter' || k === ' ')) { runStart(); return; }
+  if (RUN.state === 'over' && k === 'Enter') { runStart(); return; }
+  if (RUN.state === 'paused' && (k === 'Enter' || k === ' ')) { runPause(false); return; }
+  if (RUN.state !== 'playing') return;
+  if (k === 'ArrowLeft' || k === 'a' || k === 'A') runSwipe('left');
+  else if (k === 'ArrowRight' || k === 'd' || k === 'D') runSwipe('right');
+  else if (k === 'ArrowUp' || k === 'w' || k === 'W' || k === ' ') runSwipe('up');
+  else if (k === 'ArrowDown' || k === 's' || k === 'S') runSwipe('down');
+}
+function runTouchStart(e) {
+  if (e.target.closest('button')) return;   // 按钮走原生点击
+  e.preventDefault();
+  const t = e.changedTouches[0];
+  RUN.touch = { id: t.identifier, x: t.clientX, y: t.clientY, t: performance.now(), done: false };
+}
+function runTouchMove(e) {
+  e.preventDefault();
+  const ts = RUN.touch;
+  if (!ts || ts.done) return;
+  for (const t of e.changedTouches) {
+    if (t.identifier !== ts.id) continue;
+    const dx = t.clientX - ts.x, dy = t.clientY - ts.y;
+    if (Math.abs(dx) < 24 && Math.abs(dy) < 24) return;
+    ts.done = true;
+    if (Math.abs(dx) > Math.abs(dy)) runSwipe(dx > 0 ? 'right' : 'left');
+    else runSwipe(dy > 0 ? 'down' : 'up');
+  }
+}
+function runTouchEnd() {
+  const ts = RUN.touch;
+  RUN.touch = null;
+  if (!ts || ts.done) return;
+  if (performance.now() - ts.t > 350) return;
+  if (RUN.state === 'paused') runPause(false);
+  else if (RUN.state === 'ready') runStart();
+}
+function runSwipe(dir) {
+  if (RUN.state !== 'playing') return;
+  if (dir === 'left') RUN.lane = Math.max(0, RUN.lane - 1);
+  else if (dir === 'right') RUN.lane = Math.min(2, RUN.lane + 1);
+  else if (dir === 'up') {
+    if (RUN.grounded) { RUN.grounded = false; RUN.vy = 830; RUN.slideT = 0; RUN.slideQ = false; runSfx('jump'); }
+  } else if (dir === 'down') {
+    if (!RUN.grounded) { RUN.vy = Math.min(RUN.vy, -820); RUN.slideQ = true; }   // 空中急降接滑铲
+    else { RUN.slideT = 0.62; runSfx('slide'); }
+  }
+}
+
+// ────────── 音效（WebAudio 合成，无需素材） ──────────
+function runSfx(name) {
+  try {
+    if (!RUN.ac) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return; RUN.ac = new AC(); }
+    const ac = RUN.ac;
+    if (ac.state === 'suspended') ac.resume();
+    const P = {
+      jump:  ['square', 300, 620, 0.12, 0.045],
+      slide: ['sawtooth', 240, 110, 0.15, 0.04],
+      coin:  ['sine', 900, 1350, 0.09, 0.06],
+      hit:   ['sawtooth', 170, 55, 0.22, 0.1],
+      power: ['triangle', 480, 980, 0.18, 0.07],
+      over:  ['square', 320, 70, 0.55, 0.09],
+    }[name];
+    if (!P) return;
+    const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain();
+    o.connect(g); g.connect(ac.destination);
+    o.type = P[0];
+    o.frequency.setValueAtTime(P[1], t);
+    o.frequency.exponentialRampToValueAtTime(Math.max(30, P[2]), t + P[3]);
+    g.gain.setValueAtTime(P[4], t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + P[3]);
+    o.start(t); o.stop(t + P[3] + 0.03);
+  } catch (err) {}
+}
+
+// ────────── 关卡生成 ──────────
+function addRock(z, lane) { RUN.obstacles.push({ type: 'rock', z, x: RUN_LX[lane], lane, depth: 14, h: 30 }); }
+function addBeam(z) { RUN.obstacles.push({ type: 'beam', z, x: 0, lane: -1, depth: 12, gap: 26 }); }
+function addPillar(z, lane) { RUN.obstacles.push({ type: 'pillar', z, x: RUN_LX[lane], lane, depth: 12, h: 150 }); }
+function addPit(z, lanes, len) { RUN.obstacles.push({ type: 'pit', z, x: 0, lane: -1, lanes, len, depth: len }); }
+function addCoin(z, lane, y) { RUN.coins.push({ z, x: RUN_LX[lane], y: y == null ? 20 : y }); }
+function addPower(z, lane, kind) { RUN.powers.push({ z, x: RUN_LX[lane], y: 24, kind }); }
+function addDeco(z) {
+  const kinds = ['column', 'seaweed', 'coral', 'rock', 'statue'];
+  const side = Math.random() < 0.5 ? -1 : 1;
+  RUN.decos.push({ z, side, kind: kinds[Math.floor(Math.random() * kinds.length)], x: side * (RUN_ROAD + 30 + Math.random() * 75), seed: Math.random() * 10, h: 55 + Math.random() * 70 });
+}
+function spawnPattern(z) {
+  const diff = Math.min(1, RUN.D / 4200);
+  const rl = () => Math.floor(Math.random() * 3);
+  const other = l => [0, 1, 2].filter(x => x !== l);
+  let len = 210;
+  const t = Math.random();
+  if (t < 0.15) {                                    // 金币之字形
+    let l = rl();
+    for (let i = 0; i < 7; i++) { addCoin(z + i * 36, l, 20); if (i % 2 === 1) l = (l + 1 + Math.floor(Math.random() * 2)) % 3; }
+    len = 7 * 36 + 30;
+  } else if (t < 0.33) {                             // 石墩 + 跳跃弧金币
+    const l = rl(); addRock(z + 60, l);
+    if (Math.random() < 0.6) { for (let i = 0; i < 5; i++) addCoin(z + 14 + i * 23, l, 20 + Math.sin(i / 4 * Math.PI) * 46); }
+    else { const ol = other(l); for (let i = 0; i < 5; i++) addCoin(z + i * 34, ol[i % 2], 20); }
+  } else if (t < 0.5) {                              // 石门横梁 + 滑铲金币
+    addBeam(z + 60);
+    const l = rl(); for (let i = 0; i < 5; i++) addCoin(z + 28 + i * 30, l, 14);
+    if (diff > 0.4 && Math.random() < 0.5) { addRock(z + 230, rl()); len += 170; }
+  } else if (t < 0.64) {                             // 图腾柱守道
+    const l = rl(); addPillar(z + 60, l);
+    const ol = other(l); for (let i = 0; i < 5; i++) addCoin(z + i * 34, ol[i % 2], 20);
+    if (diff > 0.55) { addPillar(z + 210, ol[Math.floor(Math.random() * 2)]); len += 150; }
+  } else if (t < 0.78) {                             // 海沟断路
+    const wide = diff > 0.5 && Math.random() < 0.45;
+    const l = rl();
+    addPit(z + 60, wide ? [l, other(l)[Math.floor(Math.random() * 2)]] : [l], 74);
+    for (let i = 0; i < 5; i++) addCoin(z + 16 + i * 24, l, 26 + Math.sin(i / 4 * Math.PI) * 40);
+    len = 74 + 130;
+  } else if (t < 0.9) {                              // 组合障碍（保证一条活路）
+    const safe = rl(); const rest = other(safe);
+    addRock(z + 50, rest[0]);
+    if (diff > 0.5) addPillar(z + 50, rest[1]);
+    else { addRock(z + 190, rest[1]); len += 140; }
+    for (let i = 0; i < 5; i++) addCoin(z + i * 34, safe, 20);
+  } else {                                           // 道具奖励段
+    const l = rl();
+    addPower(z + 60, l, Math.random() < 0.5 ? 'magnet' : 'shield');
+    for (let i = 0; i < 6; i++) addCoin(z + 120 + i * 34, l, 20);
+    len = 120 + 6 * 34 + 30;
+  }
+  RUN.nextSpawn = z + len + 150 - diff * 70 + Math.random() * 60;
+}
+
+// ────────── 状态流转 ──────────
+function runSetupReady() {
+  RUN.state = 'ready';
+  RUN.D = 0; RUN.speed = 0; RUN.time = 0;
+  RUN.lane = 1; RUN.px = 0; RUN.camX = 0; RUN.py = 0; RUN.vy = 0;
+  RUN.grounded = false; RUN.slideT = 0; RUN.slideQ = false;
+  RUN.shield = 0; RUN.magnet = 0; RUN.invuln = 0; RUN.stumbleT = 0; RUN.shark = 0;
+  RUN.shake = 0; RUN.flash = 0; RUN.curve = 0; RUN.curveTarget = 0; RUN.curveAt = 400;
+  RUN.obstacles = []; RUN.coins = []; RUN.powers = []; RUN.decos = []; RUN.toasts = [];
+  RUN.nextSpawn = 0; RUN.nextDeco = 0; RUN.coinsGot = 0; RUN.score = 0; RUN.lastMilestone = 0;
+  document.getElementById('runStart').style.display = '';
+  document.getElementById('runOver').style.display = 'none';
+  document.getElementById('runPaused').style.display = 'none';
+  document.getElementById('runBestStart').textContent = RUN.best > 0 ? '🏆 最高纪录：' + RUN.best + ' 分' : '🎬 第一次逃亡，加油！';
+  document.getElementById('runBestInline').textContent = RUN.best > 0 ? '🏆 ' + RUN.best : '';
+  document.getElementById('runScore').textContent = '0';
+  document.getElementById('runCoins').textContent = '0';
+  runUpdateHudPower();
+}
+function runStart() {
+  RUN.obstacles = []; RUN.coins = []; RUN.powers = [];
+  RUN.lane = 1; RUN.px = 0; RUN.camX = 0; RUN.py = 0; RUN.vy = 0;
+  RUN.grounded = true; RUN.slideT = 0; RUN.slideQ = false;
+  RUN.shield = 0; RUN.magnet = 0; RUN.invuln = 0; RUN.stumbleT = 0; RUN.shark = 0;
+  RUN.shake = 0; RUN.flash = 0; RUN.speed = 300;
+  RUN.coinsGot = 0; RUN.score = 0; RUN.lastMilestone = 0; RUN.toasts = [];
+  RUN.nextSpawn = RUN.D + 420;
+  RUN.state = 'playing';
+  document.getElementById('runStart').style.display = 'none';
+  document.getElementById('runOver').style.display = 'none';
+  runSfx('power');
+}
+function runPause(on) {
+  if (on && RUN.state === 'playing') {
+    RUN.state = 'paused';
+    document.getElementById('runPaused').style.display = '';
+  } else if (!on && RUN.state === 'paused') {
+    RUN.state = 'playing';
+    document.getElementById('runPaused').style.display = 'none';
+  }
+}
+function runStumble() {
+  if (RUN.invuln > 0) return;
+  if (RUN.shield > 0) { RUN.shield = 0; RUN.invuln = 1.2; RUN.flash = 0.45; runSfx('power'); return; }
+  if (RUN.shark > 0.42) { runGameOver('shark'); return; }
+  RUN.shark = 1; RUN.speed *= 0.55; RUN.invuln = 1.1; RUN.shake = 1; RUN.stumbleT = 0.6;
+  RUN.toasts.push({ txt: '💥 踉跄！鲨鱼逼近了！', t: 0 });
+  runSfx('hit');
+}
+function runGameOver(reason) {
+  if (RUN.state !== 'playing') return;
+  RUN.state = 'over'; RUN.overReason = reason;
+  RUN.flash = 0.9; RUN.shake = 1;
+  runSfx('over');
+  RUN.newBest = RUN.score > RUN.best;
+  if (RUN.newBest) { RUN.best = RUN.score; try { lsSet('fish_run_best', RUN.best); } catch (e) {} }
+  const earn = runAwardPoints(RUN.coinsGot);
+  document.getElementById('runOverTitle').textContent = reason === 'pit' ? '🌊 掉进海沟了！' : '🦈 被鲨鱼追上了！';
+  document.getElementById('runOverSub').textContent = reason === 'pit' ? '看到缺口，记得跳过去～' : '摔跤两次就会被吃掉，稳住！';
+  document.getElementById('runFinalScore').textContent = RUN.score;
+  document.getElementById('runFinalCoins').textContent = RUN.coinsGot;
+  document.getElementById('runFinalBest').textContent = RUN.best;
+  document.getElementById('runNewBest').style.display = RUN.newBest ? '' : 'none';
+  document.getElementById('runPtsEarned').textContent = earn > 0 ? '💰 鱼粮兑换 +' + earn + ' 积分（每日上限 60）' : (RUN.coinsGot > 0 ? '今日跑酷积分已达上限，明天再来～' : '');
+  document.getElementById('runBestInline').textContent = '🏆 ' + RUN.best;
+  document.getElementById('runOver').style.display = '';
+}
+// 金币按 1:1 兑积分，每日上限 60（接入站点签到积分系统）
+function runAwardPoints(coins) {
+  let earn = 0;
+  try {
+    const today = (typeof getToday === 'function') ? getToday() : new Date().toISOString().slice(0, 10);
+    const rec = lsGet('fish_run_daily') || {};
+    if (rec.date !== today) { rec.date = today; rec.pts = 0; }
+    earn = Math.max(0, Math.min(coins, 60 - (rec.pts || 0)));
+    if (earn > 0) {
+      rec.pts += earn; lsSet('fish_run_daily', rec);
+      STATE.sign_points = (STATE.sign_points || 0) + earn;
+      if (typeof saveState === 'function') saveState({ sign_points: STATE.sign_points });
+      const pts = document.createElement('div');
+      pts.className = 'sign-points-gain'; pts.textContent = '+' + earn + ' 积分';
+      document.body.appendChild(pts);
+      setTimeout(() => pts.remove(), 1500);
+    }
+  } catch (e) {}
+  return earn;
+}
+
+// ────────── 逻辑更新 ──────────
+function runUpdate(dt) {
+  RUN.time += dt;
+  for (const b of RUN.bubbles) {
+    b.y -= b.v * dt / RUN.H;
+    if (b.y < -0.05) { b.y = 1.05; b.x = Math.random(); }
+  }
+  RUN.shake = Math.max(0, RUN.shake - dt * 2.6);
+  RUN.flash = Math.max(0, RUN.flash - dt * 2.2);
+  for (const t of RUN.toasts) t.t += dt;
+  RUN.toasts = RUN.toasts.filter(t => t.t < 1.3);
+
+  if (RUN.state === 'ready') {                     // 标题页缓速巡航 + 小鱼悬浮
+    RUN.D += 60 * dt;
+    RUN.py = 14 + Math.sin(RUN.time * 1.8) * 10;
+    RUN.curve += (RUN.curveTarget - RUN.curve) * Math.min(1, dt * 0.6);
+    if (RUN.D > RUN.curveAt) { RUN.curveAt = RUN.D + 600 + Math.random() * 400; RUN.curveTarget = (Math.random() * 2 - 1) * 0.9; }
+    while (RUN.nextDeco < RUN.D + 1500) { addDeco(RUN.nextDeco); RUN.nextDeco += 55 + Math.random() * 55; }
+    RUN.decos = RUN.decos.filter(d => d.z > RUN.D - 170);
+    return;
+  }
+  if (RUN.state !== 'playing') {
+    if (RUN.state === 'over' && RUN.overReason === 'shark') RUN.shark = Math.min(1, RUN.shark + dt * 3);
+    return;
+  }
+
+  RUN.speed = Math.min(760, RUN.speed + dt * 9);
+  const d = RUN.speed * dt;
+  const zPrev = RUN.D;
+  RUN.D += d;
+
+  RUN.curve += (RUN.curveTarget - RUN.curve) * Math.min(1, dt * 0.8);
+  if (RUN.D > RUN.curveAt) { RUN.curveAt = RUN.D + 500 + Math.random() * 500; RUN.curveTarget = (Math.random() * 2 - 1) * 0.9; }
+
+  RUN.px += (RUN_LX[RUN.lane] - RUN.px) * Math.min(1, dt * 14);
+  RUN.camX += (RUN.px - RUN.camX) * Math.min(1, dt * 8);
+
+  if (!RUN.grounded) {
+    RUN.vy -= 2400 * dt;
+    RUN.py += RUN.vy * dt;
+    if (RUN.py <= 0) {
+      RUN.py = 0; RUN.vy = 0; RUN.grounded = true;
+      if (RUN.slideQ) { RUN.slideQ = false; RUN.slideT = 0.62; runSfx('slide'); }
+    }
+  }
+  if (RUN.slideT > 0) RUN.slideT -= dt;
+  RUN.shark = Math.max(0, RUN.shark - dt / 6);
+  RUN.invuln = Math.max(0, RUN.invuln - dt);
+  RUN.magnet = Math.max(0, RUN.magnet - dt);
+  RUN.stumbleT = Math.max(0, RUN.stumbleT - dt);
+
+  while (RUN.nextSpawn < RUN.D + 1500) spawnPattern(RUN.nextSpawn);
+  while (RUN.nextDeco < RUN.D + 1500) { addDeco(RUN.nextDeco); RUN.nextDeco += 55 + Math.random() * 55; }
+  RUN.obstacles = RUN.obstacles.filter(o => o.z + (o.len || 20) > RUN.D - 170);
+  RUN.coins = RUN.coins.filter(c => c.z > RUN.D - 170 && !c.got);
+  RUN.powers = RUN.powers.filter(p => p.z > RUN.D - 170 && !p.got);
+  RUN.decos = RUN.decos.filter(dd => dd.z > RUN.D - 170);
+
+  // 碰撞（z 轴扫掠防高速穿透）
+  const curH = RUN.slideT > 0 ? 16 : 36;
+  for (const o of RUN.obstacles) {
+    const swept = o.z < RUN.D + 14 && o.z + o.depth > zPrev - 12;
+    if (!swept) continue;
+    if (o.type === 'beam') { if (RUN.py + curH > o.gap) runStumble(); continue; }
+    if (o.type === 'pit') {
+      if (RUN.py < 3 && o.lanes.some(l => Math.abs(RUN_LX[l] - RUN.px) < 30)) { runGameOver('pit'); return; }
+      continue;
+    }
+    if (Math.abs(o.x - RUN.px) < 32) {
+      if (o.type === 'rock' && RUN.py > 24) continue;   // 已跳过石墩
+      runStumble();
+      if (RUN.state !== 'playing') return;
+    }
+  }
+
+  // 金币（磁铁吸附）
+  const cy = RUN.py + (RUN.slideT > 0 ? 8 : 18);
+  for (const c of RUN.coins) {
+    if (c.got) continue;
+    const zr = c.z - RUN.D;
+    if (zr < -60 || zr > 420) continue;
+    if (RUN.magnet > 0 && zr > -10) {
+      const pull = Math.min(1, dt * 3.4 * (1 - Math.min(1, zr / 440)));
+      c.x += (RUN.px - c.x) * pull;
+      c.y += (cy - c.y) * pull;
+    }
+    if (Math.abs(zr) < 24 && Math.abs(c.x - RUN.px) < 26 && Math.abs(c.y - cy) < 34) {
+      c.got = true; RUN.coinsGot++; runSfx('coin');
+    }
+  }
+
+  // 道具
+  for (const p of RUN.powers) {
+    if (p.got) continue;
+    const zr = p.z - RUN.D;
+    if (Math.abs(zr) < 26 && Math.abs(p.x - RUN.px) < 30 && Math.abs(p.y - cy) < 42) {
+      p.got = true; runSfx('power');
+      if (p.kind === 'magnet') RUN.magnet = 8; else RUN.shield = 1;
+      RUN.toasts.push({ txt: p.kind === 'magnet' ? '🧲 磁力吸鱼粮！' : '🛡️ 护盾开启！', t: 0 });
+    }
+  }
+
+  RUN.score = Math.floor(RUN.D / 6) + RUN.coinsGot * 10;
+  if (RUN.score - RUN.lastMilestone >= 500) {
+    RUN.lastMilestone = Math.floor(RUN.score / 500) * 500;
+    RUN.toasts.push({ txt: '🏃 ' + RUN.lastMilestone + ' 分！加速～', t: 0 });
+  }
+  document.getElementById('runScore').textContent = RUN.score;
+  document.getElementById('runCoins').textContent = RUN.coinsGot;
+  runUpdateHudPower();
+}
+function runUpdateHudPower() {
+  document.getElementById('pwMagnet').style.display = RUN.magnet > 0 ? 'flex' : 'none';
+  if (RUN.magnet > 0) document.getElementById('pwMagnetBar').style.width = (RUN.magnet / 8 * 100) + '%';
+  document.getElementById('pwShield').style.display = RUN.shield > 0 ? 'flex' : 'none';
+}
+
+// ────────── 渲染 ──────────
+function runRender() {
+  const ctx = RUN.ctx, W = RUN.W, H = RUN.H, t = RUN.time;
+  ctx.save();
+  if (RUN.shake > 0) ctx.translate((Math.random() - 0.5) * RUN.shake * 14, (Math.random() - 0.5) * RUN.shake * 10);
+
+  // 海水
+  ctx.fillStyle = RUN.skyGrad; ctx.fillRect(0, 0, W, RUN.horizon + 1);
+  // 天光
+  ctx.save();
+  ctx.globalAlpha = 0.06;
+  ctx.fillStyle = '#bfe9ff';
+  for (let i = 0; i < 4; i++) {
+    ctx.save();
+    ctx.translate(RUN.offX + RUN.Wg * 0.5 + (i - 1.5) * RUN.Wg * 0.2, -40);
+    ctx.rotate(-0.32 + i * 0.21 + Math.sin(t * 0.25 + i) * 0.02);
+    ctx.fillRect(-26, 0, 52, H * 1.3);
+    ctx.restore();
+  }
+  ctx.restore();
+
+  runDrawTemple(ctx);
+
+  // 海床
+  ctx.fillStyle = RUN.groundGrad; ctx.fillRect(0, RUN.horizon, W, H - RUN.horizon);
+  // 神庙石道
+  runDrawRoad(ctx);
+
+  // 追逐的鲨鱼
+  if (RUN.shark > 0) runDrawShark(ctx, t);
+
+  // 场景实体（远 → 近）
+  const items = [];
+  for (const d of RUN.decos) items.push({ z: d.z - RUN.D, k: 0, o: d });
+  for (const o of RUN.obstacles) if (o.type !== 'pit') items.push({ z: o.z - RUN.D, k: 1, o });
+  for (const c of RUN.coins) if (!c.got) items.push({ z: c.z - RUN.D, k: 2, o: c });
+  for (const p of RUN.powers) if (!p.got) items.push({ z: p.z - RUN.D, k: 3, o: p });
+  items.sort((a, b) => b.z - a.z);
+  for (const it of items) {
+    if (it.z < -RUN_CAMD + 40) continue;
+    ctx.globalAlpha = Math.max(0.15, Math.min(1, 1.25 - it.z / RUN_FOG));
+    if (it.k === 0) runDrawDeco(ctx, it.o, it.z, t);
+    else if (it.k === 1) runDrawObstacle(ctx, it.o, it.z, t);
+    else if (it.k === 2) runDrawCoin(ctx, it.o, it.z, t);
+    else runDrawPower(ctx, it.o, it.z, t);
+  }
+  ctx.globalAlpha = 1;
+
+  runDrawFish(ctx, t);
+
+  // 高速速度线
+  if (RUN.state === 'playing' && RUN.speed > 550) {
+    ctx.strokeStyle = 'rgba(255,255,255,' + Math.min(0.3, (RUN.speed - 550) / 700) + ')';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 8; i++) {
+      const yy = ((t * 900 + i * 137) % (H + 60)) - 30;
+      const xx = RUN.offX + 14 + ((i * 73) % (RUN.Wg - 28));
+      ctx.beginPath(); ctx.moveTo(xx, yy); ctx.lineTo(xx, yy + 24 + RUN.speed * 0.03); ctx.stroke();
+    }
+  }
+
+  // 气泡
+  ctx.lineWidth = 1; ctx.strokeStyle = '#cfefff';
+  for (const b of RUN.bubbles) {
+    ctx.globalAlpha = b.a;
+    ctx.beginPath(); ctx.arc(b.x * W, b.y * H, b.r, 0, 6.2832); ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  // 浮字提示
+  ctx.textAlign = 'center';
+  ctx.font = '700 17px ' + RUN_FONT;
+  for (const to of RUN.toasts) {
+    ctx.globalAlpha = to.t < 0.15 ? to.t / 0.15 : Math.max(0, 1 - (to.t - 0.5) / 0.8);
+    ctx.fillStyle = '#fff';
+    ctx.fillText(to.txt, W / 2, H * 0.2 - to.t * 22);
+  }
+  ctx.globalAlpha = 1;
+
+  // 暗角 + 白闪 + 桌面两侧遮罩
+  ctx.fillStyle = RUN.vg; ctx.fillRect(0, 0, W, H);
+  if (RUN.flash > 0) { ctx.globalAlpha = Math.min(0.85, RUN.flash); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
+  if (RUN.offX > 4) {
+    ctx.fillStyle = 'rgba(2,16,26,.72)';
+    ctx.fillRect(0, 0, RUN.offX, H); ctx.fillRect(W - RUN.offX, 0, RUN.offX, H);
+  }
+  ctx.restore();
+}
+
+function runDrawTemple(ctx) {
+  const hx = RUN.offX + RUN.Wg / 2 - RUN.curve * 46 - RUN.camX * 0.3;
+  const y0 = RUN.horizon;
+  ctx.fillStyle = 'rgba(4,38,56,.9)';
+  for (const sd of [-1, 1]) {                       // 左右双塔
+    const tx = hx + sd * 95;
+    ctx.fillRect(tx - 22, y0 - 78, 44, 78);
+    ctx.beginPath(); ctx.moveTo(tx - 22, y0 - 78); ctx.lineTo(tx, y0 - 104); ctx.lineTo(tx + 22, y0 - 78); ctx.closePath(); ctx.fill();
+  }
+  ctx.fillRect(hx - 78, y0 - 44, 156, 44);          // 中央拱门
+  ctx.beginPath(); ctx.moveTo(hx - 78, y0 - 44); ctx.quadraticCurveTo(hx, y0 - 96, hx + 78, y0 - 44); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = 'rgba(10,60,84,.9)';              // 门洞
+  ctx.beginPath(); ctx.moveTo(hx - 34, y0); ctx.lineTo(hx - 34, y0 - 34); ctx.quadraticCurveTo(hx, y0 - 66, hx + 34, y0 - 34); ctx.lineTo(hx + 34, y0); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = 'rgba(4,34,50,.55)';              // 两侧矮墙
+  for (const sd of [-1, 1]) {
+    ctx.fillRect(hx + sd * 130 - (sd < 0 ? 90 : 0), y0 - 20, 90, 20);
+    ctx.fillRect(hx + sd * 240 - (sd < 0 ? 70 : 0), y0 - 12, 70, 12);
+  }
+}
+
+function runDrawRoad(ctx) {
+  const step = 3, H = RUN.H;
+  for (let yT = RUN.horizon + 1; yT < H; yT += step) {
+    const yB = Math.min(H, yT + step);
+    const zT = runZAt(yT), zB = runZAt(yB);
+    const ph = Math.floor((RUN.D + (zT + zB) / 2) / 34) % 2;
+    const eT = [runProj(-RUN_ROAD, 0, zT), runProj(RUN_ROAD, 0, zT)];
+    const eB = [runProj(-RUN_ROAD, 0, zB), runProj(RUN_ROAD, 0, zB)];
+    ctx.fillStyle = ph ? '#93815f' : '#9c8a68';
+    runQuadFill(ctx, eT[0].x, eT[0].y, eT[1].x, eT[1].y, eB[1].x, eB[1].y, eB[0].x, eB[0].y);
+    if (ph === 0) {                                 // 车道虚线
+      ctx.fillStyle = 'rgba(60,50,32,.4)';
+      for (const lx of [-23, 23]) {
+        const l1 = runProj(lx - 1.2, 0, zT), l2 = runProj(lx + 1.2, 0, zT);
+        const l3 = runProj(lx + 1.2, 0, zB), l4 = runProj(lx - 1.2, 0, zB);
+        runQuadFill(ctx, l1.x, l1.y, l2.x, l2.y, l3.x, l3.y, l4.x, l4.y);
+      }
+    }
+    ctx.fillStyle = '#6b5d45';                      // 路缘
+    for (const sd of [-1, 1]) {
+      const a = runProj(sd * (RUN_ROAD - 4), 0, zT), b = runProj(sd * RUN_ROAD, 0, zT);
+      const c = runProj(sd * RUN_ROAD, 0, zB), dd = runProj(sd * (RUN_ROAD - 4), 0, zB);
+      runQuadFill(ctx, a.x, a.y, b.x, b.y, c.x, c.y, dd.x, dd.y);
+    }
+    for (const o of RUN.obstacles) {                // 海沟
+      if (o.type !== 'pit' || zB > o.z + o.len || zT < o.z) continue;
+      ctx.fillStyle = '#08222e';
+      const zf = Math.max(o.z, zT), zn = Math.min(o.z + o.len, zB);
+      for (const l of o.lanes) {
+        const a = runProj(RUN_LX[l] - 21, 0, zf), b = runProj(RUN_LX[l] + 21, 0, zf);
+        const c = runProj(RUN_LX[l] + 21, 0, zn), dd = runProj(RUN_LX[l] - 21, 0, zn);
+        runQuadFill(ctx, a.x, a.y, b.x, b.y, c.x, c.y, dd.x, dd.y);
+      }
+    }
+  }
+}
+
+function runDrawObstacle(ctx, o, zr, t) {
+  if (o.type === 'rock') {
+    const p = runProj(o.x, 0, zr), s = p.s;
+    runShadowEl(ctx, p.x, p.y, 22 * s, 6 * s);
+    const g = ctx.createLinearGradient(0, p.y - 34 * s, 0, p.y);
+    g.addColorStop(0, '#aab0ba'); g.addColorStop(1, '#767c86');
+    ctx.fillStyle = g;
+    runRoundRect(ctx, p.x - 17 * s, p.y - 32 * s, 34 * s, 32 * s, 6 * s);
+    ctx.strokeStyle = 'rgba(50,54,60,.5)'; ctx.lineWidth = Math.max(1, s);
+    ctx.beginPath(); ctx.moveTo(p.x - 8 * s, p.y - 26 * s); ctx.lineTo(p.x - 3 * s, p.y - 12 * s); ctx.lineTo(p.x - 10 * s, p.y - 2 * s); ctx.stroke();
+    ctx.fillStyle = '#5f8f5a';
+    ctx.beginPath(); ctx.ellipse(p.x + 10 * s, p.y - 3 * s, 7 * s, 3.5 * s, -0.3, 0, 6.2832); ctx.fill();
+  } else if (o.type === 'beam') {
+    const a = runProj(-RUN_ROAD, o.gap, zr), b = runProj(RUN_ROAD, o.gap, zr);
+    const c = runProj(RUN_ROAD, 88, zr), d2 = runProj(-RUN_ROAD, 88, zr);
+    ctx.fillStyle = '#7d7365';
+    runQuadFill(ctx, a.x, a.y, b.x, b.y, c.x, c.y, d2.x, d2.y);
+    ctx.fillStyle = '#948a7a';                      // 顶面
+    const g2 = runProj(RUN_ROAD, 81, zr), h2 = runProj(-RUN_ROAD, 81, zr);
+    runQuadFill(ctx, d2.x, d2.y, c.x, c.y, g2.x, g2.y, h2.x, h2.y);
+    ctx.strokeStyle = 'rgba(58,50,38,.5)'; ctx.lineWidth = Math.max(1, a.s * 0.8);
+    const lp = (p1, p2, k) => ({ x: p1.x + (p2.x - p1.x) * k, y: p1.y + (p2.y - p1.y) * k });
+    for (const k of [0.42, 0.72]) {                 // 雕刻纹
+      const m1 = lp(a, d2, k), m2 = lp(b, c, k);
+      ctx.beginPath(); ctx.moveTo(m1.x, m1.y); ctx.lineTo(m2.x, m2.y); ctx.stroke();
+    }
+    ctx.fillStyle = '#6e655a';                      // 两侧立柱
+    for (const sd of [-1, 1]) {
+      const bx = sd * (RUN_ROAD - 6);
+      const b1 = runProj(bx - 6, 0, zr), b2 = runProj(bx + 6, 0, zr);
+      const b3 = runProj(bx + 6, o.gap, zr), b4 = runProj(bx - 6, o.gap, zr);
+      runQuadFill(ctx, b1.x, b1.y, b2.x, b2.y, b3.x, b3.y, b4.x, b4.y);
+    }
+    ctx.strokeStyle = '#4f9e6b'; ctx.lineWidth = Math.max(1, a.s * 0.9); ctx.lineCap = 'round';
+    for (const k of [0.25, 0.5, 0.75]) {            // 梁下垂藻
+      const bx2 = lp(a, b, k);
+      const sway = Math.sin(t * 2 + k * 9) * 4 * a.s;
+      ctx.beginPath(); ctx.moveTo(bx2.x, bx2.y);
+      ctx.quadraticCurveTo(bx2.x + sway, bx2.y + 10 * a.s, bx2.x + sway * 0.5, bx2.y + 20 * a.s);
+      ctx.stroke();
+    }
+  } else if (o.type === 'pillar') {
+    const p = runProj(o.x, 0, zr), s = p.s, h = 130;
+    runShadowEl(ctx, p.x, p.y, 16 * s, 5 * s);
+    const g = ctx.createLinearGradient(p.x - 13 * s, 0, p.x + 13 * s, 0);
+    g.addColorStop(0, '#9aa0aa'); g.addColorStop(0.5, '#7d828c'); g.addColorStop(1, '#63676f');
+    ctx.fillStyle = g;
+    for (let i = 0; i < 4; i++) {                   // 分段石柱
+      const w = (i === 0 ? 15 : i === 3 ? 12 : 13) * s;
+      const yy = p.y - (i + 1) * (h / 4) * s + ((i % 2) ? 1.5 * s : 0);
+      runRoundRect(ctx, p.x - w, yy, w * 2, h / 4 * s + 2 * s, 3 * s);
+    }
+    ctx.fillStyle = '#3c4048';                      // 愤怒鱼神脸
+    ctx.beginPath(); ctx.moveTo(p.x - 8 * s, p.y - 96 * s); ctx.lineTo(p.x - 2 * s, p.y - 89 * s); ctx.lineTo(p.x - 8 * s, p.y - 84 * s); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(p.x + 8 * s, p.y - 96 * s); ctx.lineTo(p.x + 2 * s, p.y - 89 * s); ctx.lineTo(p.x + 8 * s, p.y - 84 * s); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.arc(p.x - 6 * s, p.y - 80 * s, 2.4 * s, 0, 6.2832); ctx.fill();
+    ctx.beginPath(); ctx.arc(p.x + 6 * s, p.y - 80 * s, 2.4 * s, 0, 6.2832); ctx.fill();
+    ctx.strokeStyle = '#3c4048'; ctx.lineWidth = Math.max(1, s * 1.2);
+    ctx.beginPath(); ctx.arc(p.x, p.y - 70 * s, 4.5 * s, 0.3, Math.PI - 0.3); ctx.stroke();
+    ctx.fillStyle = '#5f8f5a';
+    ctx.beginPath(); ctx.ellipse(p.x - 8 * s, p.y - 4 * s, 6 * s, 3 * s, 0.2, 0, 6.2832); ctx.fill();
+  }
+}
+
+function runDrawCoin(ctx, c, zr, t) {
+  const bob = Math.sin(t * 4 + c.z * 0.05) * 4;
+  const p = runProj(c.x, c.y + bob, zr), s = p.s;
+  const spin = Math.abs(Math.cos(t * 3.2 + c.z * 0.03));
+  const rx = Math.max(1.5, 9 * spin) * s;
+  const g = ctx.createRadialGradient(p.x - rx * 0.3, p.y - 3 * s, 1, p.x, p.y, 9 * s);
+  g.addColorStop(0, '#ffd08a'); g.addColorStop(1, '#ff8f00');
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.ellipse(p.x, p.y, rx, 9 * s, 0, 0, 6.2832); ctx.fill();
+  ctx.strokeStyle = 'rgba(255,255,255,.75)'; ctx.lineWidth = Math.max(1, s * 0.7);
+  ctx.beginPath(); ctx.ellipse(p.x, p.y, rx * 0.55, 5 * s, 0, 0, 6.2832); ctx.stroke();
+}
+
+function runDrawPower(ctx, p, zr, t) {
+  const bob = Math.sin(t * 3 + p.z * 0.05) * 5;
+  const pr = runProj(p.x, p.y + bob, zr), s = pr.s;
+  const r = 13 * s;
+  if (p.kind === 'magnet') {
+    ctx.strokeStyle = '#e53935'; ctx.lineWidth = 6 * s;
+    ctx.beginPath(); ctx.arc(pr.x, pr.y, r * 0.7, Math.PI, 0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pr.x - r * 0.7, pr.y); ctx.lineTo(pr.x - r * 0.7, pr.y + r * 0.55); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pr.x + r * 0.7, pr.y); ctx.lineTo(pr.x + r * 0.7, pr.y + r * 0.55); ctx.stroke();
+    ctx.strokeStyle = '#fff';
+    ctx.beginPath(); ctx.moveTo(pr.x - r * 0.7, pr.y + r * 0.35); ctx.lineTo(pr.x - r * 0.7, pr.y + r * 0.55); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pr.x + r * 0.7, pr.y + r * 0.35); ctx.lineTo(pr.x + r * 0.7, pr.y + r * 0.55); ctx.stroke();
+  } else {
+    ctx.strokeStyle = 'rgba(130,220,255,.95)'; ctx.lineWidth = 2.5 * s;
+    ctx.fillStyle = 'rgba(130,220,255,.18)';
+    ctx.beginPath(); ctx.arc(pr.x, pr.y, r, 0, 6.2832); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 2 * s;
+    ctx.beginPath(); ctx.arc(pr.x, pr.y, r * 0.62, -2.2, -1.2); ctx.stroke();
+  }
+}
+
+function runDrawDeco(ctx, d, zr, t) {
+  const p = runProj(d.x, 0, zr), s = p.s;
+  if (s < 0.06) return;
+  runShadowEl(ctx, p.x, p.y, 14 * s, 4 * s);
+  if (d.kind === 'seaweed') {
+    ctx.strokeStyle = '#3f9e6d'; ctx.lineCap = 'round';
+    for (let i = 0; i < 3; i++) {
+      const h2 = d.h * (0.7 + i * 0.15) * s, sway = Math.sin(t * 1.6 + d.seed + i) * 6 * s;
+      ctx.lineWidth = Math.max(1, (4 - i) * s * 0.8);
+      ctx.beginPath();
+      ctx.moveTo(p.x + (i - 1) * 5 * s, p.y);
+      ctx.quadraticCurveTo(p.x + (i - 1) * 5 * s + sway * 0.5, p.y - h2 * 0.5, p.x + (i - 1) * 5 * s + sway, p.y - h2);
+      ctx.stroke();
+    }
+  } else if (d.kind === 'coral') {
+    ctx.fillStyle = '#ef7f8a';
+    for (const [ox, oy, r2] of [[-6, -5, 6], [4, -4, 5], [0, -10, 4]]) {
+      ctx.beginPath(); ctx.arc(p.x + ox * s, p.y + oy * s, r2 * s, 0, 6.2832); ctx.fill();
+    }
+    ctx.fillStyle = '#f4a2ab';
+    ctx.beginPath(); ctx.arc(p.x - 6 * s, p.y - 6 * s, 3 * s, 0, 6.2832); ctx.fill();
+  } else if (d.kind === 'rock') {
+    ctx.fillStyle = '#5b6a72';
+    ctx.beginPath(); ctx.ellipse(p.x, p.y - 8 * s, 14 * s, 9 * s, 0, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = '#6d7d86';
+    ctx.beginPath(); ctx.ellipse(p.x - 4 * s, p.y - 12 * s, 7 * s, 5 * s, 0, 0, 6.2832); ctx.fill();
+  } else if (d.kind === 'column') {
+    const g = ctx.createLinearGradient(p.x - 7 * s, 0, p.x + 7 * s, 0);
+    g.addColorStop(0, '#8d939d'); g.addColorStop(1, '#62676f');
+    ctx.fillStyle = g;
+    runRoundRect(ctx, p.x - 7 * s, p.y - d.h * s, 14 * s, d.h * s, 2 * s);
+    ctx.fillStyle = '#7d838d';
+    runRoundRect(ctx, p.x - 10 * s, p.y - d.h * s - 5 * s, 20 * s, 6 * s, 1.5 * s);
+    runRoundRect(ctx, p.x - 10 * s, p.y - 6 * s, 20 * s, 6 * s, 1.5 * s);
+    ctx.fillStyle = '#5f8f5a';
+    ctx.beginPath(); ctx.ellipse(p.x + 4 * s, p.y - 8 * s, 5 * s, 3 * s, 0.3, 0, 6.2832); ctx.fill();
+  } else {                                          // 鱼神石像
+    ctx.fillStyle = '#79808a';
+    ctx.beginPath(); ctx.ellipse(p.x, p.y - 14 * s, 12 * s, 10 * s, 0, 0, 6.2832); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(p.x - 10 * s, p.y - 14 * s); ctx.lineTo(p.x - 20 * s, p.y - 20 * s); ctx.lineTo(p.x - 12 * s, p.y - 22 * s); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#9aa0aa';
+    runRoundRect(ctx, p.x - 6 * s, p.y - 5 * s, 12 * s, 5 * s, 2 * s);
+    ctx.fillStyle = '#3c4048';
+    ctx.beginPath(); ctx.arc(p.x + 4 * s, p.y - 17 * s, 1.6 * s, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = '#5f8f5a';
+    ctx.beginPath(); ctx.ellipse(p.x - 6 * s, p.y - 8 * s, 5 * s, 2.5 * s, -0.2, 0, 6.2832); ctx.fill();
+  }
+}
+
+function runDrawFish(ctx, t) {
+  const hue = RUN.fishHue;
+  const body = 'hsl(' + hue + ',72%,70%)', bodyD = 'hsl(' + hue + ',70%,55%)';
+  const belly = 'hsl(' + hue + ',58%,88%)', fin = 'hsl(' + hue + ',65%,62%)';
+  const p = runProj(RUN.px, RUN.py, 0), s = p.s;
+  const sliding = RUN.slideT > 0, air = !RUN.grounded;
+  ctx.save();
+  if (RUN.invuln > 0 && Math.sin(t * 32) > 0) ctx.globalAlpha = 0.45;
+  const gy = runProj(RUN.px, 0, 0).y;
+  const shScale = Math.max(0.35, 1 - RUN.py / 160);
+  runShadowEl(ctx, p.x, gy, 20 * s * shScale, 5.5 * s * shScale);
+
+  ctx.translate(p.x, p.y);
+  if (RUN.stumbleT > 0) ctx.rotate(Math.sin(t * 26) * 0.14 * RUN.stumbleT);
+  if (air) ctx.rotate(-0.16);
+  if (sliding) ctx.scale(1.32, 0.52);
+  else if (RUN.grounded) ctx.scale(1, 1 + Math.sin(t * 13) * 0.05);
+  const u = 20 * s;
+
+  ctx.fillStyle = fin;                              // 侧鳍
+  const flap = Math.sin(t * (air ? 20 : 13)) * (air ? 0.55 : 0.35);
+  for (const sd of [-1, 1]) {
+    ctx.save();
+    ctx.translate(sd * u * 0.82, -u * 0.75);
+    ctx.rotate(sd * (0.55 + flap));
+    ctx.beginPath(); ctx.ellipse(u * 0.28, 0, u * 0.42, u * 0.2, 0, 0, 6.2832); ctx.fill();
+    ctx.restore();
+  }
+  const g = ctx.createRadialGradient(-u * 0.25, -u * 1.05, u * 0.15, 0, -u * 0.8, u * 1.15);  // 身体
+  g.addColorStop(0, body); g.addColorStop(1, bodyD);
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.ellipse(0, -u * 0.8, u * 0.95, u * 0.8, 0, 0, 6.2832); ctx.fill();
+  ctx.fillStyle = belly;                            // 肚皮
+  ctx.beginPath(); ctx.ellipse(0, -u * 0.5, u * 0.6, u * 0.42, 0, 0, 6.2832); ctx.fill();
+  ctx.fillStyle = fin;                              // 背鳍
+  ctx.beginPath();
+  ctx.moveTo(-u * 0.12, -u * 1.55);
+  ctx.quadraticCurveTo(0, -u * 1.95, u * 0.3, -u * 1.5);
+  ctx.closePath(); ctx.fill();
+  ctx.save();                                       // 尾鳍（左右摆）
+  ctx.translate(0, -u * 0.35);
+  ctx.rotate(Math.sin(t * 12) * 0.3);
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(u * 0.55, -u * 0.5); ctx.lineTo(u * 0.3, u * 0.05); ctx.lineTo(u * 0.55, u * 0.55);
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+  for (const sd of [-1, 1]) {                       // 眼睛 + 腮红
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(sd * u * 0.62, -u * 1.05, u * 0.3, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = '#333';
+    ctx.beginPath(); ctx.arc(sd * u * 0.66, -u * 1.02, u * 0.15, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(sd * u * 0.7, -u * 1.08, u * 0.05, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = 'rgba(255,120,130,.5)';
+    ctx.beginPath(); ctx.ellipse(sd * u * 0.72, -u * 0.75, u * 0.14, u * 0.09, 0, 0, 6.2832); ctx.fill();
+  }
+  if (RUN.shield > 0) {                             // 护盾气泡
+    ctx.strokeStyle = 'rgba(140,225,255,' + (0.55 + Math.sin(t * 6) * 0.25) + ')';
+    ctx.fillStyle = 'rgba(140,225,255,.1)';
+    ctx.lineWidth = u * 0.12;
+    ctx.beginPath(); ctx.arc(0, -u * 0.8, u * 1.55, 0, 6.2832); ctx.fill(); ctx.stroke();
+  }
+  ctx.restore();
+  if (sliding) {                                    // 滑铲水花
+    ctx.strokeStyle = 'rgba(210,240,255,.7)'; ctx.lineWidth = 2 * s; ctx.lineCap = 'round';
+    for (let i = 0; i < 3; i++) {
+      const xx = p.x + (i - 1) * 16 * s;
+      ctx.beginPath(); ctx.moveTo(xx, p.y - 4 * s); ctx.lineTo(xx + (i - 1) * 6 * s, p.y - 14 * s); ctx.stroke();
+    }
+  }
+}
+
+function runDrawShark(ctx, t) {
+  const W = RUN.W, H = RUN.H;
+  const rise = RUN.shark * H * 0.2;
+  const cx = RUN.offX + RUN.Wg / 2 + (RUN.px - RUN.camX) * 0.4;
+  const chomp = Math.abs(Math.sin(t * 7));
+  const u = RUN.Wg * 0.0035;
+  ctx.save();
+  ctx.translate(cx, H + 40 - rise);
+  const g = ctx.createLinearGradient(0, -u * 160, 0, 0);   // 头部
+  g.addColorStop(0, '#7d97a8'); g.addColorStop(1, '#55707f');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.moveTo(-u * 130, 0);
+  ctx.quadraticCurveTo(-u * 150, -u * 120, 0, -u * 150);
+  ctx.quadraticCurveTo(u * 150, -u * 120, u * 130, 0);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#5d7787';
+  ctx.beginPath(); ctx.moveTo(0, -u * 148); ctx.lineTo(-u * 18, -u * 210); ctx.lineTo(u * 30, -u * 140); ctx.closePath(); ctx.fill();
+  for (const sd of [-1, 1]) {                       // 侧鳍
+    ctx.beginPath();
+    ctx.moveTo(sd * u * 110, -u * 70);
+    ctx.lineTo(sd * u * 190, -u * 40 + Math.sin(t * 5) * u * 8);
+    ctx.lineTo(sd * u * 105, -u * 30);
+    ctx.closePath(); ctx.fill();
+  }
+  const open = (0.25 + chomp * 0.75) * u * 46;      // 血盆大口
+  ctx.fillStyle = '#37474f';
+  ctx.beginPath(); ctx.ellipse(0, -u * 62, u * 78, open, 0, 0, 6.2832); ctx.fill();
+  ctx.fillStyle = '#fff';
+  for (let i = -3; i <= 3; i++) {
+    const tx = i * u * 21;
+    ctx.beginPath(); ctx.moveTo(tx - u * 8, -u * 62 - open + u * 6); ctx.lineTo(tx, -u * 62 - open + u * 24); ctx.lineTo(tx + u * 8, -u * 62 - open + u * 6); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(tx - u * 8, -u * 62 + open - u * 6); ctx.lineTo(tx, -u * 62 + open - u * 24); ctx.lineTo(tx + u * 8, -u * 62 + open - u * 6); ctx.closePath(); ctx.fill();
+  }
+  for (const sd of [-1, 1]) {                       // 眼睛
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(sd * u * 62, -u * 108, u * 12, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = '#111';
+    ctx.beginPath(); ctx.arc(sd * u * 64, -u * 106, u * 6, 0, 6.2832); ctx.fill();
+  }
+  ctx.fillStyle = 'rgba(220,245,255,.35)';          // 水花
+  for (let i = 0; i < 8; i++) {
+    ctx.beginPath();
+    ctx.arc(Math.sin(i * 2.4 + t * 3) * u * 140, -u * 30 - Math.abs(Math.sin(i * 1.7 + t * 2)) * u * 60, u * 6, 0, 6.2832);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+// ────────── 主循环 / 开关 ──────────
+function runLoop(ts) {
+  if (!RUN.active) return;
+  if (!RUN.lastT) RUN.lastT = ts;
+  const dt = Math.min(0.033, (ts - RUN.lastT) / 1000);
+  RUN.lastT = ts;
+  runUpdate(dt);
+  runRender();
+  RUN.animId = requestAnimationFrame(runLoop);
+}
+window.openRun = function () {
+  if (RUN.active) return;
+  if (!RUN.canvas) runInit();
+  try {                                             // 用当前展示鱼配色
+    const f = ALL_FISH.find(x => x.id === (STATE.display_fish_id || '')) || ALL_FISH[0];
+    RUN.fishHue = (f && f.hue != null) ? f.hue : 10;
+  } catch (e) { RUN.fishHue = 10; }
+  RUN.lastT = 0;
+  runSetupReady();
+  RUN.active = true;
+  document.getElementById('runOverlay').classList.add('active');
+  runResize();
+  RUN.animId = requestAnimationFrame(runLoop);
+};
+window.closeRun = function () {
+  RUN.active = false;
+  if (RUN.animId) cancelAnimationFrame(RUN.animId);
+  RUN.animId = 0;
+  document.getElementById('runOverlay').classList.remove('active');
+};
+console.log('🏃 傻鱼快跑（神庙逃亡式跑酷）已就绪');
 
 console.log('🗡️ 移动端优先·像素RPG已就绪 | 虚拟分辨率:'+VW+'×'+VH);
 </script>
