@@ -7364,14 +7364,19 @@ function runDrawRoad(ctx) {
       const c = runProj(sd * RUN_ROAD, 0, zB), dd = runProj(sd * (RUN_ROAD - 4), 0, zB);
       runQuadFill(ctx, a.x, a.y, b.x, b.y, c.x, c.y, dd.x, dd.y);
     }
-    for (const o of RUN.obstacles) {                // 海沟
-      if (o.type !== 'pit' || zB > o.z + o.len || zT < o.z) continue;
+    for (const o of RUN.obstacles) {                // 海沟（o.z 是绝对里程，先换算成相对距离再与屏幕行带比较）
+      if (o.type !== 'pit') continue;
+      const zf0 = o.z - RUN.D, zn0 = o.z + o.len - RUN.D;
+      if (zB > zn0 || zT < zf0) continue;
       ctx.fillStyle = '#08222e';
-      const zf = Math.max(o.z, zT), zn = Math.min(o.z + o.len, zB);
+      const zf = Math.max(zf0, zT), zn = Math.min(zn0, zB);
       for (const l of o.lanes) {
         const a = runProj(RUN_LX[l] - 21, 0, zf), b = runProj(RUN_LX[l] + 21, 0, zf);
         const c = runProj(RUN_LX[l] + 21, 0, zn), dd = runProj(RUN_LX[l] - 21, 0, zn);
         runQuadFill(ctx, a.x, a.y, b.x, b.y, c.x, c.y, dd.x, dd.y);
+        ctx.strokeStyle = 'rgba(4,20,28,.55)';      // 沟沿描边，增强可见性
+        ctx.lineWidth = Math.max(1, a.s * 0.9);
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
       }
     }
   }
